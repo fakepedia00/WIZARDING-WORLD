@@ -34,6 +34,9 @@
             cursor: url('https://cur.cursors-4u.net/user/use-1/use157.cur'), auto;
         }
 
+        a, button, div { cursor: url('https://cur.cursors-4u.net/user/use-1/use157.cur'), auto; }
+        .spell-card, .close-modal { cursor: url('https://cur.cursors-4u.net/user/use-1/use157.cur'), pointer; }
+
         /* --- NAV & SIDEBAR --- */
         nav {
             display: flex; justify-content: center; align-items: center;
@@ -51,8 +54,11 @@
         }
         .sidebar.active { left: 0; }
         .close-btn { align-self: flex-end; margin-right: 20px; background: transparent; border: none; color: #aaa; font-size: 2rem; cursor: pointer; }
+        
         .sidebar-links { list-style: none; padding: 20px 0; }
         .sidebar-links a { display: block; padding: 15px 25px; color: #ccc; text-decoration: none; transition: 0.3s; font-family: 'Cinzel Decorative'; }
+        .sidebar-links a:hover { color: var(--gold); padding-left: 35px; }
+        
         .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1500; opacity: 0; pointer-events: none; transition: 0.3s; }
         .overlay.active { opacity: 1; pointer-events: all; }
 
@@ -186,23 +192,31 @@
 
     <nav>
         <button class="menu-toggle" onclick="toggleMenu()"><i class="fas fa-bars"></i></button>
-        <a href="index.html"><img src="WIZARDINGLOGO.PNG" class="nav-logo"></a>
+        <a href="index.html">
+            <img src="WIZARDINGLOGO.png" class="nav-logo">
+        </a>
     </nav>
 
     <div class="overlay" id="overlay" onclick="toggleMenu()"></div>
     <div class="sidebar" id="sidebar">
         <button class="close-btn" onclick="toggleMenu()">&times;</button>
-        <div style="text-align: center; margin-bottom: 20px;"><img src="WIZARDINGLOGO.PNG" width="80"></div>
+        <div style="text-align: center; margin-bottom: 20px;">
+            <img src="WIZARDINGLOGO.png" width="80">
+        </div>
         <ul class="sidebar-links">
             <li><a href="index.html">Inicio</a></li>
             <li><a href="peliculas.html">Películas</a></li>
+            <li><a href="noticias.html">El Profeta</a></li>
+            <li><a href="quiz.html">T.I.M.O. Quiz</a></li>
+            <li><a href="cast_hp1.html">Casting</a></li>
             <li><a href="staff.html">Staff</a></li>
-            <li><a href="casas.html">Casas</a></li>
+            <li><a href="pasaporte.html">Pasaporte</a></li>
             <li><a href="varitas.html">Varitas</a></li>
             <li><a href="patronus.html">Patronus</a></li>
-            <li><a href="quiz.html">T.I.M.O. Quiz</a></li>
-            <li><a href="pasaporte.html">Pasaporte</a></li>
+            <li><a href="mapa.html">Mapa</a></li>
+            <li><a href="diagon.html">Callejón Diagon</a></li>
             <li><a href="hechizos.html" style="color: var(--gold);">Libro de Hechizos</a></li>
+            <li><a href="reglamento.html">Decretos</a></li>
         </ul>
     </div>
 
@@ -267,14 +281,14 @@
 
     <script>
         // --- DATA ---
-        // Movimientos SVG predefinidos (Paths simples)
+        // Movimientos SVG predefinidos
         const paths = {
-            circle: "M 100 40 A 60 60 0 1 1 99 40", // Círculo
-            slash: "M 40 40 L 160 160", // Diagonal
-            swish: "M 40 100 Q 100 40 160 100 T 200 100", // Swish and flick aproximado
+            circle: "M 100 40 A 60 60 0 1 1 99 40", 
+            slash: "M 40 40 L 160 160",
+            swish: "M 40 100 Q 100 40 160 100 T 200 100", 
             triangle: "M 100 40 L 160 160 L 40 160 Z",
-            zap: "M 80 40 L 120 40 L 60 160 L 140 160", // Rayo
-            stab: "M 100 160 L 100 40" // Estocada
+            zap: "M 80 40 L 120 40 L 60 160 L 140 160", 
+            stab: "M 100 160 L 100 40"
         };
 
         const spells = [
@@ -396,16 +410,10 @@
 
             // ANIMACIÓN VARITA
             const pathEl = document.getElementById('wandPath');
-            
-            // Reset animation
             pathEl.classList.remove('draw-animation');
             void pathEl.offsetWidth; // Trigger reflow
-            
-            // Set path data & color
             pathEl.setAttribute('d', spell.move);
-            pathEl.style.stroke = spell.light === "#ffffff" ? "#d4af37" : spell.light; // Si es blanco usa dorado, sino el color del hechizo
-            
-            // Start animation
+            pathEl.style.stroke = spell.light === "#ffffff" ? "#d4af37" : spell.light;
             pathEl.classList.add('draw-animation');
 
             modal.style.display = 'flex';
@@ -424,7 +432,6 @@
             document.getElementById('overlay').classList.toggle('active');
         }
 
-        // Close modal on click outside
         window.onclick = function(event) {
             const modal = document.getElementById('spellModal');
             if (event.target == modal) {
