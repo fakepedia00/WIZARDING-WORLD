@@ -2,7 +2,8 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <title>Invocar Patronus | The Wizarding World</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+    <title>Invocar Patronus | The Wizarding World</title>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
@@ -99,6 +100,7 @@
             color: #ccc; font-family: 'Cinzel Decorative'; font-size: 1rem;
             transition: 0.3s; text-decoration: none;
         }
+        .sidebar-links a:hover { color: var(--patronus-glow); padding-left: 35px; }
         .sidebar-links i { width: 25px; margin-right: 10px; color: var(--gold); text-align: center; }
 
         .overlay {
@@ -155,7 +157,7 @@
             position: relative; width: 140px; height: 140px; margin: 0 auto;
             display: flex; justify-content: center; align-items: center;
             opacity: 0.5; pointer-events: none; transition: 0.3s;
-            touch-action: none; /* Previene scroll mientras presionas */
+            touch-action: none; 
         }
         .cast-container.active { opacity: 1; pointer-events: all; cursor: pointer; }
 
@@ -277,7 +279,7 @@
             <i class="fas fa-bars"></i>
         </button>
         <a href="index.html">
-            <img src="WIZARDINGLOGO.PNG" alt="Wizarding World" class="nav-logo">
+            <img src="WIZARDINGLOGO.png" alt="Wizarding World" class="nav-logo">
         </a>
     </nav>
 
@@ -285,16 +287,21 @@
     <div class="sidebar" id="sidebar">
         <button class="close-btn" onclick="toggleMenu()">&times;</button>
         <div style="text-align: center; margin-bottom: 20px;">
-            <img src="WIZARDINGLOGO.PNG" width="80" style="filter: brightness(0.8);">
+            <img src="WIZARDINGLOGO.png" width="80" style="filter: brightness(0.8);">
         </div>
         <ul class="sidebar-links">
             <li><a href="index.html"><i class="fas fa-home"></i> Inicio</a></li>
             <li><a href="peliculas.html"><i class="fas fa-film"></i> Películas</a></li>
-            <li><a href="staff.html"><i class="fas fa-briefcase"></i> Staff & Producción</a></li>
-            <li><a href="casas.html"><i class="fas fa-hat-wizard"></i> Ceremonia de Casas</a></li>
-            <li><a href="varitas.html"><i class="fas fa-magic"></i> Ollivanders</a></li>
-            <li><a href="patronus.html"><i class="fas fa-dragon"></i> Patronus</a></li>
+            <li><a href="noticias.html"><i class="fas fa-newspaper"></i> El Profeta</a></li>
             <li><a href="quiz.html"><i class="fas fa-scroll"></i> T.I.M.O. Quiz</a></li>
+            <li><a href="cast_hp1.html"><i class="fas fa-users"></i> Casting</a></li>
+            <li><a href="staff.html"><i class="fas fa-briefcase"></i> Staff</a></li>
+            <li><a href="pasaporte.html"><i class="fas fa-id-card"></i> Pasaporte</a></li>
+            <li><a href="mapa.html"><i class="fas fa-map-marked-alt"></i> Mapa</a></li>
+            <li><a href="diagon.html"><i class="fas fa-store"></i> Callejón Diagon</a></li>
+            <li><a href="hechizos.html"><i class="fas fa-magic"></i> Hechizos</a></li>
+            <li><a href="patronus.html" style="color: var(--patronus-glow);"><i class="fas fa-dragon"></i> Patronus</a></li>
+            <li><a href="reglamento.html"><i class="fas fa-gavel"></i> Decretos</a></li>
         </ul>
     </div>
 
