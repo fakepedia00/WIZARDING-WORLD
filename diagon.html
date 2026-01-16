@@ -4,14 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Callejón Diagon | Wizarding World</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Crimson+Text:ital,wght@0,400;0,600;1,400&family=Homemade+Apple&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
     
     <style>
         :root {
             --dark-bg: #0e1116;
             --gold: #d4af37;
+            --gold-glow: #ffd700;
             --parchment: #f0e6d2;
+            --ink: #2b1e16;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -26,15 +29,24 @@
             cursor: url('https://cur.cursors-4u.net/user/use-1/use157.cur'), auto;
         }
 
+        a, button, div { cursor: url('https://cur.cursors-4u.net/user/use-1/use157.cur'), pointer; }
+
+        /* --- PARTÍCULAS --- */
+        #particles-js {
+            position: fixed; width: 100%; height: 100%; top: 0; left: 0; z-index: 0; pointer-events: none;
+        }
+
         /* --- NAV & SIDEBAR --- */
         nav {
             display: flex; justify-content: center; align-items: center;
             padding: 10px 20px; background: rgba(5, 5, 5, 0.95);
             border-bottom: 1px solid rgba(212, 175, 55, 0.3);
             position: sticky; top: 0; z-index: 1000; height: 60px;
+            backdrop-filter: blur(5px);
         }
         .menu-toggle { position: absolute; left: 20px; background: transparent; border: none; color: var(--gold); font-size: 1.5rem; cursor: pointer; }
-        .nav-logo { height: 40px; width: auto; }
+        .nav-logo { height: 40px; width: auto; transition: 0.3s; }
+        .nav-logo:hover { filter: drop-shadow(0 0 5px var(--gold)); }
 
         .sidebar {
             position: fixed; top: 0; left: -100%; width: 80%; max-width: 300px; height: 100%;
@@ -43,103 +55,155 @@
         }
         .sidebar.active { left: 0; }
         .close-btn { align-self: flex-end; margin-right: 20px; background: transparent; border: none; color: #aaa; font-size: 2rem; cursor: pointer; }
+        
         .sidebar-links { list-style: none; padding: 20px 0; }
-        .sidebar-links a { display: block; padding: 15px 25px; color: #ccc; text-decoration: none; transition: 0.3s; font-family: 'Cinzel Decorative'; }
+        .sidebar-links a { display: block; padding: 15px 25px; color: #ccc; text-decoration: none; transition: 0.3s; font-family: 'Cinzel Decorative'; font-size: 0.9rem; text-transform: uppercase; }
+        .sidebar-links a:hover { color: var(--gold); padding-left: 35px; background: rgba(212, 175, 55, 0.05); }
+        .sidebar-links i { width: 25px; margin-right: 10px; color: var(--gold); text-align: center; }
+
         .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1500; opacity: 0; pointer-events: none; transition: 0.3s; }
         .overlay.active { opacity: 1; pointer-events: all; }
 
         /* --- HEADER --- */
         .alley-header {
-            text-align: center; padding: 60px 20px;
-            /* Si esta imagen falla, descarga una de un callejón y llámala diagon_alley.jpg */
-            background: linear-gradient(to bottom, rgba(0,0,0,0.7), var(--dark-bg)), url('https://images.unsplash.com/photo-1551269901-5c5e14c25df7?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80');
-            background-size: cover; background-position: center; border-bottom: 2px solid var(--gold);
+            text-align: center; padding: 80px 20px; position: relative; z-index: 1;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.6), var(--dark-bg)), url('https://images.unsplash.com/photo-1551269901-5c5e14c25df7?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80');
+            background-size: cover; background-position: center 30%; border-bottom: 2px solid var(--gold);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
         }
-        h1 { font-family: 'Cinzel Decorative'; font-size: clamp(2.5rem, 6vw, 4.5rem); color: var(--gold); text-shadow: 0 0 20px #000; margin-bottom: 10px; }
-        .subtitle { font-size: 1.2rem; color: #fff; text-shadow: 0 2px 5px #000; font-style: italic; }
+        h1 { 
+            font-family: 'Cinzel Decorative'; font-size: clamp(3rem, 8vw, 5rem); 
+            color: var(--gold); text-shadow: 0 0 20px #000, 0 0 10px var(--gold-glow); 
+            margin-bottom: 10px; animation: glow 3s infinite alternate;
+        }
+        @keyframes glow { from { text-shadow: 0 0 10px #000; } to { text-shadow: 0 0 20px var(--gold-glow); } }
+        
+        .subtitle { font-size: 1.3rem; color: #fff; text-shadow: 0 2px 5px #000; font-style: italic; max-width: 700px; margin: 0 auto; }
 
         /* --- GRID DE TIENDAS --- */
-        .container { max-width: 1200px; margin: 0 auto; padding: 40px 20px; flex: 1; width: 100%; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 60px 20px; flex: 1; width: 100%; position: relative; z-index: 1; }
 
         .shops-grid {
-            display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 30px;
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 40px;
         }
 
         .shop-card {
             background: rgba(20, 10, 5, 0.9);
-            border: 1px solid #444; border-radius: 8px; overflow: hidden;
-            transition: 0.3s; position: relative; cursor: pointer;
+            border: 1px solid #444; border-radius: 12px; overflow: hidden;
+            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+            position: relative; cursor: pointer;
             box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
-        .shop-card:hover { transform: translateY(-5px); border-color: var(--gold); box-shadow: 0 0 20px rgba(212, 175, 55, 0.2); }
+        .shop-card:hover { 
+            transform: translateY(-10px) scale(1.02); 
+            border-color: var(--gold); 
+            box-shadow: 0 0 30px rgba(212, 175, 55, 0.3); 
+        }
 
-        .shop-img-container { height: 200px; overflow: hidden; position: relative; background: #000; }
-        /* Placeholder en caso de que no haya imagen */
-        .shop-img { width: 100%; height: 100%; object-fit: cover; transition: 0.5s; filter: sepia(30%); opacity: 0.8; }
-        .shop-card:hover .shop-img { transform: scale(1.1); filter: sepia(0%); opacity: 1; }
+        .shop-img-container { height: 220px; overflow: hidden; position: relative; background: #000; }
+        .shop-img { width: 100%; height: 100%; object-fit: cover; transition: 0.5s; filter: sepia(40%) brightness(0.8); }
+        .shop-card:hover .shop-img { transform: scale(1.1); filter: sepia(0%) brightness(1.1); }
 
         .shop-sign {
-            position: absolute; bottom: -15px; left: 50%; transform: translateX(-50%);
-            background: #2a1a10; border: 2px solid var(--gold); padding: 5px 15px;
+            position: absolute; bottom: -18px; left: 50%; transform: translateX(-50%);
+            background: #2a1a10; border: 2px solid var(--gold); padding: 8px 20px;
             font-family: 'Cinzel Decorative'; color: var(--gold); font-size: 1.1rem;
-            white-space: nowrap; box-shadow: 0 5px 10px rgba(0,0,0,0.8); z-index: 2;
+            white-space: nowrap; box-shadow: 0 5px 15px rgba(0,0,0,0.8); z-index: 2;
+            border-radius: 4px; text-transform: uppercase; letter-spacing: 1px;
         }
 
-        .shop-info { padding: 30px 20px 20px 20px; text-align: center; color: #aaa; font-size: 0.95rem; line-height: 1.6; }
+        .shop-info { 
+            padding: 35px 20px 25px 20px; text-align: center; color: #ccc; 
+            font-size: 1rem; line-height: 1.6; font-style: italic;
+        }
 
-        /* --- MODAL --- */
+        /* --- MODAL (PERGAMINO) --- */
         .modal {
             display: none; position: fixed; z-index: 3000; left: 0; top: 0; width: 100%; height: 100%;
-            background-color: rgba(0,0,0,0.9); backdrop-filter: blur(5px);
+            background-color: rgba(0,0,0,0.9); backdrop-filter: blur(8px);
             justify-content: center; align-items: center; padding: 20px;
+            opacity: 0; transition: opacity 0.3s ease;
         }
+        .modal.show { opacity: 1; }
 
         .modal-content {
             background: url('https://www.transparenttextures.com/patterns/old-paper.png'), var(--parchment);
-            color: #2b1e16;
-            width: 100%; max-width: 600px; max-height: 80vh; overflow-y: auto;
-            border-radius: 5px; padding: 40px; position: relative;
-            box-shadow: 0 0 50px rgba(0,0,0,1); border: 5px double #4a3b2a;
+            color: var(--ink);
+            width: 100%; max-width: 550px; max-height: 85vh; overflow-y: auto;
+            border-radius: 5px; padding: 50px 40px; position: relative;
+            box-shadow: 
+                inset 0 0 80px rgba(0,0,0,0.1),
+                0 0 50px rgba(212, 175, 55, 0.2); 
+            border: 8px double #4a3b2a;
+            transform: scale(0.8); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
+        .modal.show .modal-content { transform: scale(1); }
 
-        .close-modal { position: absolute; top: 15px; right: 20px; font-size: 2rem; cursor: pointer; color: #4a3b2a; }
-        .modal-title { font-family: 'Cinzel Decorative'; font-size: 2rem; text-align: center; margin-bottom: 10px; border-bottom: 2px solid #4a3b2a; padding-bottom: 10px; }
+        /* Estilo Scrollbar del Modal */
+        .modal-content::-webkit-scrollbar { width: 8px; }
+        .modal-content::-webkit-scrollbar-track { background: #dccfb8; }
+        .modal-content::-webkit-scrollbar-thumb { background: #5d4037; border-radius: 4px; }
+
+        .close-modal { 
+            position: absolute; top: 15px; right: 20px; font-size: 2rem; 
+            cursor: pointer; color: #8b0000; transition: 0.3s; 
+        }
+        .close-modal:hover { transform: rotate(90deg); }
+
+        .modal-title { 
+            font-family: 'Cinzel Decorative'; font-size: 2.2rem; text-align: center; 
+            margin-bottom: 5px; color: #2d1b0e; line-height: 1.1;
+        }
         
-        .item-list { list-style: none; margin-top: 20px; }
+        .modal-subtitle {
+            text-align: center; font-family: 'Homemade Apple', cursive; 
+            color: #5d4037; margin-bottom: 30px; font-size: 1.1rem;
+        }
+        
+        .item-list { list-style: none; margin-top: 20px; border-top: 2px solid var(--ink); padding-top: 10px; }
         .item-row {
             display: flex; justify-content: space-between; align-items: center;
-            padding: 10px 0; border-bottom: 1px dashed #a69b8d;
+            padding: 12px 0; border-bottom: 1px dashed #a69b8d;
         }
         .item-name { font-weight: bold; font-family: 'Crimson Text'; font-size: 1.1rem; }
-        .item-price { font-family: 'Cinzel Decorative'; color: #8b0000; font-weight: bold; }
+        .item-price { font-family: 'Cinzel Decorative'; color: #8b0000; font-weight: bold; font-size: 1.1rem; }
         
-        .currency-icon { color: #d4af37; margin-left: 5px; }
+        .currency-icon { color: #d4af37; margin-left: 5px; text-shadow: 1px 1px 0 #000; }
 
-        footer { text-align: center; padding: 30px; font-size: 0.8rem; color: #666; margin-top: auto; }
+        footer { text-align: center; padding: 30px; font-size: 0.8rem; color: #666; margin-top: auto; position: relative; z-index: 1; }
     </style>
 </head>
 <body>
 
+    <div id="particles-js"></div>
+
     <nav>
         <button class="menu-toggle" onclick="toggleMenu()"><i class="fas fa-bars"></i></button>
-        <a href="index.html"><img src="WIZARDINGLOGO.PNG" class="nav-logo"></a>
+        <a href="index.html">
+            <img src="WIZARDINGLOGO.png" class="nav-logo">
+        </a>
     </nav>
 
     <div class="overlay" id="overlay" onclick="toggleMenu()"></div>
     <div class="sidebar" id="sidebar">
         <button class="close-btn" onclick="toggleMenu()">&times;</button>
-        <div style="text-align: center; margin-bottom: 20px;"><img src="WIZARDINGLOGO.PNG" width="80"></div>
+        <div style="text-align: center; margin-bottom: 20px;">
+            <img src="WIZARDINGLOGO.png" width="80" style="filter: brightness(0.8);">
+        </div>
         <ul class="sidebar-links">
-            <li><a href="index.html">Inicio</a></li>
-            <li><a href="peliculas.html">Películas</a></li>
-            <li><a href="staff.html">Staff</a></li>
-            <li><a href="casas.html">Casas</a></li>
-            <li><a href="varitas.html">Varitas</a></li>
-            <li><a href="patronus.html">Patronus</a></li>
-            <li><a href="quiz.html">T.I.M.O. Quiz</a></li>
-            <li><a href="pasaporte.html">Pasaporte</a></li>
-            <li><a href="hechizos.html">Libro de Hechizos</a></li>
-            <li><a href="diagon.html" style="color: var(--gold);">Callejón Diagon</a></li>
+            <li><a href="index.html"><i class="fas fa-home"></i> Inicio</a></li>
+            <li><a href="peliculas.html"><i class="fas fa-film"></i> Películas</a></li>
+            <li><a href="noticias.html"><i class="fas fa-newspaper"></i> El Profeta</a></li>
+            <li><a href="quiz.html"><i class="fas fa-scroll"></i> T.I.M.O. Quiz</a></li>
+            <li><a href="cast_hp1.html"><i class="fas fa-users"></i> Casting</a></li>
+            <li><a href="staff.html"><i class="fas fa-briefcase"></i> Staff</a></li>
+            <li><a href="pasaporte.html"><i class="fas fa-id-card"></i> Pasaporte</a></li>
+            <li><a href="varitas.html"><i class="fas fa-magic"></i> Varitas</a></li>
+            <li><a href="patronus.html"><i class="fas fa-dragon"></i> Patronus</a></li>
+            <li><a href="mapa.html"><i class="fas fa-map-marked-alt"></i> Mapa</a></li>
+            <li><a href="diagon.html" style="color: var(--gold);"><i class="fas fa-store"></i> Callejón Diagon</a></li>
+            <li><a href="hechizos.html"><i class="fas fa-magic"></i> Hechizos</a></li>
+            <li><a href="reglamento.html"><i class="fas fa-gavel"></i> Decretos</a></li>
         </ul>
     </div>
 
@@ -156,7 +220,15 @@
                     <img src="shop_gringotts.jpg" onerror="this.src='https://images.unsplash.com/photo-1626126525134-fbbc0ecb948f?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80'" class="shop-img" alt="Gringotts">
                     <div class="shop-sign">Gringotts</div>
                 </div>
-                <div class="shop-info">El lugar más seguro del mundo para lo que quieras guardar.</div>
+                <div class="shop-info">El lugar más seguro del mundo para lo que quieras guardar (excepto Hogwarts).</div>
+            </div>
+
+            <div class="shop-card" onclick="openShop('weasleys')">
+                <div class="shop-img-container">
+                    <img src="shop_weasleys.jpg" onerror="this.src='https://images.unsplash.com/photo-1535905557558-afc4877a26fc?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80'" class="shop-img" alt="Weasleys">
+                    <div class="shop-sign" style="color: #e67e22; border-color: #e67e22;">Sortilegios Weasley</div>
+                </div>
+                <div class="shop-info">Bromas, trucos y maravillas mágicas para magos traviesos.</div>
             </div>
 
             <div class="shop-card" onclick="openShop('books')">
@@ -164,7 +236,15 @@
                     <img src="shop_books.jpg" onerror="this.src='https://images.unsplash.com/photo-1512820790803-83ca734da794?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80'" class="shop-img" alt="Libreria">
                     <div class="shop-sign">Flourish & Blotts</div>
                 </div>
-                <div class="shop-info">Libros de texto, grimorios y bestiarios.</div>
+                <div class="shop-info">Libros de texto, grimorios antiguos y bestiarios ilustrados.</div>
+            </div>
+
+            <div class="shop-card" onclick="openShop('ollivanders')">
+                <div class="shop-img-container">
+                    <img src="shop_ollivanders.jpg" onerror="this.src='https://images.unsplash.com/photo-1518709268805-4e9042af9f23?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80'" class="shop-img" alt="Ollivanders">
+                    <div class="shop-sign">Ollivanders</div>
+                </div>
+                <div class="shop-info">Fabricantes de varitas finas desde el 382 a.C.</div>
             </div>
 
             <div class="shop-card" onclick="openShop('robes')">
@@ -172,7 +252,7 @@
                     <img src="shop_robes.jpg" onerror="this.src='https://images.unsplash.com/photo-1525507119028-ed4c629a60a3?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80'" class="shop-img" alt="Ropa">
                     <div class="shop-sign">Madame Malkin</div>
                 </div>
-                <div class="shop-info">Túnicas para todas las ocasiones.</div>
+                <div class="shop-info">Túnicas de gala, uniformes escolares y capas de viaje.</div>
             </div>
 
             <div class="shop-card" onclick="openShop('pets')">
@@ -180,7 +260,7 @@
                     <img src="shop_pets.jpg" onerror="this.src='https://images.unsplash.com/photo-1579313264428-1b207eb32630?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80'" class="shop-img" alt="Mascotas">
                     <div class="shop-sign">Emporio de la Lechuza</div>
                 </div>
-                <div class="shop-info">Lechuzas, gatos, ratas y sapos.</div>
+                <div class="shop-info">Lechuzas, gatos, ratas y sapos para estudiantes.</div>
             </div>
 
             <div class="shop-card" onclick="openShop('quidditch')">
@@ -188,7 +268,7 @@
                     <img src="shop_quidditch.jpg" onerror="this.src='https://images.unsplash.com/photo-1589937060799-72c67623c727?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80'" class="shop-img" alt="Quidditch">
                     <div class="shop-sign">Calidad para Quidditch</div>
                 </div>
-                <div class="shop-info">Escobas de carrera y equipamiento deportivo.</div>
+                <div class="shop-info">Escobas de carrera de última generación y equipamiento deportivo.</div>
             </div>
 
             <div class="shop-card" onclick="openShop('potions')">
@@ -196,7 +276,7 @@
                     <img src="shop_potions.jpg" onerror="this.src='https://images.unsplash.com/photo-1515229330267-33a37b38c292?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80'" class="shop-img" alt="Pociones">
                     <div class="shop-sign">Boticario Slug & Jiggers</div>
                 </div>
-                <div class="shop-info">Ingredientes para pociones y calderos.</div>
+                <div class="shop-info">Ingredientes frescos para pociones, calderos y viales.</div>
             </div>
 
         </div>
@@ -206,12 +286,12 @@
         <div class="modal-content">
             <span class="close-modal" onclick="closeModal()">&times;</span>
             <h2 class="modal-title" id="shopTitle">Nombre Tienda</h2>
-            <p style="text-align: center; font-style: italic; margin-bottom: 20px;">Lista de Precios Oficial</p>
+            <p class="modal-subtitle">Inventario & Lista de Precios</p>
             <ul class="item-list" id="shopItems"></ul>
         </div>
     </div>
 
-    <footer><p>&copy; 2026 Fakeland Project</p></footer>
+    <footer><p>&copy; 2026 Fakeland Project | Roleplay Experience</p></footer>
 
     <script>
         function toggleMenu() {
@@ -219,51 +299,75 @@
             document.getElementById('overlay').classList.toggle('active');
         }
 
+        // --- DATOS DE LAS TIENDAS ---
         const catalogs = {
             gringotts: {
-                title: "Gringotts: Banco de Magos",
+                title: "Gringotts: Banco",
                 items: [
                     { name: "Apertura de Bóveda", price: "5 G" },
                     { name: "Cambio de Divisa (Muggle)", price: "Sin Costo" },
-                    { name: "Caja de Seguridad Pequeña", price: "10 G / Año" }
+                    { name: "Caja de Seguridad Pequeña", price: "10 G / Año" },
+                    { name: "Análisis de Gemas", price: "2 G" }
+                ]
+            },
+            weasleys: {
+                title: "Sortilegios Weasley",
+                items: [
+                    { name: "Surtido Saltaclases", price: "3 G" },
+                    { name: "Orejeras Extensibles", price: "4 G" },
+                    { name: "Poción de Amor (Duración 24h)", price: "10 G" },
+                    { name: "Micropuffs (Rosa/Violeta)", price: "5 G" },
+                    { name: "Caramelos de la Verdad", price: "2 G" }
                 ]
             },
             books: {
                 title: "Flourish & Blotts",
                 items: [
-                    { name: "Libro Reglamentario de Hechizos (Grado 1)", price: "1 G" },
+                    { name: "Libro Reglamentario (Grado 1)", price: "1 G" },
                     { name: "Una Historia de la Magia", price: "2 G" },
                     { name: "Guía de Transformación", price: "1 G" },
-                    { name: "Mil Hierbas y Hongos Mágicos", price: "2 G" },
-                    { name: "Filtros y Pociones Mágicas", price: "2 G" }
+                    { name: "El Libro Invisible de la Invisibilidad", price: "5 G" },
+                    { name: "Vida y Mentiras de Albus Dumbledore", price: "7 G" }
+                ]
+            },
+            ollivanders: {
+                title: "Ollivanders",
+                items: [
+                    { name: "Varita Personalizada", price: "7 G" },
+                    { name: "Estuche de Terciopelo", price: "2 G" },
+                    { name: "Kit de Pulido de Varitas", price: "3 G" },
+                    { name: "Revisión de Núcleo", price: "Gratis" }
                 ]
             },
             robes: {
-                title: "Túnicas de Madame Malkin",
+                title: "Madame Malkin",
                 items: [
-                    { name: "Túnica de Trabajo (Negra, Talla 1)", price: "5 G" },
-                    { name: "Sombrero Puntiagudo (Negro)", price: "2 G" },
+                    { name: "Túnica de Trabajo (Negra)", price: "5 G" },
+                    { name: "Sombrero Puntiagudo", price: "2 G" },
                     { name: "Guantes de Piel de Dragón", price: "4 G" },
-                    { name: "Capa de Invierno (Broches de plata)", price: "8 G" }
+                    { name: "Capa de Invierno (Broches plata)", price: "8 G" },
+                    { name: "Túnica de Gala", price: "15 G" }
                 ]
             },
             pets: {
-                title: "Emporio de la Lechuza Eeylops",
+                title: "Emporio de la Lechuza",
                 items: [
                     { name: "Lechuza Nival", price: "15 G" },
                     { name: "Lechuza Parda", price: "10 G" },
                     { name: "Gato Común", price: "7 G" },
-                    { name: "Sapo", price: "5 G" },
-                    { name: "Rata", price: "3 G" }
+                    { name: "Sapo (Variedad)", price: "5 G" },
+                    { name: "Rata de Jardín", price: "3 G" },
+                    { name: "Comida para Lechuzas (Saco)", price: "5 S" }
                 ]
             },
             quidditch: {
-                title: "Artículos de Calidad para Quidditch",
+                title: "Artículos de Quidditch",
                 items: [
-                    { name: "Nimbus 2000", price: "200 G" },
-                    { name: "Barredora 5", price: "50 G" },
-                    { name: "Kit de Mantenimiento de Escobas", price: "15 G" },
-                    { name: "Snitch Dorada de Práctica", price: "10 G" }
+                    { name: "Saeta de Fuego (Bajo Pedido)", price: "500 G" },
+                    { name: "Nimbus 2001", price: "200 G" },
+                    { name: "Barredora 11", price: "50 G" },
+                    { name: "Kit de Mantenimiento", price: "15 G" },
+                    { name: "Snitch de Práctica", price: "10 G" }
                 ]
             },
             potions: {
@@ -273,7 +377,8 @@
                     { name: "Juego de Redomas de Vidrio", price: "4 G" },
                     { name: "Telescopio de Latón", price: "5 G" },
                     { name: "Balanza de Latón", price: "3 G" },
-                    { name: "Pack Básico de Ingredientes", price: "8 G" }
+                    { name: "Pack Básico de Ingredientes", price: "8 G" },
+                    { name: "Bezoar", price: "10 G" }
                 ]
             }
         };
@@ -289,16 +394,36 @@
                 li.innerHTML = `<span class="item-name">${item.name}</span><span class="item-price">${item.price} <i class="fas fa-coins currency-icon"></i></span>`;
                 list.appendChild(li);
             });
-            document.getElementById('shopModal').style.display = "flex";
+            
+            const modal = document.getElementById('shopModal');
+            modal.style.display = "flex";
+            // Forzar reflow para animación
+            setTimeout(() => modal.classList.add('show'), 10);
         }
 
         function closeModal() {
-            document.getElementById('shopModal').style.display = "none";
+            const modal = document.getElementById('shopModal');
+            modal.classList.remove('show');
+            setTimeout(() => modal.style.display = "none", 300);
         }
         
         window.onclick = function(event) {
             if (event.target == document.getElementById('shopModal')) closeModal();
         }
+
+        // --- PARTÍCULAS MÁGICAS ---
+        particlesJS("particles-js", {
+            "particles": {
+                "number": { "value": 50 },
+                "color": { "value": ["#d4af37", "#ffd700", "#ffffff"] },
+                "shape": { "type": "circle" },
+                "opacity": { "value": 0.5, "random": true, "anim": { "enable": true, "speed": 1, "opacity_min": 0.1 } },
+                "size": { "value": 3, "random": true },
+                "line_linked": { "enable": false },
+                "move": { "enable": true, "speed": 1, "direction": "top", "random": true, "out_mode": "out" }
+            },
+            "interactivity": { "events": { "onhover": { "enable": false } } }
+        });
     </script>
 </body>
 </html>
