@@ -50,6 +50,36 @@
             bottom: 0;
         }
 
+        /* --- NAV & SIDEBAR (AÑADIDO PARA QUE FUNCIONE EL MENÚ) --- */
+        nav {
+            display: flex; justify-content: center; align-items: center;
+            padding: 10px 20px; background: rgba(10, 7, 5, 0.95);
+            border-bottom: 1px solid var(--gold);
+            position: fixed; top: 0; width: 100%; z-index: 20000; /* Por encima de todo */
+            height: 60px; backdrop-filter: blur(5px);
+        }
+        
+        .menu-toggle { position: absolute; left: 20px; background: transparent; border: none; color: var(--gold); font-size: 1.5rem; cursor: pointer; pointer-events: auto; }
+        .nav-logo { height: 40px; width: auto; }
+
+        .sidebar {
+            position: fixed; top: 0; left: -100%; width: 80%; max-width: 300px; height: 100%;
+            background: rgba(10, 7, 5, 0.98); border-right: 1px solid var(--gold);
+            z-index: 25000; /* El menú debe estar sobre el bloqueo */
+            transition: 0.4s; display: flex; flex-direction: column; padding-top: 20px;
+        }
+        .sidebar.active { left: 0; }
+        .close-btn { align-self: flex-end; margin-right: 20px; background: transparent; border: none; color: #aaa; font-size: 2rem; cursor: pointer; }
+        
+        .sidebar-links { list-style: none; padding: 20px 0; }
+        .sidebar-links a { display: block; padding: 15px 25px; color: #ccc; text-decoration: none; transition: 0.3s; font-family: 'Cinzel Decorative'; font-size: 0.9rem; text-transform: uppercase; }
+        .sidebar-links a:hover { color: var(--gold); padding-left: 35px; background: rgba(212, 175, 55, 0.05); }
+        .sidebar-links i { width: 25px; margin-right: 10px; color: var(--gold); text-align: center; }
+
+        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 22000; opacity: 0; pointer-events: none; transition: 0.3s; }
+        .overlay.active { opacity: 1; pointer-events: all; }
+
+
         /* ===== PANTALLA DE BLOQUEO RESPONSIVE ===== */
         .lock-screen {
             position: fixed;
@@ -680,12 +710,40 @@
     </style>
 </head>
 <body>
-    <!-- Pantalla de carga -->
     <div class="loading" id="loadingScreen">
         <div class="loading-spinner"></div>
     </div>
 
-    <!-- Pantalla de bloqueo con contraseña -->
+    <nav>
+        <button class="menu-toggle" onclick="toggleMenu()"><i class="fas fa-bars"></i></button>
+        <a href="index.html">
+            <img src="WIZARDINGLOGO.png" class="nav-logo">
+        </a>
+    </nav>
+
+    <div class="overlay" id="overlay" onclick="toggleMenu()"></div>
+    <div class="sidebar" id="sidebar">
+        <button class="close-btn" onclick="toggleMenu()">&times;</button>
+        <div style="text-align: center; margin-bottom: 20px;">
+            <img src="WIZARDINGLOGO.png" width="80" style="filter: brightness(0.8);">
+        </div>
+        <ul class="sidebar-links">
+            <li><a href="index.html"><i class="fas fa-home"></i> Inicio</a></li>
+            <li><a href="peliculas.html"><i class="fas fa-film"></i> Películas</a></li>
+            <li><a href="noticias.html"><i class="fas fa-newspaper"></i> El Profeta</a></li>
+            <li><a href="quiz.html"><i class="fas fa-scroll"></i> T.I.M.O. Quiz</a></li>
+            <li><a href="cast_hp1.html"><i class="fas fa-users"></i> Casting</a></li>
+            <li><a href="staff.html"><i class="fas fa-briefcase"></i> Staff</a></li>
+            <li><a href="pasaporte.html"><i class="fas fa-id-card"></i> Pasaporte</a></li>
+            <li><a href="varitas.html"><i class="fas fa-magic"></i> Varitas</a></li>
+            <li><a href="patronus.html"><i class="fas fa-dragon"></i> Patronus</a></li>
+            <li><a href="mapa.html" style="color: var(--gold);"><i class="fas fa-map-marked-alt"></i> Mapa</a></li>
+            <li><a href="diagon.html"><i class="fas fa-store"></i> Callejón Diagon</a></li>
+            <li><a href="hechizos.html"><i class="fas fa-magic"></i> Hechizos</a></li>
+            <li><a href="reglamento.html"><i class="fas fa-gavel"></i> Decretos</a></li>
+        </ul>
+    </div>
+
     <div class="lock-screen" id="lockScreen">
         <div class="lock-content">
             <h1 class="lock-title">Mapa del Merodeador</h1>
@@ -720,36 +778,27 @@
         </div>
     </div>
 
-    <!-- Texto de revelación -->
     <div class="reveal-text" id="revealText">
         ¡TRAVESURA REALIZADA!
     </div>
 
-    <!-- Instrucciones táctiles -->
     <div class="touch-instructions" id="touchInstructions">
         Desliza para mover • Pulsa para ampliar
     </div>
 
-    <!-- Contenedor principal del mapa -->
     <div class="map-viewport" id="mapViewport">
         <div class="map-surface" id="mapSurface">
-            <!-- Las habitaciones y pasillos se generarán dinámicamente -->
-        </div>
+            </div>
         
-        <!-- Contenedor para huellas -->
         <div id="footprintsContainer"></div>
         
-        <!-- Contenedor para personajes -->
         <div id="charactersContainer"></div>
         
-        <!-- Contenedor para pasadizos secretos -->
         <div id="secretPassagesContainer"></div>
         
-        <!-- Efectos de tinta -->
         <div id="inkEffects"></div>
     </div>
 
-    <!-- Controles de zoom para móviles -->
     <div class="zoom-controls" id="zoomControls">
         <button class="zoom-button" onclick="zoomIn()" title="Acercar">
             <i class="fas fa-search-plus"></i>
@@ -762,7 +811,6 @@
         </button>
     </div>
 
-    <!-- Leyenda del mapa -->
     <div class="legend" id="legend">
         <div class="legend-title">Leyenda del Mapa</div>
         <div class="legend-item">
@@ -791,7 +839,6 @@
         </div>
     </div>
 
-    <!-- Controles del mapa -->
     <div class="map-controls">
         <button class="map-button" onclick="centerMap()" title="Centrar Mapa">
             <i class="fas fa-crosshairs"></i>
@@ -811,6 +858,12 @@
     </div>
 
     <script>
+        // ===== FUNCIONES DEL MENÚ =====
+        function toggleMenu() {
+            document.getElementById('sidebar').classList.toggle('active');
+            document.getElementById('overlay').classList.toggle('active');
+        }
+
         // ===== DETECCIÓN DE DISPOSITIVO =====
         const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
         if (isMobile) {
@@ -1678,6 +1731,12 @@
                 }
             }
         });
+
+        // FUNCIONES DEL MENÚ (AÑADIDO AL FINAL)
+        function toggleMenu() {
+            document.getElementById('sidebar').classList.toggle('active');
+            document.getElementById('overlay').classList.toggle('active');
+        }
     </script>
 </body>
 </html>
