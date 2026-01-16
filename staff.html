@@ -26,25 +26,41 @@
             font-family: 'Crimson Text', serif;
             min-height: 100vh;
             overflow-x: hidden;
+            display: flex; flex-direction: column;
             cursor: url('https://cur.cursors-4u.net/user/use-1/use157.cur'), auto;
         }
 
         a, button { cursor: url('https://cur.cursors-4u.net/user/use-1/use157.cur'), pointer; text-decoration: none; }
 
-        /* NAV */
+        /* --- NAV & SIDEBAR ESTANDARIZADOS --- */
         nav {
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 15px 50px; background: rgba(11, 12, 16, 0.95);
+            display: flex; justify-content: center; align-items: center;
+            padding: 10px 20px; background: rgba(11, 12, 16, 0.95);
             border-bottom: 1px solid var(--gold);
-            position: sticky; top: 0; z-index: 100; backdrop-filter: blur(10px);
+            position: sticky; top: 0; z-index: 1000; height: 60px;
+            backdrop-filter: blur(10px);
         }
         
-        .nav-logo { height: 50px; width: auto; transition: 0.3s; }
+        .menu-toggle { position: absolute; left: 20px; background: transparent; border: none; color: var(--gold); font-size: 1.5rem; cursor: pointer; }
+        .nav-logo { height: 40px; width: auto; transition: 0.3s; }
         .nav-logo:hover { filter: drop-shadow(0 0 5px var(--gold)); transform: scale(1.05); }
 
-        .nav-links { display: flex; gap: 30px; list-style: none; align-items: center; }
-        .nav-links a { color: #aaa; font-family: 'Cinzel Decorative'; text-transform: uppercase; font-size: 0.9rem; transition: 0.3s; }
-        .nav-links a:hover { color: var(--gold); }
+        /* Sidebar */
+        .sidebar {
+            position: fixed; top: 0; left: -100%; width: 80%; max-width: 300px; height: 100%;
+            background: rgba(11, 12, 16, 0.98); border-right: 1px solid var(--gold);
+            z-index: 2000; transition: 0.4s; display: flex; flex-direction: column; padding-top: 20px;
+        }
+        .sidebar.active { left: 0; }
+        .close-btn { align-self: flex-end; margin-right: 20px; background: transparent; border: none; color: #aaa; font-size: 2rem; cursor: pointer; }
+        
+        .sidebar-links { list-style: none; padding: 20px 0; }
+        .sidebar-links a { display: block; padding: 15px 25px; color: #ccc; font-family: 'Cinzel Decorative'; font-size: 0.9rem; transition: 0.3s; text-transform: uppercase; }
+        .sidebar-links a:hover { color: var(--gold); padding-left: 35px; background: rgba(212, 175, 55, 0.05); }
+        .sidebar-links i { width: 25px; margin-right: 10px; color: var(--gold); text-align: center; }
+
+        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1500; opacity: 0; pointer-events: none; transition: 0.3s; }
+        .overlay.active { opacity: 1; pointer-events: all; }
 
         /* HEADER */
         .staff-header {
@@ -66,7 +82,7 @@
         }
 
         /* GRID DE ROLES */
-        .container { max-width: 1200px; margin: 0 auto; padding: 40px 20px; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 40px 20px; flex: 1; }
         
         .staff-grid {
             display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 30px; margin-bottom: 60px;
@@ -153,7 +169,6 @@
         footer { text-align: center; padding: 40px; color: #555; font-size: 0.8rem; margin-top: auto; border-top: 1px solid #222; }
 
         @media (max-width: 768px) {
-            .nav-links { display: none; }
             .staff-grid { grid-template-columns: 1fr; }
         }
     </style>
@@ -161,16 +176,34 @@
 <body>
 
     <nav>
+        <button class="menu-toggle" onclick="toggleMenu()">
+            <i class="fas fa-bars"></i>
+        </button>
         <a href="index.html">
-            <img src="WIZARDINGLOGO.PNG" alt="Wizarding World" class="nav-logo">
+            <img src="WIZARDINGLOGO.png" alt="Wizarding World" class="nav-logo">
         </a>
-        <ul class="nav-links">
-            <li><a href="index.html">Inicio</a></li>
-            <li><a href="peliculas.html">Películas</a></li>
-            <li><a href="staff.html" style="color: var(--gold);">Staff</a></li>
-            <li><a href="quiz.html">T.I.M.O. Quiz</a></li>
-        </ul>
     </nav>
+
+    <div class="overlay" id="overlay" onclick="toggleMenu()"></div>
+    <div class="sidebar" id="sidebar">
+        <button class="close-btn" onclick="toggleMenu()">&times;</button>
+        <div style="text-align: center; margin-bottom: 20px;">
+            <img src="WIZARDINGLOGO.png" width="80" alt="Logo">
+        </div>
+        <ul class="sidebar-links">
+            <li><a href="index.html"><i class="fas fa-home"></i> Inicio</a></li>
+            <li><a href="peliculas.html"><i class="fas fa-film"></i> Películas</a></li>
+            <li><a href="noticias.html"><i class="fas fa-newspaper"></i> El Profeta</a></li>
+            <li><a href="quiz.html"><i class="fas fa-scroll"></i> T.I.M.O. Quiz</a></li>
+            <li><a href="cast_hp1.html"><i class="fas fa-users"></i> Casting</a></li>
+            <li><a href="staff.html" style="color: var(--gold);"><i class="fas fa-briefcase"></i> Staff</a></li>
+            <li><a href="pasaporte.html"><i class="fas fa-id-card"></i> Pasaporte</a></li>
+            <li><a href="mapa.html"><i class="fas fa-map-marked-alt"></i> Mapa</a></li>
+            <li><a href="diagon.html"><i class="fas fa-store"></i> Callejón Diagon</a></li>
+            <li><a href="hechizos.html"><i class="fas fa-magic"></i> Hechizos</a></li>
+            <li><a href="reglamento.html"><i class="fas fa-gavel"></i> Decretos</a></li>
+        </ul>
+    </div>
 
     <div class="staff-header">
         <h1>Departamento de Misterios</h1>
@@ -301,6 +334,13 @@
         </p>
         <p style="margin-top: 10px; opacity: 0.6;">&copy; 2026 Fakeland Project Team</p>
     </footer>
+
+    <script>
+        function toggleMenu() {
+            document.getElementById('sidebar').classList.toggle('active');
+            document.getElementById('overlay').classList.toggle('active');
+        }
+    </script>
 
 </body>
 </html>
