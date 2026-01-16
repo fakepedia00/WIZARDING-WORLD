@@ -28,7 +28,7 @@
             display: flex; flex-direction: column; overflow-x: hidden;
         }
 
-        /* --- NAV & SIDEBAR (Igual que las otras páginas) --- */
+        /* --- NAV & SIDEBAR ESTANDARIZADO --- */
         nav {
             display: flex; justify-content: center; align-items: center;
             padding: 10px 20px; background: rgba(5, 5, 5, 0.95);
@@ -45,9 +45,12 @@
         }
         .sidebar.active { left: 0; }
         .close-btn { align-self: flex-end; margin-right: 20px; background: transparent; border: none; color: #aaa; font-size: 2rem; cursor: pointer; }
+        
         .sidebar-links { list-style: none; padding: 20px 0; }
-        .sidebar-links a { display: block; padding: 15px 25px; color: #ccc; text-decoration: none; transition: 0.3s; font-family: 'Cinzel Decorative'; font-size: 1rem; }
-        .sidebar-links a:hover { color: var(--gold); padding-left: 35px; }
+        .sidebar-links a { display: block; padding: 15px 25px; color: #ccc; text-decoration: none; transition: 0.3s; font-family: 'Cinzel Decorative'; font-size: 0.9rem; text-transform: uppercase; }
+        .sidebar-links a:hover { color: var(--gold); padding-left: 35px; background: rgba(212, 175, 55, 0.05); }
+        .sidebar-links i { width: 25px; margin-right: 10px; color: var(--gold); text-align: center; }
+
         .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1500; opacity: 0; pointer-events: none; transition: 0.3s; }
         .overlay.active { opacity: 1; pointer-events: all; }
 
@@ -63,7 +66,7 @@
         /* --- EL MURO DE DECRETOS (MASONRY GRID) --- */
         .wall-container {
             max-width: 1200px; margin: 0 auto; padding: 40px 20px;
-            column-count: 3; column-gap: 30px; /* Efecto Masonry (columnas desordenadas) */
+            column-count: 3; column-gap: 30px; /* Efecto Masonry */
         }
 
         /* DISEÑO DEL MARCO (DECRETO) */
@@ -72,8 +75,8 @@
             padding: 15px;
             border-radius: 5px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.8), inset 0 0 20px rgba(0,0,0,0.5);
-            margin-bottom: 40px; /* Espacio entre cuadros verticales */
-            break-inside: avoid; /* Evita que se corten al cambiar de columna */
+            margin-bottom: 40px; /* Espacio entre cuadros */
+            break-inside: avoid; /* Evita cortes */
             position: relative;
             transition: 0.3s;
             cursor: default;
@@ -98,19 +101,19 @@
             position: relative;
         }
 
-        /* Cabecera del Decreto "PROCLAMATION" */
+        /* Cabecera del Decreto */
         .decree-header {
             border-bottom: 3px double var(--ink);
             margin-bottom: 15px; padding-bottom: 10px;
         }
         .decree-top { font-size: 0.8rem; letter-spacing: 2px; font-weight: bold; display: block; margin-bottom: 5px; }
         .decree-number { 
-            font-family: 'Rye', serif; /* Fuente estilo Oeste/Poster */
+            font-family: 'Rye', serif;
             font-size: 2.5rem; line-height: 1; display: block; 
             color: var(--ink); text-transform: uppercase;
         }
 
-        /* Texto de la regla */
+        /* Texto */
         .decree-text {
             font-family: 'Playfair Display SC', serif;
             font-weight: 900; font-size: 1.1rem; line-height: 1.4;
@@ -128,8 +131,7 @@
             font-size: 0.7rem; font-weight: bold;
         }
 
-        /* COLORES Y TAMAÑOS VARIADOS PARA REALISMO */
-        /* Hacemos algunos cuadros más grandes o con texto de color para variar */
+        /* Variantes de tamaño/color */
         .decree-frame.large .decree-number { font-size: 3.5rem; color: #8b0000; }
         .decree-frame.medium .decree-number { font-size: 2rem; }
 
@@ -144,19 +146,29 @@
 
     <nav>
         <button class="menu-toggle" onclick="toggleMenu()"><i class="fas fa-bars"></i></button>
-        <a href="index.html"><img src="WIZARDINGLOGO.PNG" class="nav-logo"></a>
+        <a href="index.html">
+            <img src="WIZARDINGLOGO.png" class="nav-logo">
+        </a>
     </nav>
 
     <div class="overlay" id="overlay" onclick="toggleMenu()"></div>
     <div class="sidebar" id="sidebar">
         <button class="close-btn" onclick="toggleMenu()">&times;</button>
-        <div style="text-align: center; margin-bottom: 20px;"><img src="WIZARDINGLOGO.PNG" width="80"></div>
+        <div style="text-align: center; margin-bottom: 20px;">
+            <img src="WIZARDINGLOGO.png" width="80" alt="Logo">
+        </div>
         <ul class="sidebar-links">
-            <li><a href="index.html">Inicio</a></li>
-            <li><a href="noticias.html">El Profeta</a></li>
-            <li><a href="cast_hp1.html">Casting</a></li>
-            <li><a href="staff.html">Staff</a></li>
-            <li><a href="reglamento.html" style="color: var(--gold);">Decretos</a></li>
+            <li><a href="index.html"><i class="fas fa-home"></i> Inicio</a></li>
+            <li><a href="peliculas.html"><i class="fas fa-film"></i> Películas</a></li>
+            <li><a href="noticias.html"><i class="fas fa-newspaper"></i> El Profeta</a></li>
+            <li><a href="quiz.html"><i class="fas fa-scroll"></i> T.I.M.O. Quiz</a></li>
+            <li><a href="cast_hp1.html"><i class="fas fa-users"></i> Casting</a></li>
+            <li><a href="staff.html"><i class="fas fa-briefcase"></i> Staff</a></li>
+            <li><a href="pasaporte.html"><i class="fas fa-id-card"></i> Pasaporte</a></li>
+            <li><a href="mapa.html"><i class="fas fa-map-marked-alt"></i> Mapa</a></li>
+            <li><a href="diagon.html"><i class="fas fa-store"></i> Callejón Diagon</a></li>
+            <li><a href="hechizos.html"><i class="fas fa-magic"></i> Hechizos</a></li>
+            <li><a href="reglamento.html" style="color: var(--gold);"><i class="fas fa-gavel"></i> Decretos</a></li>
         </ul>
     </div>
 
