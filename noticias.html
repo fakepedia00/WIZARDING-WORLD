@@ -43,9 +43,12 @@
         }
         .sidebar.active { left: 0; }
         .close-btn { align-self: flex-end; margin-right: 20px; background: transparent; border: none; color: #aaa; font-size: 2rem; cursor: pointer; }
+        
         .sidebar-links { list-style: none; padding: 20px 0; }
         .sidebar-links a { display: block; padding: 15px 25px; color: #ccc; text-decoration: none; transition: 0.3s; font-family: 'Cinzel Decorative'; font-size: 1rem; }
         .sidebar-links a:hover { color: var(--gold); padding-left: 35px; }
+        .sidebar-links i { width: 25px; margin-right: 10px; color: var(--gold); text-align: center; }
+
         .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1500; opacity: 0; pointer-events: none; transition: 0.3s; }
         .overlay.active { opacity: 1; pointer-events: all; }
 
@@ -178,20 +181,31 @@
 
     <nav>
         <button class="menu-toggle" onclick="toggleMenu()"><i class="fas fa-bars"></i></button>
-        <a href="index.html"><img src="WIZARDINGLOGO.PNG" class="nav-logo"></a>
+        <a href="index.html">
+            <img src="WIZARDINGLOGO.png" class="nav-logo">
+        </a>
     </nav>
 
     <div class="overlay" id="overlay" onclick="toggleMenu()"></div>
     <div class="sidebar" id="sidebar">
         <button class="close-btn" onclick="toggleMenu()">&times;</button>
-        <div style="text-align: center; margin-bottom: 20px;"><img src="WIZARDINGLOGO.PNG" width="80"></div>
+        <div style="text-align: center; margin-bottom: 20px;">
+            <img src="WIZARDINGLOGO.png" width="80">
+        </div>
         <ul class="sidebar-links">
-            <li><a href="index.html">Inicio</a></li>
-            <li><a href="noticias.html" style="color: var(--gold);">El Profeta</a></li>
-            <li><a href="cast_hp1.html">Casting</a></li>
-            <li><a href="staff.html">Staff</a></li>
-            <li><a href="mapa.html">Mapa</a></li>
-            <li><a href="hechizos.html">Hechizos</a></li>
+            <li><a href="index.html"><i class="fas fa-home"></i> Inicio</a></li>
+            <li><a href="peliculas.html"><i class="fas fa-film"></i> Películas</a></li>
+            <li><a href="noticias.html" style="color: var(--gold);"><i class="fas fa-newspaper"></i> El Profeta</a></li>
+            <li><a href="quiz.html"><i class="fas fa-scroll"></i> T.I.M.O. Quiz</a></li>
+            <li><a href="cast_hp1.html"><i class="fas fa-users"></i> Casting</a></li>
+            <li><a href="staff.html"><i class="fas fa-briefcase"></i> Staff</a></li>
+            <li><a href="pasaporte.html"><i class="fas fa-id-card"></i> Pasaporte</a></li>
+            <li><a href="varitas.html"><i class="fas fa-magic"></i> Varitas</a></li>
+            <li><a href="patronus.html"><i class="fas fa-dragon"></i> Patronus</a></li>
+            <li><a href="mapa.html"><i class="fas fa-map-marked-alt"></i> Mapa</a></li>
+            <li><a href="diagon.html"><i class="fas fa-store"></i> Callejón Diagon</a></li>
+            <li><a href="hechizos.html"><i class="fas fa-magic"></i> Hechizos</a></li>
+            <li><a href="reglamento.html"><i class="fas fa-gavel"></i> Decretos</a></li>
         </ul>
     </div>
 
@@ -335,8 +349,8 @@
         function renderPage() {
             const container = document.getElementById('newsContainer');
             
-            // Elegir noticia destacada (la primera del array o random)
-            const featuredIndex = 0; // O Math.floor(Math.random() * newsData.length);
+            // Elegir noticia destacada (la primera del array)
+            const featuredIndex = 0; 
             const featured = newsData[featuredIndex];
             
             // HTML Destacada
@@ -361,7 +375,6 @@
                 if (index !== featuredIndex) {
                     const previewText = news.content.replace(/<[^>]*>?/gm, '').substring(0, 100) + '...';
                     
-                    // Añadimos style con delay para el efecto cascada
                     const delay = (index * 0.1) + 's';
                     
                     html += `
@@ -380,7 +393,6 @@
             html += `</div>`;
             container.innerHTML = html;
             
-            // Activar animación al cargar
             setTimeout(() => {
                 const cards = document.querySelectorAll('.article-card');
                 cards.forEach(card => card.classList.add('visible'));
@@ -390,12 +402,11 @@
         // --- SISTEMA DE ESCRITURA MÁGICA (TYPEWRITER) ---
         function typeWriterEffect(element, htmlContent, speed = 20) {
             let i = 0;
-            element.innerHTML = ""; // Limpiar contenido previo
+            element.innerHTML = ""; 
             element.classList.add('writing-cursor');
 
             function type() {
                 if (i < htmlContent.length) {
-                    // Si encontramos una etiqueta HTML, la escribimos completa de golpe
                     if (htmlContent.charAt(i) === '<') {
                         let tag = '';
                         while (htmlContent.charAt(i) !== '>' && i < htmlContent.length) {
@@ -406,13 +417,12 @@
                         i++;
                         element.innerHTML += tag;
                     } else {
-                        // Si es una letra normal, la añadimos
                         element.innerHTML += htmlContent.charAt(i);
                         i++;
                     }
                     typingTimeout = setTimeout(type, speed);
                 } else {
-                    element.classList.remove('writing-cursor'); // Quitar pluma al terminar
+                    element.classList.remove('writing-cursor');
                 }
             }
             type();
@@ -423,22 +433,19 @@
             document.getElementById('mTitle').innerText = news.title;
             document.getElementById('mImg').src = news.img;
             
-            // Autor
             const authors = ["Rita Skeeter", "Barnabas Cuffe", "Betty Braithwaite", "Xenophilius Lovegood"];
             document.getElementById('mAuthor').innerText = "Por " + authors[Math.floor(Math.random() * authors.length)];
             
-            // Limpiar timeout anterior si se cerró rápido
             clearTimeout(typingTimeout);
             
-            // INICIAR ESCRITURA MÁGICA
             const bodyEl = document.getElementById('mBody');
-            typeWriterEffect(bodyEl, news.content, 15); // 15ms por letra (velocidad rápida)
+            typeWriterEffect(bodyEl, news.content, 15); 
 
             document.getElementById('newsModal').style.display = 'flex';
         }
 
         function closeModal() {
-            clearTimeout(typingTimeout); // Detener escritura
+            clearTimeout(typingTimeout); 
             document.getElementById('newsModal').style.display = 'none';
         }
 
@@ -448,7 +455,6 @@
             }
         }
 
-        // Iniciar
         renderPage();
 
     </script>
