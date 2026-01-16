@@ -102,7 +102,9 @@
             animation: zoomIn 20s infinite alternate; 
         }
         @keyframes zoomIn { from { transform: scale(1); } to { transform: scale(1.1); } }
+        /* Fallback si falla la imagen local */
         .hero-bg[style*="hero_train.jpg"] { background-image: url('https://images.unsplash.com/photo-1618519764620-7403abdbdfe9?auto=format&fit=crop&w=1920&q=80'); }
+        
         .hero-content { z-index: 1; padding: 20px; animation: glowFade 3s ease-in-out; }
         @keyframes glowFade { 0% { opacity: 0; text-shadow: 0 0 0 transparent; } 100% { opacity: 1; text-shadow: 0 0 20px rgba(212,175,55,0.5); } }
         
@@ -198,19 +200,25 @@
 
     <nav>
         <button class="menu-toggle" onclick="toggleMenu()"><i class="fas fa-bars"></i></button>
-        <a href="index.html"><img src="WIZARDINGLOGO.PNG" class="nav-logo"></a>
+        <a href="index.html">
+            <img src="WIZARDINGLOGO.png" class="nav-logo" alt="Logo">
+        </a>
     </nav>
 
     <div class="overlay" id="overlay" onclick="toggleMenu()"></div>
     <div class="sidebar" id="sidebar">
         <button class="close-btn" onclick="toggleMenu()">&times;</button>
-        <div style="text-align: center; margin-bottom: 20px;"><img src="WIZARDINGLOGO.PNG" width="80"></div>
+        <div style="text-align: center; margin-bottom: 20px;">
+            <img src="WIZARDINGLOGO.png" width="80" alt="Logo">
+        </div>
         <ul class="sidebar-links">
             <li><a href="index.html" style="color: var(--gold);">Inicio</a></li>
-            <li><a href="peliculas.html">Películas</a></li> <li><a href="noticias.html">El Profeta</a></li>
+            <li><a href="peliculas.html">Películas</a></li>
+            <li><a href="noticias.html">El Profeta</a></li>
             <li><a href="quiz.html">T.I.M.O. Quiz</a></li>
+            <li><a href="cast_hp1.html">Casting</a></li>
             <li><a href="staff.html">Staff</a></li>
-            <li><a href="mapa.html">Mapa</a></li>
+            <li><a href="pasaporte.html">Pasaporte</a></li> <li><a href="mapa.html">Mapa</a></li>
             <li><a href="diagon.html">Callejón Diagon</a></li>
             <li><a href="hechizos.html">Hechizos</a></li>
             <li><a href="reglamento.html">Decretos</a></li>
@@ -245,22 +253,27 @@
                 <img src="card_quiz.jpg" class="card-img" onerror="this.src='https://images.unsplash.com/photo-1516979187457-637abb4f9353?auto=format&fit=crop&w=600&q=80'">
                 <div class="card-content"><h3 class="card-title">T.I.M.O. Quiz</h3><p class="card-text">Pon a prueba tu conocimiento.</p><a href="quiz.html" class="card-link">Hacer Examen</a></div>
             </div>
+            
             <div class="feature-card reveal">
                 <img src="card_mapa.jpg" class="card-img" onerror="this.src='mapa.jpg'">
                 <div class="card-content"><h3 class="card-title">Mapa del Merodeador</h3><p class="card-text">Descubre los secretos.</p><a href="mapa.html" class="card-link">Jurar Solemnemente</a></div>
             </div>
+            
             <div class="feature-card reveal">
                 <img src="card_diagon.jpg" class="card-img" onerror="this.src='shop_gringotts.jpg'">
                 <div class="card-content"><h3 class="card-title">Callejón Diagon</h3><p class="card-text">Equipamiento escolar.</p><a href="diagon.html" class="card-link">Ir de Compras</a></div>
             </div>
+            
             <div class="feature-card reveal">
                 <img src="card_staff.jpg" class="card-img" onerror="this.src='https://images.unsplash.com/photo-1453906971074-ce568cccbc63?auto=format&fit=crop&w=600&q=80'">
                 <div class="card-content"><h3 class="card-title">Staff</h3><p class="card-text">Únete al Ministerio.</p><a href="staff.html" class="card-link">Postular</a></div>
             </div>
+            
             <div class="feature-card reveal">
                 <img src="card_hechizos.jpg" class="card-img" onerror="this.src='https://images.unsplash.com/photo-1515229330267-33a37b38c292?auto=format&fit=crop&w=600&q=80'">
                 <div class="card-content"><h3 class="card-title">Grimorio</h3><p class="card-text">Encantamientos esenciales.</p><a href="hechizos.html" class="card-link">Leer Libro</a></div>
             </div>
+            
              <div class="feature-card reveal">
                 <img src="card_reglas.jpg" class="card-img" onerror="this.src='https://images.unsplash.com/photo-1594322436404-5a0526db4d13?auto=format&fit=crop&w=600&q=80'">
                 <div class="card-content"><h3 class="card-title">Decretos</h3><p class="card-text">Normas de convivencia.</p><a href="reglamento.html" class="card-link">Leer Normas</a></div>
