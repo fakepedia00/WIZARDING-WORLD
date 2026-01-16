@@ -35,12 +35,12 @@
             z-index: 5000; transition: opacity 1.5s ease-in-out; padding: 20px;
         }
 
-        .skull-icon {
-            font-size: 5rem; color: #111; margin-bottom: 20px;
-            text-shadow: 0 0 15px var(--poison);
-            animation: pulseEvil 3s infinite alternate;
+        .lock-logo {
+            width: 150px; margin-bottom: 20px;
+            filter: grayscale(100%) brightness(0.8);
+            transition: 0.5s;
         }
-        @keyframes pulseEvil { from { text-shadow: 0 0 10px var(--poison); color: #111; } to { text-shadow: 0 0 30px var(--poison); color: #051505; } }
+        .lock-logo:hover { filter: grayscale(0%) drop-shadow(0 0 10px var(--poison)); }
 
         .riddle-box {
             max-width: 600px; text-align: center; margin-bottom: 30px;
@@ -105,7 +105,7 @@
         .book-title-card { font-family: 'Cinzel Decorative'; font-size: 1.1rem; color: #ddd; margin-bottom: 5px; }
         .book-author { font-size: 0.8rem; color: #666; font-style: italic; text-transform: uppercase; }
 
-        /* --- MODAL DE LIBRO REALISTA (AQUÍ ESTÁ LA MAGIA) --- */
+        /* --- MODAL DE LIBRO REALISTA --- */
         .read-modal {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.92); backdrop-filter: blur(5px);
@@ -119,7 +119,7 @@
             background-color: var(--parchment);
             background-image: url('https://www.transparenttextures.com/patterns/old-paper.png');
             box-shadow: 
-                inset 0 0 100px rgba(0,0,0,0.5), /* Sombra interior (viejo) */
+                inset 0 0 100px rgba(0,0,0,0.5), /* Sombra interior */
                 0 0 50px rgba(0,0,0,0.8), /* Sombra exterior */
                 10px 10px 30px #000;
             display: flex;
@@ -134,7 +134,7 @@
             to { transform: scale(1) rotateY(0deg); opacity: 1; }
         }
 
-        /* Lomo del libro (separador central) */
+        /* Lomo del libro */
         .book-spine {
             width: 40px; height: 100%;
             background: linear-gradient(to right, rgba(0,0,0,0.1), rgba(0,0,0,0.3), rgba(0,0,0,0.1));
@@ -152,7 +152,7 @@
         .page::-webkit-scrollbar { width: 8px; }
         .page::-webkit-scrollbar-thumb { background: #c0b090; border-radius: 4px; }
 
-        /* Estilos de Texto dentro del libro */
+        /* Estilos de Texto */
         .chapter-header {
             font-family: 'UnifrakturMaguntia'; font-size: 3rem; text-align: center;
             border-bottom: 3px double var(--ink); margin-bottom: 30px; line-height: 1;
@@ -175,7 +175,7 @@
         }
         h3 { font-family: 'Cinzel Decorative'; margin-top: 20px; font-size: 1.3rem; border-bottom: 1px solid #aaa; }
 
-        /* Botón Cerrar (Como un marcapáginas) */
+        /* Botón Cerrar */
         .bookmark-close {
             position: absolute; right: 30px; top: -10px;
             width: 40px; height: 100px; background: var(--blood);
@@ -197,7 +197,6 @@
         }
         .escape-btn:hover { border-color: #fff; color: #fff; }
 
-        /* Responsive */
         @media (max-width: 900px) {
             .real-book { flex-direction: column; height: 95vh; }
             .book-spine { width: 100%; height: 20px; background: linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(0,0,0,0.3)); }
@@ -209,7 +208,7 @@
 <body>
 
     <div id="lock-screen">
-        <i class="fas fa-eye skull-icon"></i>
+        <img src="WIZARDINGLOGO.png" class="lock-logo" alt="Logo">
         
         <div class="riddle-box">
             <div class="riddle-title">El Acertijo del Guardián</div>
@@ -228,6 +227,7 @@
 
     <div id="library-content">
         <div class="library-header">
+            <img src="WIZARDINGLOGO.png" width="80" style="margin-bottom: 20px; filter: grayscale(100%);">
             <h1 class="library-title">La Sección Prohibida</h1>
             <p class="library-quote">"El conocimiento peligroso es como el veneno de Basilisco: mortal en manos inexpertas, poderoso en las del maestro."</p>
         </div>
