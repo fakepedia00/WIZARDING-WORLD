@@ -12,7 +12,7 @@
             --dark-bg: #0e1116;
             --gold: #d4af37;
             --text-color: #e0d6c8;
-            --card-bg: #1a1512;
+            --card-bg: rgba(20, 15, 12, 0.9);
             --taken: #8b0000;
             --free: #2ecc71;
         }
@@ -26,7 +26,10 @@
             font-family: 'Crimson Text', serif;
             min-height: 100vh;
             display: flex; flex-direction: column; overflow-x: hidden;
+            cursor: url('https://cur.cursors-4u.net/user/use-1/use157.cur'), auto;
         }
+
+        a, button, input { cursor: url('https://cur.cursors-4u.net/user/use-1/use157.cur'), pointer; }
 
         /* --- NAV & SIDEBAR --- */
         nav {
@@ -52,10 +55,10 @@
         .overlay.active { opacity: 1; pointer-events: all; }
 
         /* --- CONTENEDOR --- */
-        .container { flex: 1; padding: 30px 15px; max-width: 1200px; margin: 0 auto; width: 100%; }
+        .container { flex: 1; padding: 40px 20px; max-width: 1200px; margin: 0 auto; width: 100%; }
 
-        h1 { font-family: 'Cinzel Decorative'; text-align: center; color: var(--gold); font-size: clamp(2rem, 5vw, 3.5rem); margin-bottom: 10px; }
-        .subtitle { text-align: center; font-style: italic; color: #aaa; margin-bottom: 40px; }
+        h1 { font-family: 'Cinzel Decorative'; text-align: center; color: var(--gold); font-size: clamp(2rem, 5vw, 3.5rem); margin-bottom: 10px; text-shadow: 0 0 10px rgba(212, 175, 55, 0.2); }
+        .subtitle { text-align: center; font-style: italic; color: #aaa; margin-bottom: 40px; letter-spacing: 1px; }
 
         /* --- LÍNEA DE TIEMPO (AÑOS) --- */
         .timeline-scroll {
@@ -66,55 +69,76 @@
             background: transparent; border: 1px solid #555; color: #666;
             padding: 10px 25px; white-space: nowrap; cursor: not-allowed;
             font-family: 'Cinzel Decorative'; font-size: 1rem; transition: 0.3s;
-            min-width: 100px; text-align: center; position: relative;
+            min-width: 100px; text-align: center; position: relative; border-radius: 4px;
         }
         /* Año 1 Activo */
         .year-btn.active {
-            border-color: var(--gold); color: var(--gold); background: rgba(212, 175, 55, 0.1); cursor: pointer;
+            border-color: var(--gold); color: var(--gold); background: rgba(212, 175, 55, 0.1); cursor: pointer; box-shadow: 0 0 15px rgba(212, 175, 55, 0.1);
         }
         /* Años Bloqueados */
         .year-btn.locked i { margin-right: 5px; font-size: 0.8rem; }
-        .year-btn.locked:hover { background: rgba(255,0,0,0.05); border-color: #8b0000; }
+        .year-btn.locked:hover { background: rgba(255,0,0,0.05); border-color: #8b0000; color: #8b0000; }
 
         /* --- GRID DE PERSONAJES --- */
         .cast-grid {
-            display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 30px; margin-bottom: 60px;
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 35px; margin-bottom: 60px;
         }
 
         .cast-card {
-            background: var(--card-bg); border-radius: 8px; overflow: hidden;
-            border: 1px solid #333; transition: 0.3s; position: relative;
+            background: var(--card-bg); border-radius: 12px; overflow: hidden;
+            border: 1px solid #333; transition: 0.4s ease; position: relative;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            /* Animación inicial */
+            opacity: 0; transform: translateY(30px); animation: fadeInUp 0.8s forwards;
         }
-        .cast-card:hover { transform: translateY(-5px); border-color: var(--gold); box-shadow: 0 5px 20px rgba(0,0,0,0.5); }
+        @keyframes fadeInUp { to { opacity: 1; transform: translateY(0); } }
 
-        .card-img-container { height: 350px; overflow: hidden; position: relative; }
-        .cast-img { width: 100%; height: 100%; object-fit: cover; transition: 0.5s; filter: grayscale(30%); }
-        .cast-card:hover .cast-img { filter: grayscale(0%); transform: scale(1.05); }
+        /* Retraso en cascada para la animación */
+        .cast-card:nth-child(1) { animation-delay: 0.1s; }
+        .cast-card:nth-child(2) { animation-delay: 0.2s; }
+        .cast-card:nth-child(3) { animation-delay: 0.3s; }
+        .cast-card:nth-child(4) { animation-delay: 0.4s; }
+        .cast-card:nth-child(5) { animation-delay: 0.5s; }
+        .cast-card:nth-child(6) { animation-delay: 0.6s; }
+        .cast-card:nth-child(7) { animation-delay: 0.7s; }
+        .cast-card:nth-child(8) { animation-delay: 0.8s; }
+        .cast-card:nth-child(9) { animation-delay: 0.9s; }
+
+        .cast-card:hover { transform: translateY(-10px); border-color: var(--gold); box-shadow: 0 15px 40px rgba(0,0,0,0.7); }
+
+        .card-img-container { height: 380px; overflow: hidden; position: relative; }
+        .cast-img { 
+            width: 100%; height: 100%; object-fit: cover; transition: 0.6s; 
+            filter: grayscale(40%) contrast(1.1); 
+        }
+        .cast-card:hover .cast-img { filter: grayscale(0%) contrast(1); transform: scale(1.08); }
 
         /* Etiquetas de Estado */
         .status-badge {
-            position: absolute; top: 10px; right: 10px; padding: 5px 12px;
-            font-size: 0.75rem; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;
-            background: rgba(0,0,0,0.9); border: 1px solid; z-index: 2;
+            position: absolute; top: 15px; right: 15px; padding: 6px 14px;
+            font-size: 0.7rem; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;
+            background: rgba(0,0,0,0.85); border: 1px solid; z-index: 2; backdrop-filter: blur(2px);
+            border-radius: 4px;
         }
         .status-taken { color: var(--taken); border-color: var(--taken); }
         .status-free { color: var(--free); border-color: var(--free); }
 
-        .card-info { padding: 15px; text-align: center; border-top: 1px solid #333; }
-        .char-name { font-family: 'Cinzel Decorative'; font-size: 1.3rem; color: #fff; margin-bottom: 5px; }
-        .char-role { color: var(--gold); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 5px; }
-        .char-fc { font-size: 0.8rem; color: #666; font-style: italic; }
+        .card-info { padding: 20px; text-align: center; border-top: 1px solid #333; position: relative; z-index: 2; background: var(--card-bg); }
+        .char-name { font-family: 'Cinzel Decorative'; font-size: 1.4rem; color: #fff; margin-bottom: 8px; }
+        .char-role { color: var(--gold); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 8px; display: block; font-weight: bold; }
+        .char-fc { font-size: 0.85rem; color: #888; font-style: italic; }
 
         /* --- FORMULARIO GOOGLE --- */
         .form-section {
-            background: rgba(255,255,255,0.02); border-radius: 10px;
-            padding: 20px; text-align: center; border: 1px solid #333;
-            margin-top: 40px;
+            background: rgba(255,255,255,0.03); border-radius: 15px;
+            padding: 40px 20px; text-align: center; border: 1px solid #333;
+            margin-top: 60px; scroll-margin-top: 100px;
         }
         .form-wrapper {
             background: #fff; /* Fondo blanco para integración limpia */
-            max-width: 800px; margin: 20px auto 0 auto;
+            max-width: 800px; margin: 30px auto 0 auto;
             border-radius: 8px; overflow: hidden;
+            box-shadow: 0 0 30px rgba(0,0,0,0.5);
         }
         iframe { width: 100%; display: block; border: none; }
 
@@ -122,6 +146,8 @@
 
         @media (max-width: 768px) {
             .timeline-scroll { justify-content: flex-start; padding-left: 10px; }
+            .cast-grid { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
+            .card-img-container { height: 300px; }
         }
     </style>
 </head>
@@ -129,27 +155,31 @@
 
     <nav>
         <button class="menu-toggle" onclick="toggleMenu()"><i class="fas fa-bars"></i></button>
-        <a href="index.html"><img src="WIZARDINGLOGO.PNG" class="nav-logo"></a>
+        <a href="index.html">
+            <img src="WIZARDINGLOGO.png" class="nav-logo">
+        </a>
     </nav>
 
     <div class="overlay" id="overlay" onclick="toggleMenu()"></div>
     <div class="sidebar" id="sidebar">
         <button class="close-btn" onclick="toggleMenu()">&times;</button>
-        <div style="text-align: center; margin-bottom: 20px;"><img src="WIZARDINGLOGO.PNG" width="80"></div>
+        <div style="text-align: center; margin-bottom: 20px;">
+            <img src="WIZARDINGLOGO.png" width="80">
+        </div>
         <ul class="sidebar-links">
             <li><a href="index.html">Inicio</a></li>
             <li><a href="peliculas.html">Películas</a></li>
+            <li><a href="noticias.html">El Profeta</a></li>
+            <li><a href="quiz.html">T.I.M.O. Quiz</a></li>
+            <li><a href="cast_hp1.html" style="color: var(--gold);">Casting</a></li>
             <li><a href="staff.html">Staff</a></li>
-            <li><a href="casas.html">Casas</a></li>
+            <li><a href="pasaporte.html">Pasaporte</a></li>
             <li><a href="varitas.html">Varitas</a></li>
             <li><a href="patronus.html">Patronus</a></li>
-            <li><a href="quiz.html">T.I.M.O. Quiz</a></li>
-            <li><a href="pasaporte.html">Pasaporte</a></li>
-            <li><a href="hechizos.html">Libro de Hechizos</a></li>
+            <li><a href="mapa.html">Mapa</a></li>
             <li><a href="diagon.html">Callejón Diagon</a></li>
+            <li><a href="hechizos.html">Hechizos</a></li>
             <li><a href="reglamento.html">Decretos</a></li>
-            <li><a href="mapa.html">Mapa del Merodeador</a></li>
-            <li><a href="cast_hp1.html" style="color: var(--gold);">Casting</a></li>
         </ul>
     </div>
 
@@ -172,7 +202,7 @@
             <div class="cast-card">
                 <div class="card-img-container">
                     <span class="status-badge status-taken">Ocupado</span>
-                    <img src="AlbusP1.jpg" class="cast-img" alt="Dumbledore">
+                    <img src="AlbusP1.jpg" onerror="this.src='https://images.unsplash.com/photo-1544979590-37e9b47cd705?auto=format&fit=crop&w=600&q=80'" class="cast-img" alt="Dumbledore">
                 </div>
                 <div class="card-info">
                     <h3 class="char-name">Albus Dumbledore</h3>
@@ -184,7 +214,7 @@
             <div class="cast-card">
                 <div class="card-img-container">
                     <span class="status-badge status-free">Disponible</span>
-                    <img src="HarryP1.jpg" class="cast-img" alt="Harry">
+                    <img src="HarryP1.jpg" onerror="this.src='https://images.unsplash.com/photo-1629853915233-a3b0928e3b4a?auto=format&fit=crop&w=600&q=80'" class="cast-img" alt="Harry">
                 </div>
                 <div class="card-info">
                     <h3 class="char-name">Harry Potter</h3>
@@ -196,7 +226,7 @@
             <div class="cast-card">
                 <div class="card-img-container">
                     <span class="status-badge status-free">Disponible</span>
-                    <img src="hemaioneP1.jpg" class="cast-img" alt="Hermione">
+                    <img src="hemaioneP1.jpg" onerror="this.src='https://images.unsplash.com/photo-1618944847023-38aa00125eb4?auto=format&fit=crop&w=600&q=80'" class="cast-img" alt="Hermione">
                 </div>
                 <div class="card-info">
                     <h3 class="char-name">Hermione Granger</h3>
@@ -208,7 +238,7 @@
             <div class="cast-card">
                 <div class="card-img-container">
                     <span class="status-badge status-free">Disponible</span>
-                    <img src="RonWeasleyP1.jpg" class="cast-img" alt="Ron">
+                    <img src="RonWeasleyP1.jpg" onerror="this.src='https://images.unsplash.com/photo-1589839499292-6277983ce44e?auto=format&fit=crop&w=600&q=80'" class="cast-img" alt="Ron">
                 </div>
                 <div class="card-info">
                     <h3 class="char-name">Ron Weasley</h3>
@@ -220,7 +250,7 @@
             <div class="cast-card">
                 <div class="card-img-container">
                     <span class="status-badge status-free">Disponible</span>
-                    <img src="DracoP1.jpg" class="cast-img" alt="Draco">
+                    <img src="DracoP1.jpg" onerror="this.src='https://images.unsplash.com/photo-1610483178766-8092d96033f3?auto=format&fit=crop&w=600&q=80'" class="cast-img" alt="Draco">
                 </div>
                 <div class="card-info">
                     <h3 class="char-name">Draco Malfoy</h3>
@@ -232,7 +262,7 @@
             <div class="cast-card">
                 <div class="card-img-container">
                     <span class="status-badge status-free">Disponible</span>
-                    <img src="severusP1.jpg" class="cast-img" alt="Snape">
+                    <img src="severusP1.jpg" onerror="this.src='https://images.unsplash.com/photo-1595152772835-219674b2a8a6?auto=format&fit=crop&w=600&q=80'" class="cast-img" alt="Snape">
                 </div>
                 <div class="card-info">
                     <h3 class="char-name">Severus Snape</h3>
@@ -244,7 +274,7 @@
             <div class="cast-card">
                 <div class="card-img-container">
                     <span class="status-badge status-free">Disponible</span>
-                    <img src="HagridP1.jpg" class="cast-img" alt="Hagrid">
+                    <img src="HagridP1.jpg" onerror="this.src='https://images.unsplash.com/photo-1548685913-fe6678babe8d?auto=format&fit=crop&w=600&q=80'" class="cast-img" alt="Hagrid">
                 </div>
                 <div class="card-info">
                     <h3 class="char-name">Rubeus Hagrid</h3>
@@ -256,7 +286,7 @@
             <div class="cast-card">
                 <div class="card-img-container">
                     <span class="status-badge status-free">Disponible</span>
-                    <img src="MinervaP1.jpg" class="cast-img" alt="McGonagall">
+                    <img src="MinervaP1.jpg" onerror="this.src='https://images.unsplash.com/photo-1601055286387-e36688226937?auto=format&fit=crop&w=600&q=80'" class="cast-img" alt="McGonagall">
                 </div>
                 <div class="card-info">
                     <h3 class="char-name">Minerva McGonagall</h3>
@@ -268,7 +298,7 @@
             <div class="cast-card">
                 <div class="card-img-container">
                     <span class="status-badge status-free">Disponible</span>
-                    <img src="QuirrellP1.jpg" class="cast-img" alt="Quirrell">
+                    <img src="QuirrellP1.jpg" onerror="this.src='https://images.unsplash.com/photo-1598153346810-860daa0d6cac?auto=format&fit=crop&w=600&q=80'" class="cast-img" alt="Quirrell">
                 </div>
                 <div class="card-info">
                     <h3 class="char-name">Quirinus Quirrell</h3>
@@ -283,12 +313,12 @@
             <h2 style="font-family: 'Cinzel Decorative'; color: var(--gold); margin-bottom: 10px;">
                 <i class="fas fa-scroll"></i> Formulario de Admisión
             </h2>
-            <p style="margin-bottom: 20px; color: #aaa;">"La pluma de aceptación y el libro de admisión están listos."</p>
+            <p style="margin-bottom: 20px; color: #aaa;">"La pluma de aceptación y el libro de admisión están listos. Inscribe tu nombre."</p>
             
             <div class="form-wrapper">
                 <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSdGEkFfY4StsMpSKahxVAA1XSw3kuzlI3X5AX9rXXuz0mlaNg/viewform?embedded=true" 
                         width="100%" 
-                        height="5629" 
+                        height="2300" 
                         frameborder="0" 
                         marginheight="0" 
                         marginwidth="0">
