@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Pasaporte Mágico | Wizarding World</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    
+    <style>
+        :root {
+            --dark-bg: #0e1116;
+            --gold: #d4af37;
+            --passport-w: 750px; /* Un poco más ancho para acomodar la foto grande */
+            --passport-h: 420px;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background-color: var(--dark-bg);
+            background-image: url('https://www.transparenttextures.com/patterns/stardust.png');
+            color: #e0d6c8;
+            font-family: 'Crimson Text', serif;
+            min-height: 100vh;
+            display: flex; flex-direction: column; overflow-x: hidden;
+        }
+
+        /* --- NAV & SIDEBAR --- */
+        nav {
+            display: flex; justify-content: center; align-items: center;
+            padding: 10px 20px; background: rgba(5, 5, 5, 0.95);
+            border-bottom: 1px solid rgba(212, 175, 55, 0.3);
+            position: sticky; top: 0; z-index: 1000; height: 60px;
+        }
+        .menu-toggle { position: absolute; left: 20px; background: transparent; border: none; color: var(--gold); font-size: 1.5rem; cursor: pointer; }
+        .nav-logo { height: 40px; width: auto; }
+
+        .sidebar {
+            position: fixed; top: 0; left: -100%; width: 80%; max-width: 300px; height: 100%;
+            background: rgba(8, 8, 10, 0.98); border-right: 1px solid var(--gold);
+            z-index: 2000; transition: 0.4s; display: flex; flex-direction: column; padding-top: 20px;
+        }
+        .sidebar.active { left: 0; }
+        .close-btn { align-self: flex-end; margin-right: 20px; background: transparent; border: none; color: #aaa; font-size: 2rem; cursor: pointer; }
+        .sidebar-links { list-style: none; padding: 20px 0; }
+        .sidebar-links a { display: block; padding: 15px 25px; color: #ccc; text-decoration: none; transition: 0.3s; font-family: 'Cinzel Decorative'; }
+        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1500; opacity: 0; pointer-events: none; transition: 0.3s; }
+        .overlay.active { opacity: 1; pointer-events: all; }
+
+        /* --- CONTENEDOR --- */
+        .container { flex: 1; display: flex; flex-direction: column; align-items: center; padding: 30px 15px; }
+        h1 { font-family: 'Cinzel Decorative'; color: var(--gold); text-align: center; margin-bottom: 20px; font-size: clamp(1.8rem, 5vw, 2.5rem); }
+
+        /* --- FORMULARIO --- */
+        .form-section {
+            background: rgba(255,255,255,0.05); padding: 25px; border-radius: 10px;
+            width: 100%; max-width: 650px; margin-bottom: 30px; border: 1px solid #333;
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px;
+        }
+        
+        .full-width { grid-column: 1 / -1; }
+        
+        label { display: block; margin-bottom: 5px; color: var(--gold); font-family: 'Cinzel Decorative'; font-size: 0.8rem; }
+        input, select {
+            width: 100%; padding: 10px; background: rgba(0,0,0,0.3); border: 1px solid #555;
+            color: #fff; border-radius: 4px; font-family: 'Crimson Text'; font-size: 1rem;
+        }
+        input:focus, select:focus { outline: none; border-color: var(--gold); }
+
+        .generate-btn {
+            width: 100%; padding: 15px; background: var(--gold); color: #000; border: none;
+            font-family: 'Cinzel Decorative'; font-weight: bold; cursor: pointer; transition: 0.3s;
+            margin-top: 10px; font-size: 1rem; grid-column: 1 / -1;
+        }
+
+        /* --- PREVISUALIZACIÓN ESCALABLE --- */
+        .preview-wrapper {
+            width: 100%; display: none; justify-content: center;
+            overflow: visible; margin-bottom: 20px;
+        }
+
+        .scalable-container {
+            width: var(--passport-w); height: var(--passport-h);
+            transform-origin: top center;
+        }
+
+        /* --- PASAPORTE HORIZONTAL --- */
+        .passport-card {
+            width: 100%; height: 100%;
+            background: url('https://www.transparenttextures.com/patterns/cream-paper.png'), #f4f1ea;
+            border-radius: 10px; 
+            box-shadow: 0 20px 60px rgba(0,0,0,0.8);
+            position: relative; overflow: hidden; color: #1a1a1a;
+            border: 2px solid #3e2723;
+            display: flex;
+        }
+
+        /* Lado Izquierdo (FOTO GRANDE) */
+        .passport-left {
+            width: 260px; /* Más ancho para la foto */
+            background: #2c241b; 
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            padding: 20px; border-right: 3px double var(--gold);
+            position: relative;
+        }
+
+        .photo-frame {
+            width: 170px; height: 210px; /* FOTO MÁS GRANDE */
+            border: 4px solid var(--gold);
+            background: #fff; overflow: hidden; margin-bottom: 20px;
+            display: flex; justify-content: center; align-items: center; 
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+        }
+        .user-photo { width: 100%; height: 100%; object-fit: cover; }
+        .photo-placeholder { font-size: 5rem; color: #ccc; }
+
+        .crest-container { display: flex; gap: 15px; margin-top: 5px; }
+        .crest-img { width: 55px; height: auto; filter: drop-shadow(0 2px 5px rgba(0,0,0,0.5)); }
+
+        /* Lado Derecho */
+        .passport-right {
+            flex: 1; padding: 25px 35px; position: relative;
+        }
+
+        /* Marca de Agua (Hogwarts) */
+        .bg-watermark {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 350px; opacity: 0.08; pointer-events: none; filter: grayscale(100%);
+        }
+
+        /* Cabecera */
+        .passport-header {
+            display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 2px solid #3e2723; padding-bottom: 10px; margin-bottom: 15px;
+        }
+        .header-text h2 { font-family: 'Cinzel Decorative'; font-size: 1.8rem; color: #3e2723; margin: 0; line-height: 1; }
+        .header-text span { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 3px; color: #5d4037; font-weight: bold; }
+        .mini-logo-header { width: 55px; opacity: 0.9; }
+
+        /* Grid de Datos */
+        .data-grid {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 12px 25px; font-size: 1rem; position: relative; z-index: 2;
+        }
+        .data-field label { display: block; font-size: 0.65rem; text-transform: uppercase; color: #795548; font-weight: bold; margin-bottom: 0; }
+        .data-field span { 
+            display: block; font-family: 'Cinzel Decorative'; color: #000; 
+            border-bottom: 1px solid #ccc; padding-bottom: 1px; font-weight: bold;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis; 
+        }
+        .full-row { grid-column: span 2; }
+
+        /* Pie con Sello del Ministerio */
+        .footer-stamps {
+            position: absolute; bottom: 15px; right: 25px;
+            display: flex; align-items: center; gap: 20px;
+        }
+        .stamp-official {
+            width: 85px; height: 85px; opacity: 0.85; transform: rotate(-15deg);
+            mix-blend-mode: multiply; filter: sepia(100%) saturate(2000%) hue-rotate(-50deg) contrast(1.2);
+        }
+        .signature { font-family: 'Dancing Script', cursive; font-size: 1.5rem; color: #000; transform: rotate(-5deg); }
+
+        /* Botones */
+        .action-btns { margin-top: 10px; display: flex; gap: 15px; justify-content: center; width: 100%; max-width: 600px; }
+        .action-btn {
+            background: transparent; border: 1px solid var(--gold); color: var(--gold);
+            padding: 12px 30px; font-family: 'Cinzel Decorative'; cursor: pointer; transition: 0.3s; flex: 1; text-align: center;
+        }
+        .action-btn:hover { background: var(--gold); color: #000; }
+
+        #photoInput { display: none; }
+        .upload-label {
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+            padding: 10px; background: rgba(255,255,255,0.1); color: #fff; width: 100%;
+            font-size: 0.9rem; cursor: pointer; border: 1px dashed #777; border-radius: 4px;
+        }
+
+        footer { text-align: center; padding: 30px; font-size: 0.8rem; color: #666; margin-top: auto; }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <button class="menu-toggle" onclick="toggleMenu()"><i class="fas fa-bars"></i></button>
+        <a href="index.html"><img src="WIZARDINGLOGO.PNG" class="nav-logo"></a>
+    </nav>
+
+    <div class="overlay" id="overlay" onclick="toggleMenu()"></div>
+    <div class="sidebar" id="sidebar">
+        <button class="close-btn" onclick="toggleMenu()">&times;</button>
+        <div style="text-align: center; margin-bottom: 20px;"><img src="WIZARDINGLOGO.PNG" width="80"></div>
+        <ul class="sidebar-links">
+            <li><a href="index.html">Inicio</a></li>
+            <li><a href="peliculas.html">Películas</a></li>
+            <li><a href="staff.html">Staff</a></li>
+            <li><a href="casas.html">Casas</a></li>
+            <li><a href="varitas.html">Varitas</a></li>
+            <li><a href="patronus.html">Patronus</a></li>
+            <li><a href="quiz.html">T.I.M.O. Quiz</a></li>
+            <li><a href="pasaporte.html" style="color: var(--gold);">Pasaporte</a></li>
+        </ul>
+    </div>
+
+    <div class="container">
+        <h1>Registro Oficial</h1>
+
+        <div class="form-section" id="formSection">
+            <div class="input-group full-width">
+                <label>Nombre Mágico Completo</label>
+                <input type="text" id="inpName" placeholder="Ej: Harry James Potter">
+            </div>
+
+            <div class="input-group full-width">
+                <label>Lugar de Nacimiento (Ciudad, País)</label>
+                <input type="text" id="inpCity" placeholder="Ej: Godric's Hollow, Inglaterra">
+            </div>
+
+            <div class="input-group">
+                <label>Fecha de Nacimiento</label>
+                <input type="date" id="inpDob">
+            </div>
+
+            <div class="input-group">
+                <label>Residencia Actual</label>
+                <select id="inpResidency">
+                    <option value="Castillo de Hogwarts">Castillo de Hogwarts</option>
+                    <option value="Ministerio de Magia">Ministerio de Magia</option>
+                    <option value="Hogsmeade">Hogsmeade</option>
+                    <option value="Callejón Diagon">Callejón Diagon</option>
+                </select>
+            </div>
+
+            <div class="input-group">
+                <label>Casa de Hogwarts</label>
+                <select id="inpHouse">
+                    <option value="Gryffindor">Gryffindor</option>
+                    <option value="Slytherin">Slytherin</option>
+                    <option value="Ravenclaw">Ravenclaw</option>
+                    <option value="Hufflepuff">Hufflepuff</option>
+                </select>
+            </div>
+
+            <div class="input-group">
+                <label>Patronus</label>
+                <input type="text" id="inpPatronus" placeholder="Ej: Ciervo">
+            </div>
+
+            <div class="input-group full-width">
+                <label>Varita (Madera & Núcleo)</label>
+                <input type="text" id="inpWand" placeholder="Ej: Acebo, Pluma de Fénix">
+            </div>
+
+            <div class="input-group full-width">
+                <label>Fotografía del Mago/Bruja</label>
+                <label for="photoInput" class="upload-label">
+                    <i class="fas fa-camera"></i> Subir Imagen (Formato Vertical)
+                </label>
+                <input type="file" id="photoInput" accept="image/*" onchange="previewPhoto(event)">
+            </div>
+
+            <button class="generate-btn" onclick="generatePassport()">Emitir Documento</button>
+        </div>
+
+        <div class="preview-wrapper" id="resultArea">
+            <div id="scaleContainer" class="scalable-container">
+                
+                <div class="passport-card" id="captureTarget">
+                    
+                    <div class="passport-left" id="passportLeft">
+                        <div class="photo-frame">
+                            <i class="fas fa-user-circle photo-placeholder" id="photoIcon"></i>
+                            <img id="displayPhoto" class="user-photo" style="display: none;">
+                        </div>
+                        
+                        <div class="crest-container">
+                            <img src="hogwartslogo.png" class="crest-img" alt="Hogwarts">
+                            <img id="houseCrest" src="gryffindor.png" class="crest-img" alt="House">
+                        </div>
+                    </div>
+
+                    <div class="passport-right">
+                        <img src="hogwartslogo.png" class="bg-watermark">
+
+                        <div class="passport-header">
+                            <div class="header-text">
+                                <h2>Ministerio de Magia</h2>
+                                <span>Departamento de Identificación</span>
+                            </div>
+                            <img src="hogwartslogo.png" class="mini-logo-header">
+                        </div>
+
+                        <div class="data-grid">
+                            <div class="data-field full-row">
+                                <label>Nombre Completo / Full Name</label>
+                                <span id="outName">NOMBRE</span>
+                            </div>
+                            <div class="data-field">
+                                <label>Nacimiento / D.O.B</label>
+                                <span id="outDob">--/--/----</span>
+                            </div>
+                            <div class="data-field">
+                                <label>Lugar Nacimiento / Birthplace</label>
+                                <span id="outCity">CIUDAD</span>
+                            </div>
+                            <div class="data-field">
+                                <label>Residencia / Residence</label>
+                                <span id="outResidency">HOGWARTS</span>
+                            </div>
+                            <div class="data-field">
+                                <label>Casa / House</label>
+                                <span id="outHouse">CASA</span>
+                            </div>
+                            <div class="data-field">
+                                <label>Patronus</label>
+                                <span id="outPatronus">---</span>
+                            </div>
+                            <div class="data-field">
+                                <label>Varita / Wand</label>
+                                <span id="outWand" style="font-size: 0.9rem;">---</span>
+                            </div>
+                        </div>
+
+                        <div class="footer-stamps">
+                            <div class="signature">Rufus Scrimgeour</div>
+                            <img src="ministeriologo.png" class="stamp-official">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="action-btns" id="actionBtns" style="display:none;">
+            <button class="action-btn" onclick="downloadPassport()">
+                <i class="fas fa-download"></i> Descargar
+            </button>
+            <button class="action-btn" onclick="editData()" style="border-color: #666; color: #aaa;">
+                Editar
+            </button>
+        </div>
+
+    </div>
+
+    <footer><p>&copy; 2026 Fakeland Project</p></footer>
+
+    <script>
+        function toggleMenu() {
+            document.getElementById('sidebar').classList.toggle('active');
+            document.getElementById('overlay').classList.toggle('active');
+        }
+
+        function previewPhoto(event) {
+            const reader = new FileReader();
+            reader.onload = function(){
+                const output = document.getElementById('displayPhoto');
+                const icon = document.getElementById('photoIcon');
+                output.src = reader.result;
+                output.style.display = 'block';
+                icon.style.display = 'none';
+            };
+            if(event.target.files[0]) {
+                reader.readAsDataURL(event.target.files[0]);
+            }
+        }
+
+        function generatePassport() {
+            const name = document.getElementById('inpName').value;
+            const city = document.getElementById('inpCity').value;
+            const dob = document.getElementById('inpDob').value;
+            const residency = document.getElementById('inpResidency').value;
+            const house = document.getElementById('inpHouse').value;
+            const patronus = document.getElementById('inpPatronus').value;
+            const wand = document.getElementById('inpWand').value;
+
+            if(!name) { alert("El nombre es obligatorio"); return; }
+
+            document.getElementById('outName').innerText = name.toUpperCase();
+            document.getElementById('outCity').innerText = city.toUpperCase() || "DESCONOCIDO";
+            document.getElementById('outDob').innerText = dob ? dob.split('-').reverse().join('/') : "DESCONOCIDA";
+            document.getElementById('outResidency').innerText = residency.toUpperCase();
+            document.getElementById('outHouse').innerText = house.toUpperCase();
+            document.getElementById('outPatronus').innerText = (patronus || "INCORPÓREO").toUpperCase();
+            document.getElementById('outWand').innerText = wand || "DESCONOCIDA";
+
+            // Colores por Casa
+            const leftPanel = document.getElementById('passportLeft');
+            const houseImg = document.getElementById('houseCrest');
+            
+            if(house === 'Gryffindor') {
+                leftPanel.style.background = "#4a0404"; 
+                leftPanel.style.borderRightColor = "#d4af37";
+                houseImg.src = "gryffindor.png";
+            } else if(house === 'Slytherin') {
+                leftPanel.style.background = "#0e2716";
+                leftPanel.style.borderRightColor = "#a6a6a6";
+                houseImg.src = "slytherin.png";
+            } else if(house === 'Ravenclaw') {
+                leftPanel.style.background = "#0e1a40";
+                leftPanel.style.borderRightColor = "#cd7f32";
+                houseImg.src = "ravenclaw.png";
+            } else if(house === 'Hufflepuff') {
+                leftPanel.style.background = "#ecb939";
+                leftPanel.style.borderRightColor = "#1a1a1a";
+                leftPanel.style.color = "#1a1a1a"; 
+                houseImg.src = "hufflepuff.png";
+            }
+
+            document.getElementById('formSection').style.display = 'none';
+            document.getElementById('resultArea').style.display = 'flex';
+            document.getElementById('actionBtns').style.display = 'flex';
+            adjustScale();
+        }
+
+        function adjustScale() {
+            const container = document.getElementById('scaleContainer');
+            const wrapper = document.querySelector('.container');
+            const cardWidth = 750;
+            const screenWidth = wrapper.clientWidth;
+
+            if (screenWidth < cardWidth) {
+                const scale = (screenWidth / cardWidth) - 0.05;
+                container.style.transform = `scale(${scale})`;
+                container.style.marginBottom = `-${(420 - (420 * scale))}px`; 
+            } else {
+                container.style.transform = "scale(1)";
+                container.style.marginBottom = "0";
+            }
+        }
+
+        window.addEventListener('resize', adjustScale);
+
+        function editData() {
+            document.getElementById('formSection').style.display = 'grid';
+            document.getElementById('resultArea').style.display = 'none';
+            document.getElementById('actionBtns').style.display = 'none';
+        }
+
+        function downloadPassport() {
+            const element = document.getElementById('captureTarget');
+            const scaleContainer = document.getElementById('scaleContainer');
+            
+            const originalTransform = scaleContainer.style.transform;
+            const originalMargin = scaleContainer.style.marginBottom;
+            scaleContainer.style.transform = "scale(1)";
+            scaleContainer.style.marginBottom = "0";
+
+            html2canvas(element, {
+                scale: 2,
+                useCORS: true,
+                allowTaint: true,
+                backgroundColor: null
+            }).then(canvas => {
+                scaleContainer.style.transform = originalTransform;
+                scaleContainer.style.marginBottom = originalMargin;
+
+                const link = document.createElement('a');
+                link.download = 'ID_Ministerio_Fakeland.png';
+                link.href = canvas.toDataURL("image/png");
+                link.click();
+            }).catch(err => {
+                scaleContainer.style.transform = originalTransform;
+                scaleContainer.style.marginBottom = originalMargin;
+                console.error(err);
+                alert("Error de descarga. Verifica imágenes locales.");
+            });
+        }
+    </script>
+</body>
+</html>

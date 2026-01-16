@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Callejón Diagon | Wizarding World</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --dark-bg: #0e1116;
+            --gold: #d4af37;
+            --parchment: #f0e6d2;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background-color: var(--dark-bg);
+            background-image: url('https://www.transparenttextures.com/patterns/black-brick-wall.png');
+            color: #e0d6c8;
+            font-family: 'Crimson Text', serif;
+            min-height: 100vh;
+            display: flex; flex-direction: column; overflow-x: hidden;
+            cursor: url('https://cur.cursors-4u.net/user/use-1/use157.cur'), auto;
+        }
+
+        /* --- NAV & SIDEBAR --- */
+        nav {
+            display: flex; justify-content: center; align-items: center;
+            padding: 10px 20px; background: rgba(5, 5, 5, 0.95);
+            border-bottom: 1px solid rgba(212, 175, 55, 0.3);
+            position: sticky; top: 0; z-index: 1000; height: 60px;
+        }
+        .menu-toggle { position: absolute; left: 20px; background: transparent; border: none; color: var(--gold); font-size: 1.5rem; cursor: pointer; }
+        .nav-logo { height: 40px; width: auto; }
+
+        .sidebar {
+            position: fixed; top: 0; left: -100%; width: 80%; max-width: 300px; height: 100%;
+            background: rgba(8, 8, 10, 0.98); border-right: 1px solid var(--gold);
+            z-index: 2000; transition: 0.4s; display: flex; flex-direction: column; padding-top: 20px;
+        }
+        .sidebar.active { left: 0; }
+        .close-btn { align-self: flex-end; margin-right: 20px; background: transparent; border: none; color: #aaa; font-size: 2rem; cursor: pointer; }
+        .sidebar-links { list-style: none; padding: 20px 0; }
+        .sidebar-links a { display: block; padding: 15px 25px; color: #ccc; text-decoration: none; transition: 0.3s; font-family: 'Cinzel Decorative'; }
+        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1500; opacity: 0; pointer-events: none; transition: 0.3s; }
+        .overlay.active { opacity: 1; pointer-events: all; }
+
+        /* --- HEADER --- */
+        .alley-header {
+            text-align: center; padding: 60px 20px;
+            /* Si esta imagen falla, descarga una de un callejón y llámala diagon_alley.jpg */
+            background: linear-gradient(to bottom, rgba(0,0,0,0.7), var(--dark-bg)), url('https://images.unsplash.com/photo-1551269901-5c5e14c25df7?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80');
+            background-size: cover; background-position: center; border-bottom: 2px solid var(--gold);
+        }
+        h1 { font-family: 'Cinzel Decorative'; font-size: clamp(2.5rem, 6vw, 4.5rem); color: var(--gold); text-shadow: 0 0 20px #000; margin-bottom: 10px; }
+        .subtitle { font-size: 1.2rem; color: #fff; text-shadow: 0 2px 5px #000; font-style: italic; }
+
+        /* --- GRID DE TIENDAS --- */
+        .container { max-width: 1200px; margin: 0 auto; padding: 40px 20px; flex: 1; width: 100%; }
+
+        .shops-grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 30px;
+        }
+
+        .shop-card {
+            background: rgba(20, 10, 5, 0.9);
+            border: 1px solid #444; border-radius: 8px; overflow: hidden;
+            transition: 0.3s; position: relative; cursor: pointer;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        .shop-card:hover { transform: translateY(-5px); border-color: var(--gold); box-shadow: 0 0 20px rgba(212, 175, 55, 0.2); }
+
+        .shop-img-container { height: 200px; overflow: hidden; position: relative; background: #000; }
+        /* Placeholder en caso de que no haya imagen */
+        .shop-img { width: 100%; height: 100%; object-fit: cover; transition: 0.5s; filter: sepia(30%); opacity: 0.8; }
+        .shop-card:hover .shop-img { transform: scale(1.1); filter: sepia(0%); opacity: 1; }
+
+        .shop-sign {
+            position: absolute; bottom: -15px; left: 50%; transform: translateX(-50%);
+            background: #2a1a10; border: 2px solid var(--gold); padding: 5px 15px;
+            font-family: 'Cinzel Decorative'; color: var(--gold); font-size: 1.1rem;
+            white-space: nowrap; box-shadow: 0 5px 10px rgba(0,0,0,0.8); z-index: 2;
+        }
+
+        .shop-info { padding: 30px 20px 20px 20px; text-align: center; color: #aaa; font-size: 0.95rem; line-height: 1.6; }
+
+        /* --- MODAL --- */
+        .modal {
+            display: none; position: fixed; z-index: 3000; left: 0; top: 0; width: 100%; height: 100%;
+            background-color: rgba(0,0,0,0.9); backdrop-filter: blur(5px);
+            justify-content: center; align-items: center; padding: 20px;
+        }
+
+        .modal-content {
+            background: url('https://www.transparenttextures.com/patterns/old-paper.png'), var(--parchment);
+            color: #2b1e16;
+            width: 100%; max-width: 600px; max-height: 80vh; overflow-y: auto;
+            border-radius: 5px; padding: 40px; position: relative;
+            box-shadow: 0 0 50px rgba(0,0,0,1); border: 5px double #4a3b2a;
+        }
+
+        .close-modal { position: absolute; top: 15px; right: 20px; font-size: 2rem; cursor: pointer; color: #4a3b2a; }
+        .modal-title { font-family: 'Cinzel Decorative'; font-size: 2rem; text-align: center; margin-bottom: 10px; border-bottom: 2px solid #4a3b2a; padding-bottom: 10px; }
+        
+        .item-list { list-style: none; margin-top: 20px; }
+        .item-row {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 10px 0; border-bottom: 1px dashed #a69b8d;
+        }
+        .item-name { font-weight: bold; font-family: 'Crimson Text'; font-size: 1.1rem; }
+        .item-price { font-family: 'Cinzel Decorative'; color: #8b0000; font-weight: bold; }
+        
+        .currency-icon { color: #d4af37; margin-left: 5px; }
+
+        footer { text-align: center; padding: 30px; font-size: 0.8rem; color: #666; margin-top: auto; }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <button class="menu-toggle" onclick="toggleMenu()"><i class="fas fa-bars"></i></button>
+        <a href="index.html"><img src="WIZARDINGLOGO.PNG" class="nav-logo"></a>
+    </nav>
+
+    <div class="overlay" id="overlay" onclick="toggleMenu()"></div>
+    <div class="sidebar" id="sidebar">
+        <button class="close-btn" onclick="toggleMenu()">&times;</button>
+        <div style="text-align: center; margin-bottom: 20px;"><img src="WIZARDINGLOGO.PNG" width="80"></div>
+        <ul class="sidebar-links">
+            <li><a href="index.html">Inicio</a></li>
+            <li><a href="peliculas.html">Películas</a></li>
+            <li><a href="staff.html">Staff</a></li>
+            <li><a href="casas.html">Casas</a></li>
+            <li><a href="varitas.html">Varitas</a></li>
+            <li><a href="patronus.html">Patronus</a></li>
+            <li><a href="quiz.html">T.I.M.O. Quiz</a></li>
+            <li><a href="pasaporte.html">Pasaporte</a></li>
+            <li><a href="hechizos.html">Libro de Hechizos</a></li>
+            <li><a href="diagon.html" style="color: var(--gold);">Callejón Diagon</a></li>
+        </ul>
+    </div>
+
+    <div class="alley-header">
+        <h1>Callejón Diagon</h1>
+        <p class="subtitle">"Aquí es donde comprarás plumas y tinta, y todo lo necesario para hacer magia."</p>
+    </div>
+
+    <div class="container">
+        <div class="shops-grid">
+            
+            <div class="shop-card" onclick="openShop('gringotts')">
+                <div class="shop-img-container">
+                    <img src="shop_gringotts.jpg" onerror="this.src='https://images.unsplash.com/photo-1626126525134-fbbc0ecb948f?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80'" class="shop-img" alt="Gringotts">
+                    <div class="shop-sign">Gringotts</div>
+                </div>
+                <div class="shop-info">El lugar más seguro del mundo para lo que quieras guardar.</div>
+            </div>
+
+            <div class="shop-card" onclick="openShop('books')">
+                <div class="shop-img-container">
+                    <img src="shop_books.jpg" onerror="this.src='https://images.unsplash.com/photo-1512820790803-83ca734da794?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80'" class="shop-img" alt="Libreria">
+                    <div class="shop-sign">Flourish & Blotts</div>
+                </div>
+                <div class="shop-info">Libros de texto, grimorios y bestiarios.</div>
+            </div>
+
+            <div class="shop-card" onclick="openShop('robes')">
+                <div class="shop-img-container">
+                    <img src="shop_robes.jpg" onerror="this.src='https://images.unsplash.com/photo-1525507119028-ed4c629a60a3?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80'" class="shop-img" alt="Ropa">
+                    <div class="shop-sign">Madame Malkin</div>
+                </div>
+                <div class="shop-info">Túnicas para todas las ocasiones.</div>
+            </div>
+
+            <div class="shop-card" onclick="openShop('pets')">
+                <div class="shop-img-container">
+                    <img src="shop_pets.jpg" onerror="this.src='https://images.unsplash.com/photo-1579313264428-1b207eb32630?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80'" class="shop-img" alt="Mascotas">
+                    <div class="shop-sign">Emporio de la Lechuza</div>
+                </div>
+                <div class="shop-info">Lechuzas, gatos, ratas y sapos.</div>
+            </div>
+
+            <div class="shop-card" onclick="openShop('quidditch')">
+                <div class="shop-img-container">
+                    <img src="shop_quidditch.jpg" onerror="this.src='https://images.unsplash.com/photo-1589937060799-72c67623c727?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80'" class="shop-img" alt="Quidditch">
+                    <div class="shop-sign">Calidad para Quidditch</div>
+                </div>
+                <div class="shop-info">Escobas de carrera y equipamiento deportivo.</div>
+            </div>
+
+            <div class="shop-card" onclick="openShop('potions')">
+                <div class="shop-img-container">
+                    <img src="shop_potions.jpg" onerror="this.src='https://images.unsplash.com/photo-1515229330267-33a37b38c292?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80'" class="shop-img" alt="Pociones">
+                    <div class="shop-sign">Boticario Slug & Jiggers</div>
+                </div>
+                <div class="shop-info">Ingredientes para pociones y calderos.</div>
+            </div>
+
+        </div>
+    </div>
+
+    <div id="shopModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal()">&times;</span>
+            <h2 class="modal-title" id="shopTitle">Nombre Tienda</h2>
+            <p style="text-align: center; font-style: italic; margin-bottom: 20px;">Lista de Precios Oficial</p>
+            <ul class="item-list" id="shopItems"></ul>
+        </div>
+    </div>
+
+    <footer><p>&copy; 2026 Fakeland Project</p></footer>
+
+    <script>
+        function toggleMenu() {
+            document.getElementById('sidebar').classList.toggle('active');
+            document.getElementById('overlay').classList.toggle('active');
+        }
+
+        const catalogs = {
+            gringotts: {
+                title: "Gringotts: Banco de Magos",
+                items: [
+                    { name: "Apertura de Bóveda", price: "5 G" },
+                    { name: "Cambio de Divisa (Muggle)", price: "Sin Costo" },
+                    { name: "Caja de Seguridad Pequeña", price: "10 G / Año" }
+                ]
+            },
+            books: {
+                title: "Flourish & Blotts",
+                items: [
+                    { name: "Libro Reglamentario de Hechizos (Grado 1)", price: "1 G" },
+                    { name: "Una Historia de la Magia", price: "2 G" },
+                    { name: "Guía de Transformación", price: "1 G" },
+                    { name: "Mil Hierbas y Hongos Mágicos", price: "2 G" },
+                    { name: "Filtros y Pociones Mágicas", price: "2 G" }
+                ]
+            },
+            robes: {
+                title: "Túnicas de Madame Malkin",
+                items: [
+                    { name: "Túnica de Trabajo (Negra, Talla 1)", price: "5 G" },
+                    { name: "Sombrero Puntiagudo (Negro)", price: "2 G" },
+                    { name: "Guantes de Piel de Dragón", price: "4 G" },
+                    { name: "Capa de Invierno (Broches de plata)", price: "8 G" }
+                ]
+            },
+            pets: {
+                title: "Emporio de la Lechuza Eeylops",
+                items: [
+                    { name: "Lechuza Nival", price: "15 G" },
+                    { name: "Lechuza Parda", price: "10 G" },
+                    { name: "Gato Común", price: "7 G" },
+                    { name: "Sapo", price: "5 G" },
+                    { name: "Rata", price: "3 G" }
+                ]
+            },
+            quidditch: {
+                title: "Artículos de Calidad para Quidditch",
+                items: [
+                    { name: "Nimbus 2000", price: "200 G" },
+                    { name: "Barredora 5", price: "50 G" },
+                    { name: "Kit de Mantenimiento de Escobas", price: "15 G" },
+                    { name: "Snitch Dorada de Práctica", price: "10 G" }
+                ]
+            },
+            potions: {
+                title: "Boticario Slug & Jiggers",
+                items: [
+                    { name: "Caldero de Peltre (Medida 2)", price: "15 G" },
+                    { name: "Juego de Redomas de Vidrio", price: "4 G" },
+                    { name: "Telescopio de Latón", price: "5 G" },
+                    { name: "Balanza de Latón", price: "3 G" },
+                    { name: "Pack Básico de Ingredientes", price: "8 G" }
+                ]
+            }
+        };
+
+        function openShop(shopKey) {
+            const data = catalogs[shopKey];
+            document.getElementById('shopTitle').innerText = data.title;
+            const list = document.getElementById('shopItems');
+            list.innerHTML = "";
+            data.items.forEach(item => {
+                const li = document.createElement('li');
+                li.className = "item-row";
+                li.innerHTML = `<span class="item-name">${item.name}</span><span class="item-price">${item.price} <i class="fas fa-coins currency-icon"></i></span>`;
+                list.appendChild(li);
+            });
+            document.getElementById('shopModal').style.display = "flex";
+        }
+
+        function closeModal() {
+            document.getElementById('shopModal').style.display = "none";
+        }
+        
+        window.onclick = function(event) {
+            if (event.target == document.getElementById('shopModal')) closeModal();
+        }
+    </script>
+</body>
+</html>

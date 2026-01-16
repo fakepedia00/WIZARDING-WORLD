@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Libro de Hechizos | Wizarding World</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --dark-bg: #0e1116;
+            --gold: #d4af37;
+            --text-color: #e0d6c8;
+            --card-bg: rgba(20, 20, 25, 0.8);
+            
+            /* Colores Mágicos */
+            --color-charm: #3498db;    /* Azul */
+            --color-curse: #e74c3c;    /* Rojo */
+            --color-trans: #f1c40f;    /* Amarillo */
+            --color-jinx: #9b59b6;     /* Morado */
+            --color-heal: #2ecc71;     /* Verde */
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background-color: var(--dark-bg);
+            background-image: url('https://www.transparenttextures.com/patterns/stardust.png');
+            color: var(--text-color);
+            font-family: 'Crimson Text', serif;
+            min-height: 100vh;
+            display: flex; flex-direction: column; overflow-x: hidden;
+            cursor: url('https://cur.cursors-4u.net/user/use-1/use157.cur'), auto;
+        }
+
+        /* --- NAV & SIDEBAR --- */
+        nav {
+            display: flex; justify-content: center; align-items: center;
+            padding: 10px 20px; background: rgba(5, 5, 5, 0.95);
+            border-bottom: 1px solid rgba(212, 175, 55, 0.3);
+            position: sticky; top: 0; z-index: 1000; height: 60px;
+        }
+        .menu-toggle { position: absolute; left: 20px; background: transparent; border: none; color: var(--gold); font-size: 1.5rem; cursor: pointer; }
+        .nav-logo { height: 40px; width: auto; }
+
+        .sidebar {
+            position: fixed; top: 0; left: -100%; width: 80%; max-width: 300px; height: 100%;
+            background: rgba(8, 8, 10, 0.98); border-right: 1px solid var(--gold);
+            z-index: 2000; transition: 0.4s; display: flex; flex-direction: column; padding-top: 20px;
+        }
+        .sidebar.active { left: 0; }
+        .close-btn { align-self: flex-end; margin-right: 20px; background: transparent; border: none; color: #aaa; font-size: 2rem; cursor: pointer; }
+        .sidebar-links { list-style: none; padding: 20px 0; }
+        .sidebar-links a { display: block; padding: 15px 25px; color: #ccc; text-decoration: none; transition: 0.3s; font-family: 'Cinzel Decorative'; }
+        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1500; opacity: 0; pointer-events: none; transition: 0.3s; }
+        .overlay.active { opacity: 1; pointer-events: all; }
+
+        /* --- CONTENEDOR --- */
+        .container { flex: 1; padding: 40px 20px; max-width: 1200px; margin: 0 auto; width: 100%; }
+
+        .page-header { text-align: center; margin-bottom: 40px; }
+        h1 { font-family: 'Cinzel Decorative'; font-size: clamp(2.5rem, 6vw, 4rem); color: var(--gold); margin-bottom: 10px; text-shadow: 0 0 20px rgba(212, 175, 55, 0.2); }
+        .subtitle { color: #aaa; font-style: italic; font-size: 1.1rem; }
+
+        /* BUSCADOR */
+        .search-container { position: relative; max-width: 600px; margin: 0 auto 50px auto; }
+        .search-input {
+            width: 100%; padding: 15px 50px 15px 25px;
+            background: rgba(255,255,255,0.05); border: 1px solid #444; border-radius: 30px;
+            color: #fff; font-size: 1.2rem; font-family: 'Crimson Text'; transition: 0.3s;
+        }
+        .search-input:focus { outline: none; border-color: var(--gold); box-shadow: 0 0 20px rgba(212, 175, 55, 0.2); }
+        .search-icon { position: absolute; right: 20px; top: 50%; transform: translateY(-50%); color: var(--gold); }
+
+        /* GRID DE HECHIZOS */
+        .spells-grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px;
+        }
+
+        .spell-card {
+            background: var(--card-bg); border: 1px solid #333;
+            border-radius: 12px; padding: 25px; position: relative;
+            transition: all 0.3s ease; cursor: pointer; overflow: hidden;
+        }
+        
+        /* Efecto Hover Mágico */
+        .spell-card:hover { transform: translateY(-5px); background: rgba(30, 30, 35, 0.95); }
+        .spell-card::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%;
+            background: #555; transition: 0.3s;
+        }
+        
+        /* Colores dinámicos */
+        .spell-card.charm:hover { box-shadow: 0 5px 20px rgba(52, 152, 219, 0.3); border-color: var(--color-charm); }
+        .spell-card.charm::before { background: var(--color-charm); }
+        
+        .spell-card.curse:hover { box-shadow: 0 5px 20px rgba(231, 76, 60, 0.3); border-color: var(--color-curse); }
+        .spell-card.curse::before { background: var(--color-curse); }
+
+        .spell-card.trans:hover { box-shadow: 0 5px 20px rgba(241, 196, 15, 0.3); border-color: var(--color-trans); }
+        .spell-card.trans::before { background: var(--color-trans); }
+
+        .spell-card.jinx:hover { box-shadow: 0 5px 20px rgba(155, 89, 182, 0.3); border-color: var(--color-jinx); }
+        .spell-card.jinx::before { background: var(--color-jinx); }
+
+        .spell-card.heal:hover { box-shadow: 0 5px 20px rgba(46, 204, 113, 0.3); border-color: var(--color-heal); }
+        .spell-card.heal::before { background: var(--color-heal); }
+
+        .spell-name { font-family: 'Cinzel Decorative'; font-size: 1.6rem; color: #fff; margin-bottom: 5px; }
+        .spell-pron { font-size: 0.9rem; color: #888; font-style: italic; margin-bottom: 15px; display: block; }
+        .spell-type-badge {
+            display: inline-block; padding: 4px 8px; border-radius: 4px; background: rgba(255,255,255,0.1);
+            font-size: 0.7rem; text-transform: uppercase; font-weight: bold; letter-spacing: 1px; color: #ddd;
+        }
+        .click-hint {
+            margin-top: 15px; font-size: 0.8rem; color: var(--gold); opacity: 0; transition: 0.3s;
+            display: flex; align-items: center; gap: 5px;
+        }
+        .spell-card:hover .click-hint { opacity: 1; }
+
+        /* --- MODAL (POPUP) --- */
+        .modal {
+            display: none; position: fixed; z-index: 3000; left: 0; top: 0; width: 100%; height: 100%;
+            background-color: rgba(0,0,0,0.85); backdrop-filter: blur(5px);
+            justify-content: center; align-items: center; padding: 20px;
+        }
+
+        .modal-content {
+            background: radial-gradient(circle at center, #1a1a20, #0a0a0e);
+            border: 1px solid var(--gold);
+            width: 100%; max-width: 700px;
+            border-radius: 15px; padding: 40px;
+            position: relative; box-shadow: 0 0 50px rgba(212, 175, 55, 0.2);
+            animation: modalOpen 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            max-height: 90vh; overflow-y: auto;
+        }
+        @keyframes modalOpen { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+        .close-modal {
+            position: absolute; top: 15px; right: 20px; color: #aaa; font-size: 2rem; cursor: pointer; transition: 0.3s;
+        }
+        .close-modal:hover { color: var(--gold); }
+
+        .modal-header { text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 20px; margin-bottom: 20px; }
+        .modal-title { font-family: 'Cinzel Decorative'; font-size: 2.5rem; color: var(--gold); }
+        .modal-pron { font-style: italic; color: #888; font-size: 1.2rem; }
+
+        .modal-body { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
+
+        /* ANIMACIÓN DE VARITA SVG */
+        .wand-canvas-container {
+            background: rgba(0,0,0,0.3); border: 1px solid #333; border-radius: 10px;
+            height: 250px; display: flex; flex-direction: column; justify-content: center; align-items: center;
+            position: relative;
+        }
+        .wand-label { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 2px; color: #666; margin-top: 10px; }
+        
+        svg path {
+            fill: none; stroke: #fff; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round;
+            stroke-dasharray: 1000; stroke-dashoffset: 1000; /* Oculto inicialmente */
+            filter: drop-shadow(0 0 5px var(--gold));
+        }
+        
+        /* Animación de dibujo */
+        .draw-animation { animation: drawPath 2s ease-in-out forwards; }
+        @keyframes drawPath { to { stroke-dashoffset: 0; } }
+
+        .info-block h4 { color: var(--gold); font-family: 'Cinzel Decorative'; margin-bottom: 8px; font-size: 1.1rem; }
+        .info-block p { color: #ccc; line-height: 1.6; margin-bottom: 20px; font-size: 0.95rem; }
+        
+        .light-indicator {
+            display: inline-block; width: 12px; height: 12px; border-radius: 50%; margin-right: 5px;
+            box-shadow: 0 0 10px currentColor;
+        }
+
+        footer { text-align: center; padding: 30px; font-size: 0.8rem; color: #666; margin-top: auto; }
+
+        @media (max-width: 768px) {
+            .modal-body { grid-template-columns: 1fr; }
+            .modal-content { padding: 25px; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <button class="menu-toggle" onclick="toggleMenu()"><i class="fas fa-bars"></i></button>
+        <a href="index.html"><img src="WIZARDINGLOGO.PNG" class="nav-logo"></a>
+    </nav>
+
+    <div class="overlay" id="overlay" onclick="toggleMenu()"></div>
+    <div class="sidebar" id="sidebar">
+        <button class="close-btn" onclick="toggleMenu()">&times;</button>
+        <div style="text-align: center; margin-bottom: 20px;"><img src="WIZARDINGLOGO.PNG" width="80"></div>
+        <ul class="sidebar-links">
+            <li><a href="index.html">Inicio</a></li>
+            <li><a href="peliculas.html">Películas</a></li>
+            <li><a href="staff.html">Staff</a></li>
+            <li><a href="casas.html">Casas</a></li>
+            <li><a href="varitas.html">Varitas</a></li>
+            <li><a href="patronus.html">Patronus</a></li>
+            <li><a href="quiz.html">T.I.M.O. Quiz</a></li>
+            <li><a href="pasaporte.html">Pasaporte</a></li>
+            <li><a href="hechizos.html" style="color: var(--gold);">Libro de Hechizos</a></li>
+        </ul>
+    </div>
+
+    <div class="container">
+        <div class="page-header">
+            <h1>Grimorio de Encantamientos</h1>
+            <p class="subtitle">Toca cualquier hechizo para estudiar su historia y movimiento.</p>
+        </div>
+
+        <div class="search-container">
+            <input type="text" id="searchInput" class="search-input" placeholder="Buscar hechizo..." onkeyup="filterSpells()">
+            <i class="fas fa-search search-icon"></i>
+        </div>
+
+        <div class="spells-grid" id="spellsGrid">
+            </div>
+        
+        <div id="noResults" style="display:none; text-align:center; color:#777; margin-top:40px;">
+            <i class="fas fa-scroll" style="font-size:3rem; margin-bottom:10px;"></i><br>Hechizo no encontrado.
+        </div>
+    </div>
+
+    <div id="spellModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal()">&times;</span>
+            
+            <div class="modal-header">
+                <h2 class="modal-title" id="mName">Nombre</h2>
+                <span class="modal-pron" id="mPron">/ Pronunciación /</span>
+            </div>
+
+            <div class="modal-body">
+                <div class="details-left">
+                    <div class="info-block">
+                        <h4>Efecto</h4>
+                        <p id="mDesc">Descripción del efecto.</p>
+                    </div>
+                    <div class="info-block">
+                        <h4>Etimología & Origen</h4>
+                        <p id="mHistory">Historia del hechizo.</p>
+                    </div>
+                    <div class="info-block">
+                        <h4>Detalles</h4>
+                        <p>
+                            <strong>Tipo:</strong> <span id="mType">Tipo</span><br>
+                            <strong>Luz:</strong> <span id="mLightColor" class="light-indicator"></span> <span id="mLightName">Color</span>
+                        </p>
+                    </div>
+                </div>
+
+                <div class="wand-canvas-container">
+                    <svg id="wandSvg" width="200" height="200" viewBox="0 0 200 200">
+                        <path id="wandPath" d="" />
+                    </svg>
+                    <div class="wand-label"><i class="fas fa-wand-magic-sparkles"></i> Movimiento de Varita</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer><p>&copy; 2026 Fakeland Project</p></footer>
+
+    <script>
+        // --- DATA ---
+        // Movimientos SVG predefinidos (Paths simples)
+        const paths = {
+            circle: "M 100 40 A 60 60 0 1 1 99 40", // Círculo
+            slash: "M 40 40 L 160 160", // Diagonal
+            swish: "M 40 100 Q 100 40 160 100 T 200 100", // Swish and flick aproximado
+            triangle: "M 100 40 L 160 160 L 40 160 Z",
+            zap: "M 80 40 L 120 40 L 60 160 L 140 160", // Rayo
+            stab: "M 100 160 L 100 40" // Estocada
+        };
+
+        const spells = [
+            { 
+                name: "Accio", pron: "AK-see-oh", type: "charm", label: "Encantamiento", 
+                desc: "Atrae un objeto hacia el lanzador.", 
+                history: "Del latín 'accerso', que significa 'llamar' o 'convocar'. Uno de los hechizos más antiguos conocidos.",
+                light: "#ffffff", lightName: "Ninguna", move: paths.swish 
+            },
+            { 
+                name: "Alohomora", pron: "a-LOH-ho-MOR-ah", type: "charm", label: "Encantamiento", 
+                desc: "Abre cerraduras mecánicas.", 
+                history: "Traído a Gran Bretaña en el siglo XVII por Eldon Elsrickle. Originalmente usado por ladrones africanos.",
+                light: "#3498db", lightName: "Azul Invisible", move: paths.circle 
+            },
+            { 
+                name: "Avada Kedavra", pron: "a-VAH-dah ke-DAH-vra", type: "curse", label: "Maldición Imperdonable", 
+                desc: "Causa la muerte instantánea.", 
+                history: "Del arameo 'abhadda kedhabhra', que significa 'desaparece con esta palabra'. Inventada en la Edad Media por magos oscuros.",
+                light: "#2ecc71", lightName: "Verde Intenso", move: paths.zap 
+            },
+            { 
+                name: "Crucio", pron: "KROO-see-oh", type: "curse", label: "Maldición Imperdonable", 
+                desc: "Tortura a la víctima.", 
+                history: "Del latín 'crucio', 'yo torturo'. Legalizada brevemente durante regímenes oscuros.",
+                light: "#e74c3c", lightName: "Rojo (Invisible)", move: paths.slash 
+            },
+            { 
+                name: "Expecto Patronum", pron: "ex-PEK-toh pa-TRO-num", type: "charm", label: "Encantamiento", 
+                desc: "Conjura un guardián espiritual.", 
+                history: "Famoso por su dificultad. Creado en la antigüedad para defenderse de Lethifolds y Dementores.",
+                light: "#ffffff", lightName: "Blanco Plateado", move: paths.circle 
+            },
+            { 
+                name: "Expelliarmus", pron: "ex-pel-ee-AR-mus", type: "charm", label: "Encantamiento", 
+                desc: "Desarma al oponente.", 
+                history: "Popularizado por Elizabeth Smudgling en 1379, aunque algunos historiadores dicen que Merlín lo usaba.",
+                light: "#e74c3c", lightName: "Escarlata", move: paths.stab 
+            },
+            { 
+                name: "Lumos", pron: "LOO-mos", type: "charm", label: "Encantamiento", 
+                desc: "Enciende la punta de la varita.", 
+                history: "Inventado por Levina Monkstanley en el siglo XVIII en el Ministerio de Magia.",
+                light: "#ffffcc", lightName: "Blanco Cálido", move: paths.circle 
+            },
+            { 
+                name: "Sectumsempra", pron: "sec-tum-SEM-pra", type: "curse", label: "Maldición", 
+                desc: "Corta al oponente profundamente.", 
+                history: "Inventado por Severus Snape durante sus años escolares bajo el alias 'El Príncipe Mestizo'.",
+                light: "#ffffff", lightName: "Blanco", move: paths.slash 
+            },
+            { 
+                name: "Wingardium Leviosa", pron: "win-GAR-dee-um lev-ee-OH-sa", type: "charm", label: "Encantamiento", 
+                desc: "Hace levitar objetos.", 
+                history: "Creado por Jarleth Hobart en 1544. La pronunciación exacta es crucial para evitar accidentes.",
+                light: "#ffffff", lightName: "Ninguna", move: paths.swish 
+            },
+             { 
+                name: "Aguamenti", pron: "AH-gwah-MEN-tee", type: "charm", label: "Encantamiento", 
+                desc: "Genera agua potable.", 
+                history: "Esencial para apagar fuegos y supervivencia. Se enseña en sexto año.",
+                light: "#3498db", lightName: "Azul Claro", move: paths.swish 
+            },
+            {
+                name: "Incendio", pron: "in-SEN-dee-oh", type: "charm", label: "Encantamiento",
+                desc: "Genera llamas.", 
+                history: "Del latín 'incendium'. Uso común en herbología y duelos.",
+                light: "#e67e22", lightName: "Naranja", move: paths.zap
+            },
+            {
+                name: "Protego", pron: "pro-TAY-goh", type: "charm", label: "Encantamiento",
+                desc: "Crea un escudo mágico.", 
+                history: "El encantamiento escudo estándar. Existen variaciones como Protego Totalum.",
+                light: "#ffffff", lightName: "Transparente", move: paths.stab
+            }
+        ];
+
+        // --- RENDER ---
+        function renderSpells(filter = "") {
+            const grid = document.getElementById('spellsGrid');
+            grid.innerHTML = "";
+            const search = filter.toLowerCase();
+            let count = 0;
+
+            spells.forEach(spell => {
+                if(spell.name.toLowerCase().includes(search) || spell.label.toLowerCase().includes(search)) {
+                    count++;
+                    const card = document.createElement('div');
+                    card.className = `spell-card ${spell.type}`;
+                    card.onclick = () => openModal(spell);
+                    
+                    card.innerHTML = `
+                        <h3 class="spell-name">${spell.name}</h3>
+                        <span class="spell-type-badge">${spell.label}</span>
+                        <p class="click-hint"><i class="fas fa-hand-pointer"></i> Ver Detalles</p>
+                    `;
+                    grid.appendChild(card);
+                }
+            });
+
+            document.getElementById('noResults').style.display = count === 0 ? 'block' : 'none';
+        }
+
+        // --- MODAL LOGIC ---
+        function openModal(spell) {
+            const modal = document.getElementById('spellModal');
+            
+            // Llenar datos
+            document.getElementById('mName').innerText = spell.name;
+            document.getElementById('mPron').innerText = `/ ${spell.pron} /`;
+            document.getElementById('mDesc').innerText = spell.desc;
+            document.getElementById('mHistory').innerText = spell.history;
+            document.getElementById('mType').innerText = spell.label;
+            
+            const lightDot = document.getElementById('mLightColor');
+            lightDot.style.background = spell.light;
+            lightDot.style.boxShadow = `0 0 10px ${spell.light}`;
+            document.getElementById('mLightName').innerText = spell.lightName;
+
+            // ANIMACIÓN VARITA
+            const pathEl = document.getElementById('wandPath');
+            
+            // Reset animation
+            pathEl.classList.remove('draw-animation');
+            void pathEl.offsetWidth; // Trigger reflow
+            
+            // Set path data & color
+            pathEl.setAttribute('d', spell.move);
+            pathEl.style.stroke = spell.light === "#ffffff" ? "#d4af37" : spell.light; // Si es blanco usa dorado, sino el color del hechizo
+            
+            // Start animation
+            pathEl.classList.add('draw-animation');
+
+            modal.style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('spellModal').style.display = 'none';
+        }
+
+        function filterSpells() {
+            renderSpells(document.getElementById('searchInput').value);
+        }
+
+        function toggleMenu() {
+            document.getElementById('sidebar').classList.toggle('active');
+            document.getElementById('overlay').classList.toggle('active');
+        }
+
+        // Close modal on click outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('spellModal');
+            if (event.target == modal) {
+                closeModal();
+            }
+        }
+
+        // Init
+        document.addEventListener('DOMContentLoaded', () => renderSpells());
+
+    </script>
+</body>
+</html>

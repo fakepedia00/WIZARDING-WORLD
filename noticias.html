@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>El Profeta | Noticias Mágicas</title>
+    <link href="https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&family=Cinzel+Decorative:wght@400;700;900&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --paper: #f3e8d4;
+            --ink: #1a1a1a;
+            --gold: #d4af37;
+            --dark-bg: #0e1116;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background-color: var(--dark-bg);
+            background-image: url('https://www.transparenttextures.com/patterns/wood-pattern.png');
+            font-family: 'Crimson Text', serif;
+            min-height: 100vh;
+            display: flex; flex-direction: column; overflow-x: hidden;
+            color: var(--ink);
+        }
+
+        /* --- NAV & SIDEBAR --- */
+        nav {
+            display: flex; justify-content: center; align-items: center;
+            padding: 10px 20px; background: rgba(5, 5, 5, 0.95);
+            border-bottom: 1px solid rgba(212, 175, 55, 0.3);
+            position: sticky; top: 0; z-index: 1000; height: 60px;
+        }
+        .menu-toggle { position: absolute; left: 20px; background: transparent; border: none; color: var(--gold); font-size: 1.5rem; cursor: pointer; }
+        .nav-logo { height: 40px; width: auto; }
+
+        .sidebar {
+            position: fixed; top: 0; left: -100%; width: 80%; max-width: 300px; height: 100%;
+            background: rgba(8, 8, 10, 0.98); border-right: 1px solid var(--gold);
+            z-index: 2000; transition: 0.4s; display: flex; flex-direction: column; padding-top: 20px; color: #ccc;
+        }
+        .sidebar.active { left: 0; }
+        .close-btn { align-self: flex-end; margin-right: 20px; background: transparent; border: none; color: #aaa; font-size: 2rem; cursor: pointer; }
+        .sidebar-links { list-style: none; padding: 20px 0; }
+        .sidebar-links a { display: block; padding: 15px 25px; color: #ccc; text-decoration: none; transition: 0.3s; font-family: 'Cinzel Decorative'; font-size: 1rem; }
+        .sidebar-links a:hover { color: var(--gold); padding-left: 35px; }
+        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1500; opacity: 0; pointer-events: none; transition: 0.3s; }
+        .overlay.active { opacity: 1; pointer-events: all; }
+
+        /* --- CONTENEDOR DEL PERIÓDICO --- */
+        .paper-wrapper {
+            max-width: 1000px; margin: 40px auto;
+            background-color: var(--paper);
+            background-image: url('https://www.transparenttextures.com/patterns/old-paper.png');
+            padding: 40px;
+            box-shadow: 0 0 50px rgba(0,0,0,0.8);
+            position: relative;
+        }
+
+        .prophet-header {
+            text-align: center; border-bottom: 3px double var(--ink);
+            padding-bottom: 15px; margin-bottom: 30px;
+        }
+        .prophet-title {
+            font-family: 'UnifrakturMaguntia', cursive;
+            font-size: clamp(3rem, 8vw, 6rem);
+            line-height: 0.8; margin-bottom: 10px;
+        }
+        .prophet-meta {
+            display: flex; justify-content: space-between;
+            font-family: 'Cinzel Decorative'; font-weight: bold; font-size: 0.8rem;
+            border-top: 1px solid var(--ink); border-bottom: 1px solid var(--ink);
+            padding: 5px 0; margin-top: 10px;
+        }
+
+        /* --- GRID DE NOTICIAS --- */
+        .news-grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 30px; column-gap: 40px;
+        }
+
+        .article-card {
+            border-bottom: 1px solid rgba(0,0,0,0.1); padding-bottom: 20px;
+            cursor: pointer; transition: 0.3s;
+            /* Inicialmente oculto para la animación de entrada */
+            opacity: 0; transform: translateY(50px);
+        }
+        
+        /* Animación de Entrada */
+        @keyframes floatUp {
+            from { opacity: 0; transform: translateY(50px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .article-card.visible {
+            animation: floatUp 0.8s ease-out forwards;
+        }
+
+        .article-card:hover .article-title { text-decoration: underline; text-decoration-color: var(--gold); }
+
+        .article-img-box {
+            width: 100%; height: 200px; border: 2px solid var(--ink);
+            padding: 3px; margin-bottom: 15px; position: relative; overflow: hidden;
+        }
+        .article-img {
+            width: 100%; height: 100%; object-fit: cover;
+            filter: grayscale(100%) contrast(120%);
+            transition: 0.5s;
+        }
+        .article-card:hover .article-img { transform: scale(1.1); filter: grayscale(80%) contrast(100%); }
+
+        .article-title {
+            font-family: 'Cinzel Decorative'; font-weight: 900; font-size: 1.4rem;
+            line-height: 1.1; margin-bottom: 10px; text-transform: uppercase;
+        }
+        .article-preview {
+            font-size: 0.95rem; line-height: 1.4; text-align: justify;
+            color: #333;
+            display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
+        }
+        .author { font-style: italic; font-size: 0.8rem; margin-top: 5px; display: block; color: #555; }
+
+        /* --- ARTÍCULO DESTACADO --- */
+        .hero-article {
+            grid-column: 1 / -1; display: grid; grid-template-columns: 1fr 1fr; gap: 30px;
+            border-bottom: 3px double var(--ink); padding-bottom: 30px; margin-bottom: 30px;
+            opacity: 0; animation: floatUp 1s ease-out forwards;
+        }
+        .hero-img-box { height: 350px; border: 3px solid var(--ink); padding: 5px; }
+        .hero-title { font-size: 3rem; margin-bottom: 15px; }
+        .hero-text { font-size: 1.1rem; column-count: 2; column-gap: 20px; text-align: justify; }
+
+        @media (max-width: 768px) {
+            .hero-article { grid-template-columns: 1fr; }
+            .hero-text { column-count: 1; }
+            .paper-wrapper { padding: 20px; width: 95%; }
+        }
+
+        /* --- MODAL --- */
+        .modal {
+            display: none; position: fixed; z-index: 3000; left: 0; top: 0; width: 100%; height: 100%;
+            background-color: rgba(0,0,0,0.95); backdrop-filter: blur(5px);
+            justify-content: center; align-items: center; padding: 20px;
+        }
+        .modal-content {
+            background-color: var(--paper);
+            background-image: url('https://www.transparenttextures.com/patterns/old-paper.png');
+            width: 100%; max-width: 800px; max-height: 90vh; overflow-y: auto;
+            border: 10px double var(--ink); padding: 40px; position: relative;
+            box-shadow: 0 0 50px rgba(212, 175, 55, 0.4);
+        }
+        .close-modal { position: absolute; top: 15px; right: 20px; font-size: 2rem; cursor: pointer; color: var(--ink); }
+        
+        .modal-headline { font-family: 'Cinzel Decorative'; font-size: 2.5rem; margin-bottom: 10px; border-bottom: 1px solid var(--ink); line-height: 1.1; }
+        .modal-img { width: 100%; height: 300px; object-fit: cover; border: 2px solid var(--ink); margin-bottom: 20px; filter: grayscale(100%); }
+        
+        /* El cuerpo donde se escribirá el texto */
+        .modal-body { 
+            font-size: 1.2rem; line-height: 1.8; text-align: justify; 
+            min-height: 100px; font-family: 'Crimson Text', serif;
+        }
+        
+        /* Cursor de pluma al escribir */
+        .writing-cursor::after {
+            content: '✒️'; /* Icono de pluma al final mientras escribe */
+            display: inline-block;
+            animation: writing 0.5s infinite alternate;
+        }
+        @keyframes writing { from { transform: translateY(0); } to { transform: translateY(-5px); } }
+
+        footer { text-align: center; padding: 20px; color: #888; font-size: 0.8rem; margin-top: auto; }
+
+    </style>
+</head>
+<body>
+
+    <nav>
+        <button class="menu-toggle" onclick="toggleMenu()"><i class="fas fa-bars"></i></button>
+        <a href="index.html"><img src="WIZARDINGLOGO.PNG" class="nav-logo"></a>
+    </nav>
+
+    <div class="overlay" id="overlay" onclick="toggleMenu()"></div>
+    <div class="sidebar" id="sidebar">
+        <button class="close-btn" onclick="toggleMenu()">&times;</button>
+        <div style="text-align: center; margin-bottom: 20px;"><img src="WIZARDINGLOGO.PNG" width="80"></div>
+        <ul class="sidebar-links">
+            <li><a href="index.html">Inicio</a></li>
+            <li><a href="noticias.html" style="color: var(--gold);">El Profeta</a></li>
+            <li><a href="cast_hp1.html">Casting</a></li>
+            <li><a href="staff.html">Staff</a></li>
+            <li><a href="mapa.html">Mapa</a></li>
+            <li><a href="hechizos.html">Hechizos</a></li>
+        </ul>
+    </div>
+
+    <div class="paper-wrapper">
+        <div class="prophet-header">
+            <div class="prophet-title">EL PROFETA</div>
+            <div class="prophet-meta">
+                <span>EDICIÓN ESPECIAL</span>
+                <span>PRECIO: 5 KNUTS</span>
+                <span>LONDRES, 1991</span>
+            </div>
+        </div>
+
+        <div id="newsContainer">
+            </div>
+    </div>
+
+    <div id="newsModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal()">&times;</span>
+            <h2 class="modal-headline" id="mTitle">Titulo</h2>
+            <span class="author" id="mAuthor" style="margin-bottom: 20px; display:block;"></span>
+            <img src="" class="modal-img" id="mImg">
+            <div class="modal-body" id="mBody"></div>
+        </div>
+    </div>
+
+    <footer><p>&copy; 2026 Fakeland Project</p></footer>
+
+    <script>
+        function toggleMenu() {
+            document.getElementById('sidebar').classList.toggle('active');
+            document.getElementById('overlay').classList.toggle('active');
+        }
+
+        const newsData = [
+            { 
+                title: "¡FUGA MASIVA EN AZKABAN!", 
+                img: "noticia1.jpg",
+                content: `<p><strong>LONDRES.</strong> El Ministerio de Magia ha confirmado esta mañana lo que muchos temían: una brecha de seguridad sin precedentes en la prisión de Azkaban.</p><p>Aproximadamente a las 3:00 AM, los Dementores abandonaron sus puestos, permitiendo la huida de diez prisioneros de alta peligrosidad. Cornelius Fudge, visiblemente agitado, declaró: "Estamos controlando la situación". Sin embargo, fuentes internas sugieren que el Ministerio ha perdido el control sobre las criaturas oscuras.</p><p>Se insta a la población a asegurar sus hogares y evitar salidas nocturnas hasta nuevo aviso.</p>`
+            },
+            { 
+                title: "HARRY POTTER: ¿EL ELEGIDO?", 
+                img: "noticia2.jpg",
+                content: `<p>El niño que vivió ha sido visto comprando sus útiles escolares, y el mundo mágico no puede dejar de preguntarse: ¿Es cierto todo lo que se dice?</p><p>Testigos en el Callejón Diagon afirman que el joven Potter parece un chico normal, aunque la cicatriz en su frente sigue siendo un recordatorio visible de aquella noche fatídica. Albus Dumbledore se ha negado a comentar sobre el paradero del muchacho durante la última década, citando razones de seguridad.</p><p>¿Traerá su llegada a Hogwarts una nueva era de luz... o atraerá de nuevo a la oscuridad?</p>`
+            },
+            { 
+                title: "DUMBLEDORE NOMBRA NUEVO PROFESOR", 
+                img: "noticia3.jpg",
+                content: `<p>Como cada año, el puesto de Defensa Contra las Artes Oscuras ha sido cubierto. Esta vez, el Profesor Quirinus Quirrell, conocido por su brillante mente pero nerviosa disposición, tomará el cargo.</p><p>Quirrell ha regresado recientemente de un año sabático en Albania, donde afirma haber tenido "encuentros prácticos" con criaturas oscuras. Algunos estudiantes ya han notado un extraño olor a ajo alrededor de su turbante, el cual asegura que es para protegerse de un vampiro vengativo.</p>`
+            },
+            { 
+                title: "¡AVISTADO AUTO VOLADOR!", 
+                img: "noticia4.jpg",
+                content: `<p>Muggles en todo Londres reportaron haber visto "un objeto azul volador" sobre la ciudad. El Departamento de Uso Incorrecto de Artefactos Muggles está investigando, aunque Arthur Weasley ha negado cualquier implicación.</p><p>"Mis hijos estaban en la cena", declaró Weasley. Sin embargo, fuentes confiables aseguran que un Ford Anglia modificado ha desaparecido de su garaje. Si se confirma la infracción del Estatuto del Secreto, las multas podrían ser astronómicas.</p>`
+            },
+            { 
+                title: "MINISTERIO NIEGA EL RETORNO", 
+                img: "noticia5.jpg",
+                content: `<p>"Absurdo. Ridículo. Imposible". Esas fueron las palabras del Ministro Fudge ante los rumores de actividad oscura en los bosques de Albania.</p><p>A pesar de los informes de desapariciones misteriosas y comportamientos erráticos en criaturas mágicas, la postura oficial es que "Aquel que no debe ser nombrado" fue derrotado para siempre. Cualquier sugerencia de lo contrario es considerada, según el Ministerio, una ofensa a la paz pública.</p>`
+            },
+            { 
+                title: "NUEVAS REGLAS EN GRINGOTTS", 
+                img: "noticia6.jpg",
+                content: `<p>Los duendes de Gringotts han implementado nuevas medidas de seguridad tras el intento de robo en la cámara 713. Aunque se insiste en que nada fue robado, la seguridad ha sido triplicada.</p><p>"Solo un loco intentaría robar aquí", gruñó Griphook al ser entrevistado. Se rumorea que dragones adicionales han sido trasladados a las bóvedas inferiores para custodiar objetos de valor incalculable.</p>`
+            },
+            { 
+                title: "¡MUNDIAL DE QUIDDITCH!", 
+                img: "noticia7.jpg",
+                content: `<p>La fiebre del Quidditch se apodera de Gran Bretaña. Irlanda y Bulgaria se preparan para lo que promete ser la final del siglo. Viktor Krum, el joven buscador prodigio, es el favorito de las apuestas.</p><p>Se han habilitado trasladores en todo el país para transportar a los 100,000 magos que asistirán al evento. El Departamento de Deportes y Juegos Mágicos advierte sobre el uso de magia cerca de los campamentos muggles.</p>`
+            },
+            { 
+                title: "DRAGÓN SOBRE LONDRES", 
+                img: "noticia8.jpg",
+                content: `<p>Una sombra gigantesca oscureció el Big Ben anoche. Aunque los meteorólogos muggles lo atribuyeron a una "nube de forma inusual", los magos sabemos la verdad: un Galés Verde Común escapó brevemente de su reserva.</p><p>Los desmemorizadores trabajaron toda la noche para rectificar la situación. Se insta a los ciudadanos a no intentar domesticar criaturas de clasificación XXXXX en sus patios traseros.</p>`
+            },
+            { 
+                title: "ESCÁNDALO DE POCIONES", 
+                img: "noticia9.jpg",
+                content: `<p>Se ha descubierto una red de contrabando de Amortentia (filtros de amor) de alta potencia dentro de Hogwarts. Al parecer, estudiantes de sexto año estaban vendiendo los frascos antes de San Valentín.</p><p>El Profesor Snape confiscó tres calderos llenos y ha prometido castigos severos. "El amor no se puede fabricar", recordó el profesor, "pero la vergüenza pública sí".</p>`
+            },
+            { 
+                title: "REDADA EN MANSIÓN MALFOY", 
+                img: "noticia10.jpg",
+                content: `<p>Aurores realizaron una inspección sorpresa en la residencia de Lucius Malfoy buscando objetos oscuros ilegales. Malfoy, conocido filántropo y consejero del Ministro, calificó el acto como "un insulto a su linaje".</p><p>No se encontraron objetos prohibidos en la superficie, aunque persisten rumores sobre una cámara secreta debajo del salón principal. La investigación continúa.</p>`
+            },
+            { 
+                title: "ACCIDENTE EN POCIONES", 
+                img: "noticia11.jpg",
+                content: `<p>La clase de primer año de Gryffindor y Slytherin terminó abruptamente cuando el caldero de Neville Longbottom se derritió, creando una nube de humo verde y ácido.</p><p>Varios estudiantes fueron enviados a la enfermería con forúnculos. Se recuerda a los alumnos que leer las instrucciones *antes* de añadir las púas de puercoespín es fundamental para la integridad física.</p>`
+            },
+            { 
+                title: "GILDEROY LOCKHART FIRMA", 
+                img: "noticia12.jpg",
+                content: `<p>El cinco veces ganador del premio a la Sonrisa Más Encantadora, Gilderoy Lockhart, estará firmando copias de su autobiografía "El Encantador" en Flourish & Blotts este sábado.</p><p>Se espera una multitud récord. Lockhart ha prometido revelar en exclusiva su secreto para combatir a los hombres lobo... y para mantener el cabello con tanto volumen.</p>`
+            },
+            { 
+                title: "¿SIRIUS BLACK EN HOGSMEADE?", 
+                img: "noticia13.jpg",
+                content: `<p>El pánico se desató en Las Tres Escobas cuando un cliente afirmó ver la silueta del infame asesino Sirius Black. Los dementores patrullaron la zona, causando que la cerveza de mantequilla se congelara en las jarras.</p><p>Resultó ser una falsa alarma (un perro callejero muy grande), pero el Ministerio recuerda que Black sigue armado y es extremadamente peligroso.</p>`
+            },
+            { 
+                title: "FIESTA DE FANTASMAS", 
+                img: "noticia14.jpg",
+                content: `<p>Sir Nicholas de Mimsy-Porpington celebró su 500 aniversario de muerte con una fiesta en las mazmorras. Asistieron fantasmas de todo el país, incluyendo a la Llorona Myrtle, quien inundó el baño de chicas en protesta por no ser invitada a la mesa principal.</p><p>La comida, que consistía en pescado podrido y pasteles mohosos, fue descrita por los asistentes vivos como "una experiencia olfativa inolvidable".</p>`
+            },
+            { 
+                title: "LLUVIA DE RANAS", 
+                img: "noticia15.jpg",
+                content: `<p>Un fallo en el Departamento de Mantenimiento Meteorológico Mágico provocó una lluvia de ranas toro sobre el Atrio del Ministerio. Los empleados tuvieron que usar el hechizo *Impervius* para llegar a sus oficinas.</p><p>Las ranas han sido reubicadas, pero se aconseja llevar paraguas por si acaso empiezan a caer renacuajos.</p>`
+            },
+            { 
+                title: "RETRASOS EN EL EXPRESO", 
+                img: "noticia16.jpg",
+                content: `<p>El Expreso de Hogwarts sufrió un retraso de dos horas debido a una inspección de seguridad rutinaria. Los estudiantes aprovecharon para comprar todos los pasteles de calabaza del carrito.</p><p>El conductor asegura que llegarán a tiempo para el banquete de bienvenida, siempre y cuando no haya "más sorpresas espectrales" en las vías.</p>`
+            },
+            { 
+                title: "DEMENTORES EN HUELGA", 
+                img: "noticia17.jpg",
+                content: `<p>Los guardianes de Azkaban han mostrado signos de inquietud. Afirman que el "suministro de felicidad" ha disminuido y exigen mejores condiciones o más prisioneros.</p><p>El Ministerio está negociando, aunque muchos temen que los Dementores decidan buscar alimento por su cuenta en zonas pobladas.</p>`
+            },
+            { 
+                title: "NUEVAS BROMAS EN ZONKO", 
+                img: "noticia18.jpg",
+                content: `<p>La famosa tienda de bromas de Hogsmeade ha lanzado su nueva línea: "Caramelos de la Verdad". Cuidado con lo que comes, podrías terminar confesando tus secretos más oscuros.</p><p>Argus Filch ya ha solicitado que se prohíban en los pasillos de Hogwarts, alegando que "ya hay suficiente ruido sin que los estudiantes griten sus secretos".</p>`
+            },
+            { 
+                title: "GRITOS DE MANDRÁGORAS", 
+                img: "noticia19.jpg",
+                content: `<p>La clase de Herbología tuvo un incidente menor cuando un estudiante de segundo año se quitó las orejeras antes de tiempo. El grito de la Mandrágora lo dejó inconsciente durante dos horas.</p><p>La Profesora Sprout recuerda que las Mandrágoras jóvenes pueden no ser mortales, pero te dejarán fuera de combate si no tienes cuidado.</p>`
+            },
+            { 
+                title: "ROBO EN DEP. DE MISTERIOS", 
+                img: "noticia20.jpg",
+                content: `<p>Una esfera de profecía ha desaparecido del estante 97. Los Inefables se niegan a comentar sobre el contenido de la misma, pero fuentes indican que podría estar relacionada con el destino del mundo mágico.</p><p>¿Quién podría infiltrarse en el lugar más seguro del Ministerio? Las investigaciones apuntan a magia oscura muy avanzada.</p>`
+            }
+        ];
+
+        let typingTimeout;
+
+        function renderPage() {
+            const container = document.getElementById('newsContainer');
+            
+            // Elegir noticia destacada (la primera del array o random)
+            const featuredIndex = 0; // O Math.floor(Math.random() * newsData.length);
+            const featured = newsData[featuredIndex];
+            
+            // HTML Destacada
+            let html = `
+                <div class="hero-article" onclick="openModal(${featuredIndex})">
+                    <div class="hero-img-box">
+                        <img src="${featured.img}" class="article-img" onerror="this.src='https://images.unsplash.com/photo-1547756536-cde3673fa2e5?auto=format&fit=crop&w=1000&q=80'">
+                    </div>
+                    <div>
+                        <h2 class="hero-title">${featured.title}</h2>
+                        <span class="author">Por Rita Skeeter - Corresponsal Especial</span>
+                        <div class="hero-text">
+                            ${featured.content.substring(0, 300).replace(/<[^>]*>?/gm, '')}... <br><strong>(Clic para leer la historia completa)</strong>
+                        </div>
+                    </div>
+                </div>
+                <div class="news-grid">
+            `;
+
+            // HTML Resto de noticias con Animación de Entrada
+            newsData.forEach((news, index) => {
+                if (index !== featuredIndex) {
+                    const previewText = news.content.replace(/<[^>]*>?/gm, '').substring(0, 100) + '...';
+                    
+                    // Añadimos style con delay para el efecto cascada
+                    const delay = (index * 0.1) + 's';
+                    
+                    html += `
+                        <div class="article-card" style="animation-delay: ${delay}" onclick="openModal(${index})">
+                            <div class="article-img-box">
+                                <img src="${news.img}" class="article-img" onerror="this.src='https://images.unsplash.com/photo-1618519764620-7403abdbdfe9?auto=format&fit=crop&w=600&q=80'">
+                            </div>
+                            <h3 class="article-title">${news.title}</h3>
+                            <p class="article-preview">${previewText}</p>
+                            <span class="author">El Profeta</span>
+                        </div>
+                    `;
+                }
+            });
+
+            html += `</div>`;
+            container.innerHTML = html;
+            
+            // Activar animación al cargar
+            setTimeout(() => {
+                const cards = document.querySelectorAll('.article-card');
+                cards.forEach(card => card.classList.add('visible'));
+            }, 100);
+        }
+
+        // --- SISTEMA DE ESCRITURA MÁGICA (TYPEWRITER) ---
+        function typeWriterEffect(element, htmlContent, speed = 20) {
+            let i = 0;
+            element.innerHTML = ""; // Limpiar contenido previo
+            element.classList.add('writing-cursor');
+
+            function type() {
+                if (i < htmlContent.length) {
+                    // Si encontramos una etiqueta HTML, la escribimos completa de golpe
+                    if (htmlContent.charAt(i) === '<') {
+                        let tag = '';
+                        while (htmlContent.charAt(i) !== '>' && i < htmlContent.length) {
+                            tag += htmlContent.charAt(i);
+                            i++;
+                        }
+                        tag += '>';
+                        i++;
+                        element.innerHTML += tag;
+                    } else {
+                        // Si es una letra normal, la añadimos
+                        element.innerHTML += htmlContent.charAt(i);
+                        i++;
+                    }
+                    typingTimeout = setTimeout(type, speed);
+                } else {
+                    element.classList.remove('writing-cursor'); // Quitar pluma al terminar
+                }
+            }
+            type();
+        }
+
+        function openModal(index) {
+            const news = newsData[index];
+            document.getElementById('mTitle').innerText = news.title;
+            document.getElementById('mImg').src = news.img;
+            
+            // Autor
+            const authors = ["Rita Skeeter", "Barnabas Cuffe", "Betty Braithwaite", "Xenophilius Lovegood"];
+            document.getElementById('mAuthor').innerText = "Por " + authors[Math.floor(Math.random() * authors.length)];
+            
+            // Limpiar timeout anterior si se cerró rápido
+            clearTimeout(typingTimeout);
+            
+            // INICIAR ESCRITURA MÁGICA
+            const bodyEl = document.getElementById('mBody');
+            typeWriterEffect(bodyEl, news.content, 15); // 15ms por letra (velocidad rápida)
+
+            document.getElementById('newsModal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            clearTimeout(typingTimeout); // Detener escritura
+            document.getElementById('newsModal').style.display = 'none';
+        }
+
+        window.onclick = function(event) {
+            if (event.target == document.getElementById('newsModal')) {
+                closeModal();
+            }
+        }
+
+        // Iniciar
+        renderPage();
+
+    </script>
+</body>
+</html>

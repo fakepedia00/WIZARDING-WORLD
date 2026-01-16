@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Staff & Producción | Wizarding World</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --gold: #d4af37;
+            --silver: #c0c0c0;
+            --dark-bg: #0b0c10;
+            --card-bg: #1f2833;
+            --text-color: #c5c6c7;
+            --accent: #45a29e;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background-color: var(--dark-bg);
+            background-image: url('https://www.transparenttextures.com/patterns/black-felt.png');
+            color: var(--text-color);
+            font-family: 'Crimson Text', serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+            cursor: url('https://cur.cursors-4u.net/user/use-1/use157.cur'), auto;
+        }
+
+        a, button { cursor: url('https://cur.cursors-4u.net/user/use-1/use157.cur'), pointer; text-decoration: none; }
+
+        /* NAV */
+        nav {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 15px 50px; background: rgba(11, 12, 16, 0.95);
+            border-bottom: 1px solid var(--gold);
+            position: sticky; top: 0; z-index: 100; backdrop-filter: blur(10px);
+        }
+        
+        .nav-logo { height: 50px; width: auto; transition: 0.3s; }
+        .nav-logo:hover { filter: drop-shadow(0 0 5px var(--gold)); transform: scale(1.05); }
+
+        .nav-links { display: flex; gap: 30px; list-style: none; align-items: center; }
+        .nav-links a { color: #aaa; font-family: 'Cinzel Decorative'; text-transform: uppercase; font-size: 0.9rem; transition: 0.3s; }
+        .nav-links a:hover { color: var(--gold); }
+
+        /* HEADER */
+        .staff-header {
+            text-align: center; padding: 80px 20px;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.8), var(--dark-bg)),
+                        url('https://images.unsplash.com/photo-1516280440614-6697288d5d38?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80');
+            background-size: cover; background-position: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        h1 {
+            font-family: 'Cinzel Decorative'; font-size: clamp(2.5rem, 6vw, 4.5rem); color: var(--gold);
+            margin-bottom: 15px; text-shadow: 0 0 20px rgba(0,0,0,0.8);
+        }
+        
+        .subtitle { 
+            font-size: 1.2rem; color: var(--silver); letter-spacing: 2px; text-transform: uppercase; 
+            max-width: 700px; margin: 0 auto; line-height: 1.6;
+        }
+
+        /* GRID DE ROLES */
+        .container { max-width: 1200px; margin: 0 auto; padding: 40px 20px; }
+        
+        .staff-grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 30px; margin-bottom: 60px;
+        }
+
+        .role-card {
+            background: rgba(31, 40, 51, 0.6);
+            border: 1px solid rgba(197, 198, 199, 0.1);
+            border-radius: 8px; padding: 30px;
+            transition: 0.3s; position: relative; overflow: hidden;
+            display: flex; flex-direction: column; align-items: center; text-align: center;
+        }
+
+        .role-card:hover {
+            transform: translateY(-5px); 
+            border-color: var(--gold); 
+            background: rgba(31, 40, 51, 0.9);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .icon-container {
+            width: 80px; height: 80px; border-radius: 50%;
+            background: rgba(0,0,0,0.3); border: 2px solid var(--gold);
+            display: flex; justify-content: center; align-items: center;
+            margin-bottom: 20px; font-size: 2rem; color: var(--gold);
+            transition: 0.5s;
+        }
+        
+        .role-card:hover .icon-container {
+            background: var(--gold); color: #000; box-shadow: 0 0 20px var(--gold);
+        }
+
+        .role-title { font-family: 'Cinzel Decorative'; font-size: 1.5rem; color: #fff; margin-bottom: 5px; }
+        .role-subtitle { font-size: 0.8rem; color: var(--accent); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 15px; }
+        
+        .role-desc { 
+            font-size: 0.95rem; color: #aaa; line-height: 1.6; margin-bottom: 25px; 
+            border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px; width: 100%;
+        }
+
+        /* BADGE DE ESTADO */
+        .vacancy-badge {
+            background: rgba(46, 204, 113, 0.2); color: #2ecc71; border: 1px solid #2ecc71;
+            padding: 4px 10px; border-radius: 20px; font-size: 0.7rem; text-transform: uppercase;
+            margin-bottom: 15px;
+        }
+
+        /* BOTÓN APLICAR */
+        .apply-btn {
+            margin-top: auto;
+            border: 1px solid var(--gold); color: var(--gold);
+            padding: 10px 30px; font-family: 'Cinzel Decorative'; font-size: 0.9rem;
+            transition: 0.3s; background: transparent; text-transform: uppercase; width: 100%;
+        }
+        .apply-btn:hover { background: var(--gold); color: #000; }
+
+        /* SECCIÓN CEO */
+        .ceo-section {
+            background: radial-gradient(circle, rgba(212, 175, 55, 0.1) 0%, transparent 70%);
+            border: 1px solid var(--gold); padding: 40px; border-radius: 10px;
+            margin-bottom: 60px; text-align: center;
+        }
+
+        /* FORMULARIO DE APLICACIÓN */
+        .form-section {
+            background: rgba(31, 40, 51, 0.4); 
+            border-radius: 10px;
+            padding: 40px 20px; 
+            text-align: center; 
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            margin-top: 40px;
+            scroll-margin-top: 100px;
+        }
+        
+        .form-wrapper {
+            background: #fff;
+            max-width: 800px; margin: 30px auto 0 auto;
+            border-radius: 8px; overflow: hidden;
+            box-shadow: 0 0 30px rgba(0,0,0,0.5);
+        }
+
+        iframe { width: 100%; display: block; border: none; }
+
+        footer { text-align: center; padding: 40px; color: #555; font-size: 0.8rem; margin-top: auto; border-top: 1px solid #222; }
+
+        @media (max-width: 768px) {
+            .nav-links { display: none; }
+            .staff-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <a href="index.html">
+            <img src="WIZARDINGLOGO.PNG" alt="Wizarding World" class="nav-logo">
+        </a>
+        <ul class="nav-links">
+            <li><a href="index.html">Inicio</a></li>
+            <li><a href="peliculas.html">Películas</a></li>
+            <li><a href="staff.html" style="color: var(--gold);">Staff</a></li>
+            <li><a href="quiz.html">T.I.M.O. Quiz</a></li>
+        </ul>
+    </nav>
+
+    <div class="staff-header">
+        <h1>Departamento de Misterios</h1>
+        <p class="subtitle">
+            El mundo mágico no se construye solo. Buscamos a los arquitectos, videntes y artistas que darán vida a Fakeland detrás de cámaras.
+        </p>
+    </div>
+
+    <div class="container">
+
+        <div class="ceo-section">
+            <div class="icon-container" style="margin: 0 auto 20px auto; width: 100px; height: 100px; font-size: 3rem;">
+                <i class="fas fa-crown"></i>
+            </div>
+            <h2 class="role-title" style="font-size: 2rem; color: var(--gold);">Dirección General (CEO)</h2>
+            <p style="color: #ccc; max-width: 600px; margin: 10px auto 30px auto;">
+                Los guardianes de la visión. Responsables de coordinar todos los departamentos, mantener el orden en el roleplay y asegurar que la magia nunca se apague.
+            </p>
+            <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+                <span class="vacancy-badge" style="background: rgba(231, 76, 60, 0.2); color: #e74c3c; border-color: #e74c3c;">Cupos Limitados</span>
+            </div>
+            <br>
+            <a href="#application-form" class="apply-btn" style="display: inline-block; width: auto; background: var(--gold); color: #000;">
+                Postular a Dirección
+            </a>
+        </div>
+        
+        <h2 style="font-family: 'Cinzel Decorative'; color: var(--text-color); margin-bottom: 30px; text-align: center; border-bottom: 1px solid #333; padding-bottom: 10px;">
+            Vacantes Técnicas & Artísticas
+        </h2>
+
+        <div class="staff-grid">
+            
+            <div class="role-card">
+                <div class="icon-container"><i class="fas fa-video"></i></div>
+                <h3 class="role-title">Magia Visual</h3>
+                <span class="role-subtitle">Cámaras & Fotografía</span>
+                <span class="vacancy-badge">Abierto</span>
+                <p class="role-desc">
+                    Encargados de capturar los momentos. Buscamos personas con ojo estético para grabar escenas (en juegos o vida real), tomar capturas y crear "retratos en movimiento".
+                </p>
+                <a href="#application-form" class="apply-btn">Aplicar</a>
+            </div>
+
+            <div class="role-card">
+                <div class="icon-container"><i class="fas fa-wand-magic-sparkles"></i></div>
+                <h3 class="role-title">Pensadero Digital</h3>
+                <span class="role-subtitle">Editores de Video</span>
+                <span class="vacancy-badge">Abierto</span>
+                <p class="role-desc">
+                    Los alquimistas de la post-producción. Tu magia une las escenas, añade efectos especiales (VFX) y crea la atmósfera cinematográfica para TikTok, YouTube o Reels.
+                </p>
+                <a href="#application-form" class="apply-btn">Aplicar</a>
+            </div>
+
+            <div class="role-card">
+                <div class="icon-container"><i class="fas fa-music"></i></div>
+                <h3 class="role-title">Coro del Sapo</h3>
+                <span class="role-subtitle">Músicos & Sonido</span>
+                <span class="vacancy-badge">Abierto</span>
+                <p class="role-desc">
+                    Compositores, editores de audio o seleccionadores de banda sonora. Encargados de dar vida auditiva al mundo mágico, desde ambientes de bosque hasta duelos épicos.
+                </p>
+                <a href="#application-form" class="apply-btn">Aplicar</a>
+            </div>
+
+            <div class="role-card">
+                <div class="icon-container"><i class="fas fa-feather-alt"></i></div>
+                <h3 class="role-title">Plumas de Rita</h3>
+                <span class="role-subtitle">Guionistas & Lore</span>
+                <span class="vacancy-badge">Abierto</span>
+                <p class="role-desc">
+                    Arquitectos de la historia. Ayudan a escribir los guiones de los videos, desarrollan tramas secundarias para el roleplay y mantienen la coherencia del canon.
+                </p>
+                <a href="#application-form" class="apply-btn">Aplicar</a>
+            </div>
+
+            <div class="role-card">
+                <div class="icon-container"><i class="fas fa-newspaper"></i></div>
+                <h3 class="role-title">El Profeta</h3>
+                <span class="role-subtitle">Diseño Gráfico</span>
+                <span class="vacancy-badge">Abierto</span>
+                <p class="role-desc">
+                    Creadores de carteles de "Se Busca", portadas de libros, identificaciones del Ministerio y publicidad para las redes sociales del proyecto.
+                </p>
+                <a href="#application-form" class="apply-btn">Aplicar</a>
+            </div>
+
+            <div class="role-card">
+                <div class="icon-container"><i class="fas fa-shield-alt"></i></div>
+                <h3 class="role-title">Aurores</h3>
+                <span class="role-subtitle">Moderadores de Comunidad</span>
+                <span class="vacancy-badge">Abierto</span>
+                <p class="role-desc">
+                    Encargados de mantener la paz en el servidor/chat. Vigilan el cumplimiento de las reglas, resuelven disputas y aseguran un ambiente seguro para todos.
+                </p>
+                <a href="#application-form" class="apply-btn">Aplicar</a>
+            </div>
+
+        </div>
+
+        <div id="application-form" class="form-section">
+            <h2 style="font-family: 'Cinzel Decorative'; color: var(--gold); font-size: 2rem; margin-bottom: 10px;">
+                <i class="fas fa-file-signature"></i> Solicitud de Ingreso al Staff
+            </h2>
+            <p style="color: #ccc; max-width: 600px; margin: 0 auto;">
+                "La magia florece solo en almas únicas." Completa el pergamino digital a continuación para ser considerado en nuestras filas.
+            </p>
+            
+            <div class="form-wrapper">
+                <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSdPntU70rJEesfainlKWt5Kg9iSUILp2SGz3VnPBNCoJ7WvVQ/viewform?embedded=true" 
+                        width="100%" 
+                        height="2487" 
+                        frameborder="0" 
+                        marginheight="0" 
+                        marginwidth="0">
+                    Cargando…
+                </iframe>
+            </div>
+        </div>
+
+    </div>
+
+    <footer>
+        <p>
+            Wizarding World Digital. Propiedad intelectual de J.K. Rowling y Warner Bros. Entertainment Inc.<br>
+            Este sitio es un proyecto sin fines de lucro (Fakeland) para roleplay.
+        </p>
+        <p style="margin-top: 10px; opacity: 0.6;">&copy; 2026 Fakeland Project Team</p>
+    </footer>
+
+</body>
+</html>

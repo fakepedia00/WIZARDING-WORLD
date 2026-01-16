@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Decretos y Normas | Fakeland Project</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Playfair+Display+SC:wght@700;900&family=Rye&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --wood: #5d4037;
+            --paper: #f0e6d2;
+            --ink: #2b2b2b;
+            --gold: #d4af37;
+            --dark-bg: #1a1a1a;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background-color: var(--dark-bg);
+            /* Fondo de Pared de Piedra */
+            background-image: url('https://www.transparenttextures.com/patterns/stone-wall.png'); 
+            color: var(--ink);
+            font-family: 'Playfair Display SC', serif;
+            min-height: 100vh;
+            display: flex; flex-direction: column; overflow-x: hidden;
+        }
+
+        /* --- NAV & SIDEBAR (Igual que las otras páginas) --- */
+        nav {
+            display: flex; justify-content: center; align-items: center;
+            padding: 10px 20px; background: rgba(5, 5, 5, 0.95);
+            border-bottom: 1px solid rgba(212, 175, 55, 0.3);
+            position: sticky; top: 0; z-index: 1000; height: 60px;
+        }
+        .menu-toggle { position: absolute; left: 20px; background: transparent; border: none; color: var(--gold); font-size: 1.5rem; cursor: pointer; }
+        .nav-logo { height: 40px; width: auto; }
+
+        .sidebar {
+            position: fixed; top: 0; left: -100%; width: 80%; max-width: 300px; height: 100%;
+            background: rgba(8, 8, 10, 0.98); border-right: 1px solid var(--gold);
+            z-index: 2000; transition: 0.4s; display: flex; flex-direction: column; padding-top: 20px; color: #ccc;
+        }
+        .sidebar.active { left: 0; }
+        .close-btn { align-self: flex-end; margin-right: 20px; background: transparent; border: none; color: #aaa; font-size: 2rem; cursor: pointer; }
+        .sidebar-links { list-style: none; padding: 20px 0; }
+        .sidebar-links a { display: block; padding: 15px 25px; color: #ccc; text-decoration: none; transition: 0.3s; font-family: 'Cinzel Decorative'; font-size: 1rem; }
+        .sidebar-links a:hover { color: var(--gold); padding-left: 35px; }
+        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1500; opacity: 0; pointer-events: none; transition: 0.3s; }
+        .overlay.active { opacity: 1; pointer-events: all; }
+
+        /* --- CABECERA DE LA PARED --- */
+        .wall-header {
+            text-align: center; padding: 40px 20px;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent);
+            color: #fff; text-shadow: 0 5px 10px #000;
+        }
+        .main-title { font-family: 'Cinzel Decorative'; font-size: 3rem; color: var(--gold); margin-bottom: 10px; }
+        .subtitle { font-family: 'Crimson Text', serif; font-style: italic; color: #ccc; }
+
+        /* --- EL MURO DE DECRETOS (MASONRY GRID) --- */
+        .wall-container {
+            max-width: 1200px; margin: 0 auto; padding: 40px 20px;
+            column-count: 3; column-gap: 30px; /* Efecto Masonry (columnas desordenadas) */
+        }
+
+        /* DISEÑO DEL MARCO (DECRETO) */
+        .decree-frame {
+            background-color: var(--wood);
+            padding: 15px;
+            border-radius: 5px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8), inset 0 0 20px rgba(0,0,0,0.5);
+            margin-bottom: 40px; /* Espacio entre cuadros verticales */
+            break-inside: avoid; /* Evita que se corten al cambiar de columna */
+            position: relative;
+            transition: 0.3s;
+            cursor: default;
+        }
+
+        /* Efecto de "colgado" */
+        .decree-frame::before {
+            content: ''; position: absolute; top: -15px; left: 50%; transform: translateX(-50%);
+            width: 10px; height: 10px; background: #111; border-radius: 50%; /* El clavo */
+            box-shadow: 0 0 5px rgba(255,255,255,0.2);
+        }
+
+        .decree-frame:hover { transform: scale(1.02) rotate(1deg); z-index: 10; }
+
+        /* INTERIOR DEL PERGAMINO */
+        .decree-paper {
+            background-color: var(--paper);
+            background-image: url('https://www.transparenttextures.com/patterns/old-paper.png');
+            border: 2px solid #333;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+        }
+
+        /* Cabecera del Decreto "PROCLAMATION" */
+        .decree-header {
+            border-bottom: 3px double var(--ink);
+            margin-bottom: 15px; padding-bottom: 10px;
+        }
+        .decree-top { font-size: 0.8rem; letter-spacing: 2px; font-weight: bold; display: block; margin-bottom: 5px; }
+        .decree-number { 
+            font-family: 'Rye', serif; /* Fuente estilo Oeste/Poster */
+            font-size: 2.5rem; line-height: 1; display: block; 
+            color: var(--ink); text-transform: uppercase;
+        }
+
+        /* Texto de la regla */
+        .decree-text {
+            font-family: 'Playfair Display SC', serif;
+            font-weight: 900; font-size: 1.1rem; line-height: 1.4;
+            color: #1a1a1a; margin-bottom: 15px;
+            text-transform: uppercase;
+        }
+        
+        .decree-subtext {
+            font-family: 'Crimson Text', serif; font-size: 0.9rem; text-transform: none; color: #444; font-style: italic;
+        }
+
+        /* Firma */
+        .decree-footer {
+            margin-top: 15px; padding-top: 10px; border-top: 1px solid #aaa;
+            font-size: 0.7rem; font-weight: bold;
+        }
+
+        /* COLORES Y TAMAÑOS VARIADOS PARA REALISMO */
+        /* Hacemos algunos cuadros más grandes o con texto de color para variar */
+        .decree-frame.large .decree-number { font-size: 3.5rem; color: #8b0000; }
+        .decree-frame.medium .decree-number { font-size: 2rem; }
+
+        /* Responsive */
+        @media (max-width: 900px) { .wall-container { column-count: 2; } }
+        @media (max-width: 600px) { .wall-container { column-count: 1; } }
+
+        footer { text-align: center; padding: 20px; color: #888; font-size: 0.8rem; margin-top: auto; background: #000; }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <button class="menu-toggle" onclick="toggleMenu()"><i class="fas fa-bars"></i></button>
+        <a href="index.html"><img src="WIZARDINGLOGO.PNG" class="nav-logo"></a>
+    </nav>
+
+    <div class="overlay" id="overlay" onclick="toggleMenu()"></div>
+    <div class="sidebar" id="sidebar">
+        <button class="close-btn" onclick="toggleMenu()">&times;</button>
+        <div style="text-align: center; margin-bottom: 20px;"><img src="WIZARDINGLOGO.PNG" width="80"></div>
+        <ul class="sidebar-links">
+            <li><a href="index.html">Inicio</a></li>
+            <li><a href="noticias.html">El Profeta</a></li>
+            <li><a href="cast_hp1.html">Casting</a></li>
+            <li><a href="staff.html">Staff</a></li>
+            <li><a href="reglamento.html" style="color: var(--gold);">Decretos</a></li>
+        </ul>
+    </div>
+
+    <div class="wall-header">
+        <h1 class="main-title">Decretos Educacionales</h1>
+        <p class="subtitle">"El desconocimiento de la ley no exime de su cumplimiento"</p>
+    </div>
+
+    <div class="wall-container">
+
+        <div class="decree-frame large">
+            <div class="decree-paper">
+                <div class="decree-header">
+                    <span class="decree-top">PROCLAMACIÓN</span>
+                    <span class="decree-number">Nº 1</span>
+                </div>
+                <div class="decree-text">
+                    El respeto es la base de la magia.
+                </div>
+                <div class="decree-subtext">
+                    Cualquier insulto, acoso o discriminación hacia otro alumno (Off-Rol) será castigado con la expulsión inmediata. Las maldiciones imperdonables están prohibidas fuera de tramas autorizadas.
+                </div>
+                <div class="decree-footer">POR ORDEN DEL MINISTERIO</div>
+            </div>
+        </div>
+
+        <div class="decree-frame">
+            <div class="decree-paper">
+                <div class="decree-header">
+                    <span class="decree-top">DECRETO</span>
+                    <span class="decree-number">Nº 24</span>
+                </div>
+                <div class="decree-text">
+                    La actividad es obligatoria.
+                </div>
+                <div class="decree-subtext">
+                    Los alumnos que no registren actividad en el castillo durante 7 días serán considerados "Desaparecidos" y su ficha será archivada.
+                </div>
+                <div class="decree-footer">LA ALTA INQUISIDORA</div>
+            </div>
+        </div>
+
+        <div class="decree-frame medium">
+            <div class="decree-paper">
+                <div class="decree-header">
+                    <span class="decree-top">DECRETO</span>
+                    <span class="decree-number">Nº 30</span>
+                </div>
+                <div class="decree-text">
+                    Prohibido el Metarol.
+                </div>
+                <div class="decree-subtext">
+                    Tu personaje no puede saber cosas que tú leíste en el chat Off-Rol. No puedes usar información que tu personaje no haya obtenido legítimamente dentro del rol.
+                </div>
+                <div class="decree-footer">EL DIRECTOR</div>
+            </div>
+        </div>
+
+        <div class="decree-frame">
+            <div class="decree-paper">
+                <div class="decree-header">
+                    <span class="decree-top">PROCLAMACIÓN</span>
+                    <span class="decree-number">Nº 45</span>
+                </div>
+                <div class="decree-text">
+                    Vestimenta.
+                </div>
+                <div class="decree-subtext">
+                    El uniforme escolar debe llevarse correctamente en horas lectivas. Se permite ropa muggle solo los fines de semana en Hogsmeade.
+                </div>
+                <div class="decree-footer">ARGUS FILCH</div>
+            </div>
+        </div>
+
+        <div class="decree-frame large">
+            <div class="decree-paper">
+                <div class="decree-header">
+                    <span class="decree-top">DECRETO</span>
+                    <span class="decree-number">Nº 68</span>
+                </div>
+                <div class="decree-text">
+                    Contenido Explícito.
+                </div>
+                <div class="decree-subtext">
+                    Este es un colegio. Cualquier escena de índole sexual (+18) está terminantemente prohibida en los canales públicos. Usen las habitaciones privadas o "Fade to Black".
+                </div>
+                <div class="decree-footer">POR ORDEN DEL MINISTERIO</div>
+            </div>
+        </div>
+
+        <div class="decree-frame">
+            <div class="decree-paper">
+                <div class="decree-header">
+                    <span class="decree-top">DECRETO</span>
+                    <span class="decree-number">Nº 82</span>
+                </div>
+                <div class="decree-text">
+                    Godmodding.
+                </div>
+                <div class="decree-subtext">
+                    No puedes controlar las acciones de otro personaje ni decidir si tus hechizos aciertan siempre. El rol es cooperativo, no una dictadura.
+                </div>
+                <div class="decree-footer">LA ALTA INQUISIDORA</div>
+            </div>
+        </div>
+
+        <div class="decree-frame">
+            <div class="decree-paper">
+                <div class="decree-header">
+                    <span class="decree-top">DECRETO</span>
+                    <span class="decree-number">Nº 99</span>
+                </div>
+                <div class="decree-text">
+                    Canales de Voz.
+                </div>
+                <div class="decree-subtext">
+                    Se prohíbe el uso de encantamientos "Sonorus" (gritos) o música muggle estridente en los canales de voz comunes.
+                </div>
+                <div class="decree-footer">EL CORO DEL SAPO</div>
+            </div>
+        </div>
+
+    </div>
+
+    <footer><p>&copy; 2026 Fakeland Project</p></footer>
+
+    <script>
+        function toggleMenu() {
+            document.getElementById('sidebar').classList.toggle('active');
+            document.getElementById('overlay').classList.toggle('active');
+        }
+    </script>
+</body>
+</html>

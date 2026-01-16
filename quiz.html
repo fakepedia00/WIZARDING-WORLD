@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>T.I.M.O. Challenge | Fakeland</title>
+    <link href="https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&family=Cinzel+Decorative:wght@400;700;900&family=Great+Vibes&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+
+    <style>
+        :root {
+            --gold: #d4af37;
+            --dark-bg: #0b0c10;
+            --paper: #f3e8d4;
+            --ink: #1a1a1a;
+            --red: #8b0000;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background-color: var(--dark-bg);
+            background-image: url('https://www.transparenttextures.com/patterns/black-felt.png');
+            color: #ccc;
+            font-family: 'Crimson Text', serif;
+            min-height: 100vh;
+            display: flex; flex-direction: column;
+        }
+
+        /* --- NAV --- */
+        nav {
+            display: flex; justify-content: center; align-items: center;
+            padding: 10px 20px; background: rgba(5, 5, 5, 0.95);
+            border-bottom: 1px solid rgba(212, 175, 55, 0.3);
+            position: sticky; top: 0; z-index: 1000; height: 60px;
+        }
+        .menu-toggle { position: absolute; left: 20px; background: transparent; border: none; color: var(--gold); font-size: 1.5rem; cursor: pointer; }
+        .nav-logo { height: 40px; width: auto; }
+
+        /* SIDEBAR */
+        .sidebar {
+            position: fixed; top: 0; left: -100%; width: 80%; max-width: 300px; height: 100%;
+            background: rgba(8, 8, 10, 0.98); border-right: 1px solid var(--gold);
+            z-index: 2000; transition: 0.4s; display: flex; flex-direction: column; padding-top: 20px;
+        }
+        .sidebar.active { left: 0; }
+        .close-btn { align-self: flex-end; margin-right: 20px; background: transparent; border: none; color: #aaa; font-size: 2rem; cursor: pointer; }
+        .sidebar-links { list-style: none; padding: 20px 0; }
+        .sidebar-links a { display: block; padding: 15px 25px; color: #ccc; text-decoration: none; transition: 0.3s; font-family: 'Cinzel Decorative'; font-size: 1rem; }
+        .sidebar-links a:hover { color: var(--gold); padding-left: 35px; }
+        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1500; opacity: 0; pointer-events: none; transition: 0.3s; }
+        .overlay.active { opacity: 1; pointer-events: all; }
+
+        /* --- CONTENEDOR PRINCIPAL --- */
+        .main-container {
+            flex: 1; display: flex; justify-content: center; align-items: center; padding: 20px;
+        }
+
+        /* PANTALLAS (INICIO, QUIZ) */
+        .screen {
+            background: rgba(20, 20, 25, 0.95);
+            border: 2px solid var(--gold);
+            padding: 40px; border-radius: 15px;
+            max-width: 700px; width: 100%; text-align: center;
+            box-shadow: 0 0 50px rgba(0,0,0,0.8);
+            display: none;
+        }
+        .screen.active { display: block; animation: fadeIn 0.5s; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* PANTALLA INICIO */
+        h1 { font-family: 'Cinzel Decorative'; color: var(--gold); margin-bottom: 20px; font-size: 2.5rem; }
+        .input-name {
+            width: 100%; padding: 15px; font-size: 1.2rem; margin-bottom: 20px;
+            background: rgba(255,255,255,0.1); border: 1px solid #555; color: #fff;
+            text-align: center; font-family: 'Crimson Text';
+        }
+        .start-btn {
+            background: var(--gold); color: #000; border: none; padding: 15px 40px;
+            font-family: 'Cinzel Decorative'; font-size: 1.2rem; cursor: pointer;
+            transition: 0.3s; text-transform: uppercase; font-weight: bold;
+        }
+        .start-btn:hover { transform: scale(1.05); box-shadow: 0 0 20px var(--gold); }
+
+        /* PANTALLA QUIZ (Timer y Preguntas) */
+        .timer-bar { width: 100%; height: 10px; background: #333; margin-bottom: 20px; border-radius: 5px; overflow: hidden; }
+        .timer-fill { height: 100%; width: 100%; background: var(--gold); transition: width 1s linear; }
+        .question-text { font-size: 1.5rem; margin-bottom: 30px; color: #fff; min-height: 80px; }
+        .options-grid { display: grid; gap: 15px; }
+        .option-btn {
+            background: rgba(255,255,255,0.05); border: 1px solid #444; color: #ccc;
+            padding: 15px; cursor: pointer; transition: 0.2s; font-size: 1.1rem; text-align: left;
+        }
+        .option-btn:hover { background: rgba(212, 175, 55, 0.2); border-color: var(--gold); }
+        .option-btn.correct { background: #2ecc71; color: #000; border-color: #2ecc71; }
+        .option-btn.wrong { background: #e74c3c; color: #fff; border-color: #e74c3c; }
+
+        /* --- PANTALLA DIPLOMA HORIZONTAL --- */
+        #result-screen { max-width: 1100px; background: transparent; border: none; box-shadow: none; }
+        
+        #diploma-container {
+            /* Fondo y Bordes del Pergamino */
+            background-color: var(--paper);
+            background-image: url('https://www.transparenttextures.com/patterns/old-paper.png');
+            color: var(--ink);
+            padding: 40px;
+            border: 12px double var(--ink);
+            position: relative;
+            margin-bottom: 20px;
+            /* Layout Horizontal usando CSS Grid */
+            display: grid;
+            grid-template-columns: 1fr 3fr 1fr; /* 3 Columnas: Sello, Texto, Nota */
+            gap: 20px;
+            align-items: center;
+        }
+
+        /* Columna Izquierda: El Sello de Hogwarts */
+        .diploma-seal-col { text-align: center; }
+        .hogwarts-seal-img {
+            width: 180px; height: auto;
+            opacity: 0.9; filter: sepia(30%);
+            border-bottom: 2px solid var(--ink); padding-bottom: 10px;
+        }
+
+        /* Columna Central: Texto del Diploma */
+        .diploma-text-col { text-align: center; border-left: 2px solid rgba(0,0,0,0.1); border-right: 2px solid rgba(0,0,0,0.1); padding: 0 20px; }
+        .diploma-header { font-family: 'UnifrakturMaguntia'; font-size: 3.5rem; margin-bottom: 5px; line-height: 1; }
+        .diploma-sub { font-family: 'Cinzel Decorative'; font-size: 1rem; text-transform: uppercase; letter-spacing: 3px; margin-bottom: 25px; }
+        .diploma-body { font-size: 1.1rem; margin-bottom: 20px; line-height: 1.4; }
+        .student-name { 
+            font-family: 'Great Vibes'; font-size: 3.5rem; color: var(--red); 
+            display: block; margin: 10px 0;
+        }
+
+        /* Columna Derecha: La Nota T.I.M.O. */
+        .diploma-grade-col { text-align: center; }
+        .grade-stamp {
+            border: 6px double var(--red); color: var(--red);
+            font-family: 'Cinzel Decorative'; font-size: 5rem; font-weight: 900;
+            width: 150px; height: 150px; line-height: 130px;
+            border-radius: 50%;
+            display: inline-block; transform: rotate(-15deg);
+            opacity: 0.8; margin-bottom: 10px;
+        }
+        .grade-label { font-family: 'Cinzel Decorative'; font-weight: bold; font-size: 0.9rem; }
+
+        /* Fila Inferior: Firmas (Abarca las 3 columnas) */
+        .signatures-row {
+            grid-column: 1 / -1; /* Ocupa todo el ancho abajo */
+            display: flex; justify-content: space-around;
+            margin-top: 30px; padding-top: 20px;
+            border-top: 1px solid var(--ink);
+        }
+        .sig-block { text-align: center; width: 30%; }
+        .sig-font { font-family: 'Great Vibes'; font-size: 1.8rem; display: block; margin-bottom: -5px; transform: rotate(-5deg); color: var(--red); }
+        .sig-title { font-size: 0.8rem; font-family: 'Cinzel Decorative'; }
+
+        .download-btn {
+            background: #27ae60; color: #fff; border: none; padding: 15px 30px;
+            font-family: 'Cinzel Decorative'; font-size: 1rem; cursor: pointer;
+            border-radius: 5px; transition: 0.3s;
+        }
+        .download-btn:hover { background: #2ecc71; box-shadow: 0 0 15px #2ecc71; }
+
+        /* Responsive para móvil: Diploma vertical si la pantalla es muy estrecha */
+        @media (max-width: 768px) {
+            #diploma-container { grid-template-columns: 1fr; }
+            .diploma-text-col { border: none; padding: 20px 0; border-top: 1px solid #ccc; border-bottom: 1px solid #ccc; }
+            .signatures-row { flex-direction: column; gap: 20px; }
+            .sig-block { width: 100%; }
+        }
+
+        footer { text-align: center; padding: 20px; color: #555; font-size: 0.8rem; margin-top: auto; }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <button class="menu-toggle" onclick="toggleMenu()"><i class="fas fa-bars"></i></button>
+        <a href="index.html"><img src="WIZARDINGLOGO.PNG" class="nav-logo"></a>
+    </nav>
+
+    <div class="overlay" id="overlay" onclick="toggleMenu()"></div>
+    <div class="sidebar" id="sidebar">
+        <button class="close-btn" onclick="toggleMenu()">&times;</button>
+        <div style="text-align: center; margin-bottom: 20px;"><img src="WIZARDINGLOGO.PNG" width="80"></div>
+        <ul class="sidebar-links">
+            <li><a href="index.html">Inicio</a></li>
+            <li><a href="quiz.html" style="color: var(--gold);">T.I.M.O. Quiz</a></li>
+        </ul>
+    </div>
+
+    <div class="main-container">
+
+        <div id="start-screen" class="screen active">
+            <h1>Desafío T.I.M.O.</h1>
+            <p style="margin-bottom: 15px; font-size: 1.1rem;">50 Preguntas. 15 Segundos cada una.</p>
+            <p style="margin-bottom: 30px; color: #aaa;">"Solo los verdaderos magos y brujas lograrán el grado de Extraordinario. ¿Estás listo?"</p>
+            
+            <input type="text" id="username" class="input-name" placeholder="Firma aquí con tu nombre..." autocomplete="off">
+            <button class="start-btn" onclick="startQuiz()">Romper el Sello</button>
+        </div>
+
+        <div id="quiz-screen" class="screen">
+            <div style="display:flex; justify-content:space-between; margin-bottom:10px; color:#aaa; font-size:0.9rem;">
+                <span id="q-counter">Pregunta 1/50</span>
+                <span id="time-text">15s</span>
+            </div>
+            
+            <div class="timer-bar"><div id="timer-fill" class="timer-fill"></div></div>
+            
+            <h2 id="question-text" class="question-text">Cargando pregunta...</h2>
+            
+            <div id="options-container" class="options-grid">
+                </div>
+        </div>
+
+        <div id="result-screen" class="screen">
+            
+            <div id="diploma-content">
+                <div id="diploma-container">
+                    
+                    <div class="diploma-seal-col">
+                        <img src="WIZARDINGLOGO.PNG" class="hogwarts-seal-img" alt="Hogwarts Seal">
+                        <p style="font-family:'Cinzel Decorative'; font-size:0.7rem; margin-top:5px;">SELLO OFICIAL</p>
+                    </div>
+
+                    <div class="diploma-text-col">
+                        <div class="diploma-header">Hogwarts</div>
+                        <div class="diploma-sub">Escuela de Magia y Hechicería</div>
+                        <div class="diploma-body">
+                            Por la presente se certifica que:
+                            <span id="student-name-display" class="student-name">Nombre del Alumno</span>
+                            Ha completado el <strong>Examen de Conocimientos Mágicos Generales</strong>. Tras rigurosa evaluación por el tribunal, se le otorga la calificación final de:
+                        </div>
+                    </div>
+
+                    <div class="diploma-grade-col">
+                        <div id="final-grade" class="grade-stamp">?</div>
+                        <p id="grade-text" class="grade-label">CALIFICACIÓN</p>
+                    </div>
+
+                    <div class="signatures-row">
+                        <div class="sig-block">
+                            <span class="sig-font">Albus Dumbledore</span>
+                            <span class="sig-title">Director de Hogwarts</span>
+                        </div>
+                        <div class="sig-block">
+                            <span class="sig-font">Griselda Marchbanks</span>
+                            <span class="sig-title">Tribunal de Exámenes T.I.M.O.</span>
+                        </div>
+                        <div class="sig-block">
+                             <span class="sig-font" style="opacity: 0.7;">Min. de Magia</span>
+                             <span class="sig-title">Departamento de Educación</span>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <div style="margin-top: 30px;">
+                <p style="margin-bottom: 15px;">¡Felicidades! Guarda tu resultado.</p>
+                <button class="download-btn" onclick="downloadDiploma()"><i class="fas fa-file-download"></i> Descargar Diploma</button> &nbsp; 
+                <button class="start-btn" onclick="location.reload()" style="font-size: 0.9rem; padding: 15px; background: #444; color: #fff;">Intentar de Nuevo</button>
+            </div>
+        </div>
+
+    </div>
+
+    <footer><p>&copy; 2026 Fakeland Project</p></footer>
+
+    <script>
+        function toggleMenu() {
+            document.getElementById('sidebar').classList.toggle('active');
+            document.getElementById('overlay').classList.toggle('active');
+        }
+
+        // --- BANCO DE 50 PREGUNTAS ---
+        const questionsDB = [
+            // Lote 1: Básico
+            { q: "¿Cuál es el hechizo para convocar objetos?", opts: ["Accio", "Alohomora", "Expelliarmus", "Lumos"], a: 0 },
+            { q: "¿Quién es el guardián de las llaves y terrenos de Hogwarts?", opts: ["Filch", "Hagrid", "Snape", "Dumbledore"], a: 1 },
+            { q: "¿De qué color es la sangre de unicornio?", opts: ["Dorada", "Azul", "Plateada", "Roja"], a: 2 },
+            { q: "¿Cuál es la posición de Harry en el equipo de Quidditch?", opts: ["Cazador", "Golpeador", "Guardián", "Buscador"], a: 3 },
+            { q: "¿Qué criatura guarda la entrada a la sala común de Gryffindor?", opts: ["Un trol", "La Señora Gorda", "Un caballero", "El Barón Sanguinario"], a: 1 },
+            
+            // Lote 2: Hechizos y Pociones
+            { q: "¿Qué hechizo abre cerraduras?", opts: ["Alohomora", "Abrete Sésamo", "Bombarda", "Diffindo"], a: 0 },
+            { q: "¿Qué poción permite cambiar de forma?", opts: ["Amortentia", "Felix Felicis", "Poción Multijugos", "Veritaserum"], a: 2 },
+            { q: "¿Cuál es el contrahechizo de 'Lumos'?", opts: ["Nox", "Oscurus", "Apagonus", "Finite"], a: 0 },
+            { q: "¿Qué ingrediente falta: Piel de serpiente arbórea africana y...?", opts: ["Pelo de veela", "Crisopos", "Sangre de dragón", "Raíz de mandrágora"], a: 1 },
+            { q: "¿Qué hechizo se usa para repeler a un Boggart?", opts: ["Expecto Patronum", "Riddikulus", "Stupefy", "Protego"], a: 1 },
+
+            // Lote 3: Criaturas
+            { q: "¿Qué criatura solo pueden ver aquellos que han presenciado la muerte?", opts: ["Thestral", "Hipogrifo", "Kelpie", "Graphorn"], a: 0 },
+            { q: "¿Cómo se llama el perro de tres cabezas de Hagrid?", opts: ["Fang", "Fluffy", "Norberto", "Aragog"], a: 1 },
+            { q: "¿Qué es Fawkes?", opts: ["Un dragón", "Un hipogrifo", "Un fénix", "Una lechuza"], a: 2 },
+            { q: "¿Cuál es la clasificación ministerial de un hombre lobo?", opts: ["XX", "XXX", "XXXX", "XXXXX"], a: 3 },
+            { q: "¿Qué roban los Escarbatos (Nifflers)?", opts: ["Comida", "Varitas", "Cosas brillantes", "Libros"], a: 2 },
+
+            // Lote 4: Personajes
+            { q: "¿Cuál es el segundo nombre de Harry Potter?", opts: ["James", "Sirius", "Albus", "Arthur"], a: 0 },
+            { q: "¿Quién destruyó el diario de Tom Riddle?", opts: ["Ron", "Hermione", "Harry", "Ginny"], a: 2 },
+            { q: "¿Quién es el Príncipe Mestizo?", opts: ["Voldemort", "Dumbledore", "Snape", "Sirius Black"], a: 2 },
+            { q: "¿Quién mató a Sirius Black?", opts: ["Lucius Malfoy", "Bellatrix Lestrange", "Voldemort", "Peter Pettigrew"], a: 1 },
+            { q: "¿Cómo se llama la madre de Draco Malfoy?", opts: ["Bellatrix", "Andromeda", "Narcissa", "Pansy"], a: 2 },
+
+            // Lote 5: Objetos Mágicos
+            { q: "¿Cuántas Reliquias de la Muerte existen?", opts: ["7", "3", "5", "1"], a: 1 },
+            { q: "¿Qué objeto se usa para ver recuerdos?", opts: ["Espejo de Oesed", "Pensadero", "Giratiempos", "Recordadora"], a: 1 },
+            { q: "¿Cuál de estos NO es un Horrocrux?", opts: ["Diadema de Ravenclaw", "Espada de Gryffindor", "Copa de Hufflepuff", "Guardapelo de Slytherin"], a: 1 },
+            { q: "¿Qué atrapa la Snitch Dorada?", opts: ["10 puntos", "50 puntos", "150 puntos y termina el juego", "200 puntos"], a: 2 },
+            { q: "¿Quiénes son los creadores del Mapa del Merodeador? (Apodos)", opts: ["Lunático, Colagusano, Canuto y Cornamenta", "Harry, Ron y Hermione", "Fred y George", "Los Fundadores"], a: 0 },
+
+            // Lote 6: Lugares
+            { q: "¿En qué piso está la Sala de los Menesteres?", opts: ["Tercero", "Quinto", "Séptimo", "Mazmorras"], a: 2 },
+            { q: "¿Dónde se encuentra la tienda de varitas de Ollivander?", opts: ["Hogsmeade", "Callejón Knockturn", "Callejón Diagon", "Valle de Godric"], a: 2 },
+            { q: "¿Cuál es el nombre de la prisión de los magos?", opts: ["Nurmengard", "Azkaban", "Ministerio", "San Mungo"], a: 1 },
+            { q: "¿Dónde viven los Weasley?", opts: ["Grimmauld Place", "Little Whinging", "La Madriguera", "Shell Cottage"], a: 2 },
+            { q: "¿Qué tienda de bromas abrieron Fred y George?", opts: ["Zonko", "Sortilegios Weasley", "Gambol y Japes", "Borgin y Burkes"], a: 1 },
+
+            // Lote 7: Historia de Hogwarts
+            { q: "¿Cuál de estos NO es uno de los fundadores de Hogwarts?", opts: ["Godric Gryffindor", "Helga Hufflepuff", "Merlín", "Salazar Slytherin"], a: 2 },
+            { q: "¿Quién es el fantasma de la casa Slytherin?", opts: ["Nick Casi Decapitado", "El Barón Sanguinario", "El Fraile Gordo", "La Dama Gris"], a: 1 },
+            { q: "¿Cuál es el lema de Hogwarts?", opts: ["Draco dormiens nunquam titillandus", "La magia es poder", "Siempre puros", "El conocimiento es poder"], a: 0 },
+            { q: "¿Quién abrió la Cámara de los Secretos la primera vez?", opts: ["Harry Potter", "Tom Riddle", "Ginny Weasley", "Hagrid"], a: 1 },
+            { q: "¿Qué asignatura enseñaba Dumbledore antes de ser director?", opts: ["Pociones", "Encantamientos", "Transformaciones", "Defensa C.A.O."], a: 2 },
+
+            // Lote 8: Difíciles
+            { q: "¿Cuál es la forma del Patronus de Hermione?", opts: ["Nutria", "Gato", "Ardilla", "Búho"], a: 0 },
+            { q: "¿Qué madera tiene la varita de Harry?", opts: ["Sauco", "Acebo", "Tejo", "Nogal"], a: 1 },
+            { q: "¿Cómo se llama el duende que ayuda a Harry a entrar en Gringotts?", opts: ["Dobby", "Kreacher", "Griphook", "Bogrod"], a: 2 },
+            { q: "¿Qué equipo ganó el Mundial de Quidditch en el cuarto libro?", opts: ["Bulgaria", "Inglaterra", "Perú", "Irlanda"], a: 3 },
+            { q: "¿Cuál es el nombre completo de Dumbledore?", opts: ["Albus Percival Wulfric Brian Dumbledore", "Albus Brian Percival Dumbledore", "Albus Wulfric Dumbledore", "Solo Albus Dumbledore"], a: 0 },
+
+            // Lote 9: Más Difíciles
+            { q: "¿Qué hechizo usó Harry contra Draco en el baño en el sexto libro?", opts: ["Expelliarmus", "Sectumsempra", "Stupefy", "Levicorpus"], a: 1 },
+            { q: "¿Quién fue el maestro de varitas extranjero que compitió con Ollivander?", opts: ["Gregorovitch", "Karkaroff", "Grindelwald", "Desconocido"], a: 0 },
+            { q: "¿De qué color son los ojos de Lily Potter?", opts: ["Marrones", "Azules", "Verdes", "Avellana"], a: 2 },
+            { q: "¿Qué dragón enfrentó Cedric Diggory en el Torneo?", opts: ["Colacuerno Húngaro", "Galés Verde", "Hocicorto Sueco", "Bola de Fuego Chino"], a: 2 },
+            { q: "¿Qué día nació Harry Potter?", opts: ["31 de Octubre", "1 de Septiembre", "31 de Julio", "25 de Diciembre"], a: 2 },
+
+            // Lote 10: Finales
+            { q: "¿Quién sustituyó a la Señora Gorda cuando fue atacada?", opts: ["Sir Cadogan", "El Barón Sanguinario", "Un Troll de Seguridad", "Nadie"], a: 0 },
+            { q: "¿Qué es un Bezoar?", opts: ["Un veneno", "Un antídoto sacado del estómago de una cabra", "Una planta mágica", "Una piedra preciosa"], a: 1 },
+            { q: "¿Cuál era el apodo de Snape en la escuela?", opts: ["Canuto", "Quejicus (Snivellus)", "Lunático", "Cornamenta"], a: 1 },
+            { q: "¿Quién custodiaba la entrada de la sala común de Ravenclaw?", opts: ["Un cuadro de Rowena", "Una gárgola parlante", "Una aldaba con forma de águila", "La Dama Gris"], a: 2 },
+            { q: "ÚLTIMA: ¿Qué le deja Dumbledore a Ron en su testamento?", opts: ["La Espada de Gryffindor", "El Desiluminador", "Un libro de cuentos", "La Snitch Dorada"], a: 1 }
+        ];
+
+        // Variables de Estado
+        let currentQuestion = 0;
+        let score = 0;
+        let timeLeft = 15;
+        let timerInterval;
+        let userName = "";
+
+        // INICIO
+        function startQuiz() {
+            const input = document.getElementById('username');
+            if(input.value.trim() === "") {
+                alert("¡Debes firmar el registro con tu nombre!");
+                return;
+            }
+            userName = input.value;
+            
+            document.getElementById('start-screen').classList.remove('active');
+            document.getElementById('quiz-screen').classList.add('active');
+            
+            loadQuestion();
+        }
+
+        // CARGAR PREGUNTA
+        function loadQuestion() {
+            if (currentQuestion >= questionsDB.length) {
+                showResult();
+                return;
+            }
+
+            clearInterval(timerInterval);
+            timeLeft = 15;
+            updateTimerUI();
+            
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                updateTimerUI();
+                if(timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    selectOption(-1); // Tiempo agotado = incorrecto
+                }
+            }, 1000);
+
+            const qData = questionsDB[currentQuestion];
+            document.getElementById('q-counter').innerText = `Pregunta ${currentQuestion + 1}/${questionsDB.length}`;
+            document.getElementById('question-text').innerText = qData.q;
+            
+            const optsContainer = document.getElementById('options-container');
+            optsContainer.innerHTML = "";
+
+            qData.opts.forEach((opt, index) => {
+                const btn = document.createElement('div');
+                btn.className = 'option-btn';
+                btn.innerText = opt;
+                btn.onclick = () => selectOption(index);
+                optsContainer.appendChild(btn);
+            });
+        }
+
+        // ACTUALIZAR RELOJ
+        function updateTimerUI() {
+            document.getElementById('time-text').innerText = timeLeft + "s";
+            const percentage = (timeLeft / 15) * 100;
+            document.getElementById('timer-fill').style.width = percentage + "%";
+            
+            if(timeLeft < 5) document.getElementById('timer-fill').style.background = "#e74c3c";
+            else document.getElementById('timer-fill').style.background = "#d4af37";
+        }
+
+        // SELECCIONAR OPCIÓN
+        function selectOption(selectedIndex) {
+            clearInterval(timerInterval);
+            
+            const qData = questionsDB[currentQuestion];
+            const buttons = document.querySelectorAll('.option-btn');
+
+            if(selectedIndex !== -1) {
+                 if(selectedIndex === qData.a) {
+                    score++;
+                    buttons[selectedIndex].classList.add('correct');
+                } else {
+                    buttons[selectedIndex].classList.add('wrong');
+                    buttons[qData.a].classList.add('correct');
+                }
+            } else {
+                 // Tiempo agotado, solo mostrar la correcta
+                 buttons[qData.a].classList.add('correct');
+            }
+
+            setTimeout(() => {
+                currentQuestion++;
+                loadQuestion();
+            }, 1000);
+        }
+
+        // MOSTRAR DIPLOMA FINAL
+        function showResult() {
+            document.getElementById('quiz-screen').classList.remove('active');
+            document.getElementById('result-screen').classList.add('active');
+
+            document.getElementById('student-name-display').innerText = userName;
+
+            // Calcular Nota T.I.M.O. (Sobre 50 preguntas)
+            // O (90%+): 45-50 | E (70%+): 35-44 | A (50%+): 25-34
+            // I (30%+): 15-24 | D (10%+): 5-14  | T (<10%): 0-4
+            let gradeLetter = "T";
+            let gradeText = "TROLL";
+
+            if (score >= 45) { gradeLetter = "O"; gradeText = "EXTRAORDINARIO"; }
+            else if (score >= 35) { gradeLetter = "E"; gradeText = "SUPERA LAS EXPECTATIVAS"; }
+            else if (score >= 25) { gradeLetter = "A"; gradeText = "ACEPTABLE"; }
+            else if (score >= 15) { gradeLetter = "I"; gradeText = "INSATISFACTORIO"; }
+            else if (score >= 5) { gradeLetter = "D"; gradeText = "DESASTROSO"; }
+
+            document.getElementById('final-grade').innerText = gradeLetter;
+            document.getElementById('grade-text').innerText = gradeText;
+        }
+
+        // --- DESCARGAR DIPLOMA ---
+        function downloadDiploma() {
+            // Ocultamos temporalmente el botón de descarga del área a capturar si estuviera dentro
+            const diplomaElement = document.getElementById("diploma-container");
+            
+            html2canvas(diplomaElement, {
+                backgroundColor: null,
+                scale: 2, // Mayor calidad
+                useCORS: true // Ayuda con imágenes externas si las hubiera
+            }).then(canvas => {
+                let link = document.createElement('a');
+                link.download = `Diploma_Hogwarts_${userName.replace(/\s+/g, '_')}.png`;
+                link.href = canvas.toDataURL("image/png");
+                link.click();
+            });
+        }
+    </script>
+</body>
+</html>

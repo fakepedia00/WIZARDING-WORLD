@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Películas | The Wizarding World</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --gold: #d4af37;
+            --gold-glow: #ffd700;
+            --dark-bg: #0e1116;
+            --text-color: #e0d6c8;
+            --locked-overlay: rgba(0, 0, 0, 0.7);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background-color: var(--dark-bg);
+            background-image: url('https://www.transparenttextures.com/patterns/stardust.png');
+            color: var(--text-color);
+            font-family: 'Crimson Text', serif;
+            overflow-x: hidden;
+            min-height: 100vh;
+            cursor: url('https://cur.cursors-4u.net/user/use-1/use157.cur'), auto;
+        }
+
+        a, button { cursor: url('https://cur.cursors-4u.net/user/use-1/use157.cur'), pointer; text-decoration: none; }
+
+        /* --- NAV SUPERIOR (Igual al Index) --- */
+        nav {
+            display: flex; justify-content: center; align-items: center;
+            padding: 10px 30px;
+            background: rgba(5, 5, 5, 0.95);
+            border-bottom: 1px solid rgba(212, 175, 55, 0.3);
+            position: sticky; top: 0; z-index: 1000;
+            height: 70px;
+            backdrop-filter: blur(10px);
+        }
+
+        .menu-toggle {
+            position: absolute; left: 30px;
+            background: transparent; border: none;
+            color: var(--gold); font-size: 1.8rem;
+            cursor: pointer; transition: 0.3s;
+        }
+        .menu-toggle:hover { text-shadow: 0 0 10px var(--gold); transform: scale(1.1); }
+
+        .nav-logo { height: 50px; width: auto; transition: 0.3s; }
+        .nav-logo:hover { filter: drop-shadow(0 0 5px var(--gold)); transform: scale(1.05); }
+
+        /* --- SIDEBAR --- */
+        .sidebar {
+            position: fixed; top: 0; left: -320px;
+            width: 300px; height: 100%;
+            background: rgba(8, 8, 10, 0.98);
+            border-right: 1px solid var(--gold);
+            z-index: 2000;
+            transition: 0.5s cubic-bezier(0.77, 0, 0.175, 1);
+            display: flex; flex-direction: column;
+            box-shadow: 10px 0 30px rgba(0,0,0,0.5);
+            padding-top: 20px;
+        }
+
+        .sidebar.active { left: 0; }
+
+        .close-btn {
+            align-self: flex-end; margin-right: 20px;
+            background: transparent; border: none;
+            color: #aaa; font-size: 2rem; cursor: pointer; transition: 0.3s;
+        }
+        .close-btn:hover { color: var(--gold); transform: rotate(90deg); }
+
+        .sidebar-links { list-style: none; padding: 20px 0; margin-top: 20px; }
+        .sidebar-links li { border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .sidebar-links a {
+            display: block; padding: 15px 30px;
+            color: #ccc; font-family: 'Cinzel Decorative'; font-size: 1.1rem;
+            transition: 0.3s; letter-spacing: 1px;
+        }
+        .sidebar-links a:hover {
+            background: linear-gradient(90deg, rgba(212, 175, 55, 0.1), transparent);
+            color: var(--gold); padding-left: 40px;
+        }
+        .sidebar-links i { width: 25px; margin-right: 10px; color: var(--gold); text-align: center; }
+
+        .overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.7); z-index: 1500;
+            opacity: 0; pointer-events: none; transition: 0.3s;
+            backdrop-filter: blur(3px);
+        }
+        .overlay.active { opacity: 1; pointer-events: all; }
+
+        /* --- CONTENIDO PRINCIPAL --- */
+        .container { max-width: 1200px; margin: 0 auto; padding: 40px 20px; }
+
+        .page-header {
+            text-align: center; margin-bottom: 60px;
+            border-bottom: 1px solid rgba(212, 175, 55, 0.1); padding-bottom: 20px;
+        }
+        .page-header h1 {
+            font-family: 'Cinzel Decorative'; font-size: clamp(2.5rem, 6vw, 4rem); color: var(--gold);
+            margin-bottom: 10px; text-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
+        }
+        .page-header p { color: #aaa; font-style: italic; letter-spacing: 1px; }
+
+        .saga-title {
+            font-family: 'Cinzel Decorative'; font-size: 1.8rem; color: #fff;
+            border-left: 4px solid var(--gold); padding-left: 15px; margin: 40px 0 30px 0;
+        }
+
+        /* --- GRID DE PELÍCULAS --- */
+        .movies-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 30px;
+        }
+
+        .movie-card {
+            position: relative; border-radius: 8px; overflow: hidden;
+            aspect-ratio: 2/3; /* Proporción póster */
+            transition: all 0.4s ease;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            background: #000;
+        }
+
+        .movie-card img {
+            width: 100%; height: 100%; object-fit: cover; display: block;
+            transition: transform 0.5s;
+        }
+
+        /* ESTADO: DESBLOQUEADO (ACTIVO) */
+        .unlocked {
+            cursor: pointer; border: 2px solid var(--gold);
+        }
+        .unlocked:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 0 30px rgba(212, 175, 55, 0.4);
+        }
+        .unlocked:hover img { transform: scale(1.05); }
+        
+        .status-badge {
+            position: absolute; top: 10px; right: 10px; z-index: 2;
+            padding: 5px 10px; border-radius: 4px; font-size: 0.7rem; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+        }
+        .badge-open { background: var(--gold); color: #000; }
+        .badge-closed { background: #333; color: #aaa; border: 1px solid #555; }
+
+        /* Titulo flotante en la tarjeta */
+        .card-title {
+            position: absolute; bottom: 0; left: 0; width: 100%;
+            background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
+            padding: 20px 10px 10px 10px; text-align: center;
+            color: #fff; font-family: 'Cinzel Decorative'; font-size: 0.9rem;
+            transform: translateY(100%); transition: 0.3s;
+        }
+        .unlocked:hover .card-title { transform: translateY(0); }
+
+        /* ESTADO: BLOQUEADO */
+        .locked {
+            cursor: not-allowed; border: 1px solid #333;
+        }
+        .locked img {
+            filter: grayscale(100%) brightness(0.4) blur(1px);
+        }
+        .locked:hover img { filter: grayscale(100%) brightness(0.6) blur(0px); }
+        
+        .lock-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            color: #aaa; z-index: 2; opacity: 0.7; transition: 0.3s;
+        }
+        .lock-overlay i { font-size: 3rem; margin-bottom: 10px; }
+        .lock-overlay span { font-family: 'Cinzel Decorative'; font-size: 0.8rem; text-transform: uppercase; }
+        
+        .locked:hover .lock-overlay { opacity: 1; color: var(--gold); }
+
+        /* PARTICULAS */
+        #particles { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: -1; }
+        .particle { position: absolute; background: white; border-radius: 50%; opacity: 0; animation: rise 10s infinite ease-in; }
+        @keyframes rise { 0% { transform: translateY(100vh) scale(0); opacity: 0; } 50% { opacity: 0.5; } 100% { transform: translateY(-10vh) scale(1); opacity: 0; } }
+
+        footer { text-align: center; padding: 40px; border-top: 1px solid #333; color: #555; margin-top: 50px; font-size: 0.8rem; }
+
+        @media (max-width: 768px) {
+            .page-header h1 { font-size: 2.5rem; }
+            .movies-grid { grid-template-columns: repeat(2, 1fr); gap: 15px; } /* 2 columnas en móvil */
+        }
+    </style>
+</head>
+<body>
+
+    <div id="particles"></div>
+
+    <nav>
+        <button class="menu-toggle" onclick="toggleMenu()">
+            <i class="fas fa-bars"></i>
+        </button>
+        
+        <a href="index.html">
+            <img src="WIZARDINGLOGO.PNG" alt="Wizarding World" class="nav-logo">
+        </a>
+    </nav>
+
+    <div class="overlay" id="overlay" onclick="toggleMenu()"></div>
+    <div class="sidebar" id="sidebar">
+        <button class="close-btn" onclick="toggleMenu()">&times;</button>
+        <div style="text-align: center; margin-bottom: 20px;">
+            <img src="WIZARDINGLOGO.PNG" width="80" style="filter: brightness(0.8);">
+        </div>
+        <ul class="sidebar-links">
+            <li><a href="index.html"><i class="fas fa-home"></i> Inicio</a></li>
+            <li><a href="peliculas.html"><i class="fas fa-film"></i> Películas</a></li>
+            <li><a href="staff.html"><i class="fas fa-briefcase"></i> Staff & Producción</a></li>
+            <li><a href="casas.html"><i class="fas fa-hat-wizard"></i> Ceremonia de Casas</a></li>
+            <li><a href="varitas.html"><i class="fas fa-magic"></i> Ollivanders</a></li>
+            <li><a href="patronus.html"><i class="fas fa-dragon"></i> Patronus</a></li>
+            <li><a href="quiz.html"><i class="fas fa-scroll"></i> T.I.M.O. Quiz</a></li>
+        </ul>
+    </div>
+
+    <div class="container">
+        
+        <div class="page-header">
+            <h1>Archivos del Tiempo</h1>
+            <p>Selecciona una línea temporal para acceder al casting y a la historia.</p>
+        </div>
+
+        <h2 class="saga-title">La Saga Original</h2>
+        <div class="movies-grid">
+            
+            <div class="movie-card unlocked" onclick="window.location.href='cast_hp1.html'">
+                <span class="status-badge badge-open">Casting Abierto</span>
+                <img src="pelicula1.jpg" alt="La Piedra Filosofal">
+                <div class="card-title">Año I: La Piedra Filosofal</div>
+            </div>
+
+            <div class="movie-card locked" onclick="lockedAlert()">
+                <div class="lock-overlay">
+                    <i class="fas fa-lock"></i>
+                    <span>Restringido</span>
+                </div>
+                <img src="pelicula2.jpg" alt="Cámara Secreta">
+            </div>
+
+            <div class="movie-card locked" onclick="lockedAlert()">
+                <div class="lock-overlay">
+                    <i class="fas fa-lock"></i>
+                    <span>Restringido</span>
+                </div>
+                <img src="pelicula3.jpg" alt="Prisionero de Azkaban">
+            </div>
+
+            <div class="movie-card locked" onclick="lockedAlert()">
+                <div class="lock-overlay">
+                    <i class="fas fa-lock"></i>
+                    <span>Restringido</span>
+                </div>
+                <img src="pelicula4.jpg" alt="Cáliz de Fuego">
+            </div>
+
+            <div class="movie-card locked" onclick="lockedAlert()">
+                <div class="lock-overlay">
+                    <i class="fas fa-lock"></i>
+                    <span>Restringido</span>
+                </div>
+                <img src="pelicula5.jpg" alt="Orden del Fénix">
+            </div>
+
+            <div class="movie-card locked" onclick="lockedAlert()">
+                <div class="lock-overlay">
+                    <i class="fas fa-lock"></i>
+                    <span>Restringido</span>
+                </div>
+                <img src="pelicula6.jpg" alt="Misterio del Príncipe">
+            </div>
+
+            <div class="movie-card locked" onclick="lockedAlert()">
+                <div class="lock-overlay">
+                    <i class="fas fa-lock"></i>
+                    <span>Restringido</span>
+                </div>
+                <img src="pelicula7part1.jpg" alt="Reliquias Parte 1">
+            </div>
+
+            <div class="movie-card locked" onclick="lockedAlert()">
+                <div class="lock-overlay">
+                    <i class="fas fa-lock"></i>
+                    <span>Restringido</span>
+                </div>
+                <img src="pelicula7part2.jpg" alt="Reliquias Parte 2">
+            </div>
+        </div>
+
+        <h2 class="saga-title">Archivos de Newt Scamander</h2>
+        <div class="movies-grid">
+            
+            <div class="movie-card locked" onclick="lockedAlert()">
+                <div class="lock-overlay">
+                    <i class="fas fa-lock"></i>
+                    <span>Restringido</span>
+                </div>
+                <img src="animalesF1.jpg" alt="Animales Fantásticos">
+            </div>
+
+            <div class="movie-card locked" onclick="lockedAlert()">
+                <div class="lock-overlay">
+                    <i class="fas fa-lock"></i>
+                    <span>Restringido</span>
+                </div>
+                <img src="animalesF2.jpg" alt="Crímenes de Grindelwald">
+            </div>
+
+            <div class="movie-card locked" onclick="lockedAlert()">
+                <div class="lock-overlay">
+                    <i class="fas fa-lock"></i>
+                    <span>Restringido</span>
+                </div>
+                <img src="animalesF3.jpg" alt="Secretos de Dumbledore">
+            </div>
+
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2026 Fakeland Project | Diseño Mágico por Hawkyss</p>
+    </footer>
+
+    <script>
+        // Lógica del Menú
+        function toggleMenu() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('overlay');
+            sidebar.classList.toggle('active');
+            overlay.classList.toggle('active');
+        }
+
+        // Alerta de Bloqueo
+        function lockedAlert() {
+            alert("⛔ Hechizo de Protección Detectado\n\nEsta línea temporal aún no está disponible para casting. Concéntrate en el año 1991.");
+        }
+
+        // Partículas
+        document.addEventListener('DOMContentLoaded', () => {
+            const container = document.getElementById('particles');
+            for (let i = 0; i < 40; i++) {
+                const p = document.createElement('div');
+                p.className = 'particle';
+                p.style.width = p.style.height = Math.random() * 3 + 'px';
+                p.style.left = Math.random() * 100 + '%';
+                p.style.animationDuration = (5 + Math.random() * 10) + 's';
+                p.style.animationDelay = Math.random() * 5 + 's';
+                container.appendChild(p);
+            }
+        });
+    </script>
+</body>
+</html>

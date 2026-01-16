@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <title>Invocar Patronus | The Wizarding World</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    
+    <style>
+        :root {
+            --patronus-light: #d4f1f9;
+            --patronus-glow: #00e5ff;
+            --patronus-blue: #5bc0de;
+            --dark-forest: #050a10;
+            --gold: #d4af37;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
+
+        body {
+            background-color: var(--dark-forest);
+            color: #e0e0e0;
+            font-family: 'Crimson Text', serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+            cursor: url('https://cur.cursors-4u.net/user/use-1/use157.cur'), auto;
+        }
+
+        a, button, input { cursor: url('https://cur.cursors-4u.net/user/use-1/use157.cur'), pointer; }
+
+        /* --- ATMÓSFERA --- */
+        .fog-container {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle at center, #1a2530 0%, #000000 100%);
+            z-index: -2;
+        }
+
+        .fog-layer {
+            position: absolute; width: 200%; height: 100%;
+            background: url('https://raw.githubusercontent.com/danielstuart14/CSS_FOG_ANIMATION/master/img/fog1.png') repeat-x;
+            background-size: contain;
+            opacity: 0.4;
+            z-index: -1;
+        }
+        .fog-1 { bottom: 0; animation: fogMove 60s linear infinite; }
+        .fog-2 { bottom: 20%; animation: fogMove 40s linear infinite reverse; opacity: 0.2; }
+        @keyframes fogMove { 0% { transform: translate3d(0, 0, 0); } 100% { transform: translate3d(-50%, 0, 0); } }
+
+        /* --- NAV RESPONSIVE --- */
+        nav {
+            display: flex; justify-content: center; align-items: center;
+            padding: 10px 20px;
+            background: rgba(0, 0, 0, 0.6);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            position: sticky; top: 0; z-index: 100;
+            height: 60px;
+            backdrop-filter: blur(5px);
+        }
+
+        .menu-toggle {
+            position: absolute; left: 20px;
+            background: transparent; border: none;
+            color: var(--patronus-glow); font-size: 1.5rem;
+            cursor: pointer; padding: 10px;
+        }
+
+        .nav-logo { height: 40px; width: auto; transition: 0.3s; }
+        .nav-logo:hover { filter: drop-shadow(0 0 8px var(--patronus-glow)); }
+
+        /* --- SIDEBAR --- */
+        .sidebar {
+            position: fixed; top: 0; left: -100%;
+            width: 80%; max-width: 300px; height: 100%;
+            background: rgba(8, 8, 10, 0.98);
+            border-right: 1px solid var(--gold);
+            z-index: 2000;
+            transition: 0.4s cubic-bezier(0.77, 0, 0.175, 1);
+            display: flex; flex-direction: column;
+            box-shadow: 10px 0 50px rgba(0,0,0,0.8);
+            padding-top: 20px;
+        }
+
+        .sidebar.active { left: 0; }
+
+        .close-btn {
+            align-self: flex-end; margin-right: 20px;
+            background: transparent; border: none;
+            color: #aaa; font-size: 2rem; cursor: pointer;
+        }
+
+        .sidebar-links { list-style: none; padding: 20px 0; margin-top: 10px; }
+        .sidebar-links li { border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .sidebar-links a {
+            display: block; padding: 15px 25px;
+            color: #ccc; font-family: 'Cinzel Decorative'; font-size: 1rem;
+            transition: 0.3s; text-decoration: none;
+        }
+        .sidebar-links i { width: 25px; margin-right: 10px; color: var(--gold); text-align: center; }
+
+        .overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8); z-index: 1500;
+            opacity: 0; pointer-events: none; transition: 0.3s;
+            backdrop-filter: blur(3px);
+        }
+        .overlay.active { opacity: 1; pointer-events: all; }
+
+        /* --- CONTENEDOR PRINCIPAL --- */
+        .main-container {
+            flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+            padding: 20px; text-align: center; position: relative; width: 100%; min-height: 80vh;
+        }
+
+        /* FASE 1: CONCENTRACIÓN */
+        .stage-box {
+            max-width: 700px; width: 100%;
+            padding: 30px 20px;
+            background: rgba(10, 20, 30, 0.6);
+            border: 1px solid rgba(91, 192, 222, 0.2);
+            border-radius: 15px;
+            backdrop-filter: blur(8px);
+            box-shadow: 0 0 50px rgba(0,0,0,0.5);
+            transition: all 0.5s ease;
+            position: relative;
+        }
+
+        h1 {
+            font-family: 'Cinzel Decorative'; 
+            font-size: clamp(2rem, 8vw, 4rem);
+            color: var(--patronus-light); margin-bottom: 10px;
+            text-shadow: 0 0 15px var(--patronus-blue);
+        }
+
+        p.instruction {
+            font-size: clamp(1rem, 4vw, 1.2rem); 
+            color: #ccc; margin-bottom: 30px; line-height: 1.6; font-style: italic;
+        }
+
+        .memory-input {
+            width: 90%; padding: 15px;
+            background: transparent;
+            border: none; border-bottom: 2px solid #444;
+            color: #fff; font-family: 'Crimson Text'; font-size: 1.2rem;
+            text-align: center; margin-bottom: 40px; transition: 0.4s;
+        }
+        .memory-input:focus { outline: none; border-color: var(--patronus-glow); text-shadow: 0 0 10px var(--patronus-glow); }
+        .memory-input::placeholder { color: #555; font-size: 1rem; }
+
+        /* BOTÓN DE CARGA */
+        .cast-container {
+            position: relative; width: 140px; height: 140px; margin: 0 auto;
+            display: flex; justify-content: center; align-items: center;
+            opacity: 0.5; pointer-events: none; transition: 0.3s;
+            touch-action: none; /* Previene scroll mientras presionas */
+        }
+        .cast-container.active { opacity: 1; pointer-events: all; cursor: pointer; }
+
+        .cast-btn {
+            width: 90px; height: 90px; border-radius: 50%;
+            background: rgba(91, 192, 222, 0.1); border: 2px solid var(--patronus-blue);
+            color: var(--patronus-light); font-size: 2rem;
+            display: flex; justify-content: center; align-items: center;
+            transition: 0.3s; position: relative; z-index: 2;
+        }
+
+        .progress-ring {
+            position: absolute; top: 0; left: 0; width: 140px; height: 140px;
+            transform: rotate(-90deg);
+        }
+        .progress-ring__circle {
+            transition: stroke-dashoffset 0.1s linear;
+            stroke: var(--patronus-glow);
+            filter: drop-shadow(0 0 5px var(--patronus-glow));
+        }
+
+        .helper-text {
+            margin-top: 20px; color: var(--patronus-blue); font-size: 0.9rem; letter-spacing: 2px; text-transform: uppercase;
+            opacity: 0; transition: 0.3s;
+        }
+
+        /* FASE 2: REVELACIÓN (RESULTADO) */
+        .patronus-reveal {
+            display: none; opacity: 0;
+            flex-direction: column; align-items: center; justify-content: center;
+            animation: fadeIn 2s forwards; z-index: 10; width: 100%;
+        }
+        @keyframes fadeIn { to { opacity: 1; } }
+
+        /* Contenedor específico para la CAPTURA */
+        .capture-area {
+            display: flex; flex-direction: column; align-items: center;
+            padding: 20px; border-radius: 20px;
+            background: transparent; width: 100%;
+        }
+
+        .animal-container {
+            position: relative; 
+            width: clamp(250px, 60vw, 400px); /* Adaptable */
+            height: clamp(250px, 60vw, 400px);
+            display: flex; justify-content: center; align-items: center; margin-bottom: 10px;
+        }
+
+        .animal-img {
+            max-width: 100%; max-height: 100%; object-fit: contain;
+            filter: drop-shadow(0 0 20px var(--patronus-glow)) brightness(1.2) contrast(1.1);
+            animation: float 4s ease-in-out infinite;
+        }
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
+
+        .patronus-name {
+            font-family: 'Cinzel Decorative'; 
+            font-size: clamp(2.5rem, 10vw, 4.5rem); 
+            color: #fff; text-shadow: 0 0 30px var(--patronus-glow);
+            margin-bottom: 20px; z-index: 20; text-align: center;
+        }
+
+        .patronus-content-box {
+            max-width: 700px; width: 100%;
+            background: rgba(0,0,0,0.7);
+            border: 1px solid var(--patronus-blue);
+            border-radius: 10px;
+            padding: 20px;
+            backdrop-filter: blur(5px);
+            box-shadow: 0 0 30px rgba(0,229,255,0.1);
+        }
+
+        .patronus-desc { font-size: 1.1rem; line-height: 1.6; color: #ddd; margin-bottom: 20px; }
+        
+        .patronus-advice {
+            border-top: 1px solid rgba(91, 192, 222, 0.3); padding-top: 15px;
+            font-style: italic; color: var(--patronus-light); font-size: 1rem;
+        }
+        .advice-title {
+            display: block; font-family: 'Cinzel Decorative'; color: var(--patronus-blue);
+            font-size: 0.8rem; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 2px;
+        }
+
+        /* BOTONES DE ACCIÓN */
+        .actions-container {
+            margin-top: 30px; display: flex; gap: 15px; flex-wrap: wrap; justify-content: center; width: 100%;
+        }
+
+        .action-btn {
+            background: transparent; border: 1px solid var(--patronus-blue);
+            color: #fff; padding: 12px 25px; cursor: pointer; border-radius: 30px;
+            font-family: 'Cinzel Decorative'; transition: 0.3s; display: flex; align-items: center; gap: 10px;
+            font-size: 0.9rem;
+        }
+        .action-btn:hover { background: var(--patronus-blue); color: #000; box-shadow: 0 0 20px var(--patronus-glow); }
+
+        /* Partículas y Flash */
+        #particles-js { position: absolute; width: 100%; height: 100%; top: 0; left: 0; pointer-events: none; z-index: 5; }
+        .flash-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: white; opacity: 0; pointer-events: none; z-index: 200;
+        }
+        @keyframes flashAnim { 0% { opacity: 0; } 10% { opacity: 1; } 100% { opacity: 0; } }
+
+        footer { text-align: center; padding: 30px; color: #555; font-size: 0.8rem; margin-top: auto; border-top: 1px solid rgba(255,255,255,0.1); }
+    </style>
+</head>
+<body>
+
+    <div class="fog-container">
+        <div class="fog-layer fog-1"></div>
+        <div class="fog-layer fog-2"></div>
+    </div>
+    <div id="particles-js"></div>
+    <div class="flash-overlay" id="flash"></div>
+
+    <nav>
+        <button class="menu-toggle" onclick="toggleMenu()">
+            <i class="fas fa-bars"></i>
+        </button>
+        <a href="index.html">
+            <img src="WIZARDINGLOGO.PNG" alt="Wizarding World" class="nav-logo">
+        </a>
+    </nav>
+
+    <div class="overlay" id="overlay" onclick="toggleMenu()"></div>
+    <div class="sidebar" id="sidebar">
+        <button class="close-btn" onclick="toggleMenu()">&times;</button>
+        <div style="text-align: center; margin-bottom: 20px;">
+            <img src="WIZARDINGLOGO.PNG" width="80" style="filter: brightness(0.8);">
+        </div>
+        <ul class="sidebar-links">
+            <li><a href="index.html"><i class="fas fa-home"></i> Inicio</a></li>
+            <li><a href="peliculas.html"><i class="fas fa-film"></i> Películas</a></li>
+            <li><a href="staff.html"><i class="fas fa-briefcase"></i> Staff & Producción</a></li>
+            <li><a href="casas.html"><i class="fas fa-hat-wizard"></i> Ceremonia de Casas</a></li>
+            <li><a href="varitas.html"><i class="fas fa-magic"></i> Ollivanders</a></li>
+            <li><a href="patronus.html"><i class="fas fa-dragon"></i> Patronus</a></li>
+            <li><a href="quiz.html"><i class="fas fa-scroll"></i> T.I.M.O. Quiz</a></li>
+        </ul>
+    </div>
+
+    <div class="main-container">
+
+        <div class="stage-box" id="inputStage">
+            <h1>Expecto Patronum</h1>
+            <p class="instruction">
+                Este es un hechizo que transforma la esperanza en protección.<br>
+                Piensa en tu recuerdo más feliz. Aquel que te hace sentir invencible.
+            </p>
+            <input type="text" id="memoryInput" class="memory-input" placeholder="Escribe tu recuerdo feliz..." autocomplete="off">
+            
+            <div class="cast-container" id="castContainer">
+                <svg class="progress-ring" width="140" height="140">
+                    <circle class="progress-ring__circle" stroke-width="4" fill="transparent" r="65" cx="70" cy="70" stroke-dasharray="408.4" stroke-dashoffset="408.4" />
+                </svg>
+                <div class="cast-btn" id="castBtn">
+                    <i class="fas fa-wand-magic-sparkles"></i>
+                </div>
+            </div>
+            <div class="helper-text" id="helperText">Mantén presionado</div>
+        </div>
+
+        <div class="patronus-reveal" id="revealStage">
+            
+            <div class="capture-area" id="captureTarget">
+                <div class="animal-container">
+                    <img id="patronusImg" src="" class="animal-img" alt="Patronus">
+                </div>
+                <h2 class="patronus-name" id="patronusName">Nombre</h2>
+                
+                <div class="patronus-content-box">
+                    <p class="patronus-desc" id="patronusDesc">Descripción...</p>
+                    <div class="patronus-advice">
+                        <span class="advice-title">El consejo de tu Guardián</span>
+                        "<span id="patronusAdvice">Consejo...</span>"
+                    </div>
+                </div>
+                
+                <div id="watermark" style="display:none; margin-top: 20px; font-size: 0.8rem; color: #888; text-transform: uppercase; letter-spacing: 2px;">
+                    Wizarding World | Fakeland Project
+                </div>
+            </div>
+
+            <div class="actions-container">
+                <button class="action-btn" onclick="downloadResult()">
+                    <i class="fas fa-camera"></i> Guardar
+                </button>
+                <button class="action-btn" onclick="location.reload()" style="border-color: #666; color: #aaa;">
+                    <i class="fas fa-rotate-right"></i> Otro intento
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+    <footer>
+        <p>&copy; 2026 Fakeland Project | Diseño Mágico por Hawkyss</p>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+
+    <script>
+        // --- 1. LÓGICA DEL MENÚ ---
+        function toggleMenu() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('overlay');
+            sidebar.classList.toggle('active');
+            overlay.classList.toggle('active');
+        }
+
+        // DATOS (Tus archivos locales)
+        const patronusData = [
+            {
+                name: "Ciervo",
+                file: "PCiervo.jpg",
+                desc: "Posees un espíritu noble y protector. El ciervo no busca la pelea, pero se mantiene firme ante el peligro para proteger a su manada. Eres un líder natural.",
+                advice: "Confía en tu propia brújula moral. Tienes la fuerza para guiar a otros a través de la oscuridad."
+            },
+            {
+                name: "Jack Russell",
+                file: "PJack Russell Terrier.jpg",
+                desc: "La lealtad es tu rasgo más definitorio. Puede que a veces te subestimen, pero tienes una energía inagotable y un coraje que supera con creces tu tamaño.",
+                advice: "Nunca dudes de tu impacto en el mundo. Tu tenacidad es tu magia más poderosa."
+            },
+            {
+                name: "Nutria",
+                file: "PNutria.png",
+                desc: "Eres una persona brillante, curiosa y llena de vida. Tienes el raro don de encontrar la alegría incluso en situaciones difíciles.",
+                advice: "No pierdas nunca tu capacidad de asombro. Tu alegría es un acto de rebelión."
+            },
+            {
+                name: "Caballo",
+                file: "PCaballo.jpg",
+                desc: "Tienes un alma libre que no puede ser enjaulada. La pasión y la fuerza corren por tus venas. Valoras tu libertad por encima de todo.",
+                advice: "Corre libre hacia tus sueños. No dejes que nadie te ponga riendas."
+            },
+            {
+                name: "Fénix",
+                file: "PFenix.jpg",
+                desc: "Eres la definición de resiliencia. Has pasado por momentos difíciles, pero siempre encuentras la forma de renacer de tus cenizas.",
+                advice: "No temas a los finales, porque para ti, cada final es solo un nuevo comienzo brillante."
+            },
+            {
+                name: "Cierva",
+                file: "PCierva.jpg",
+                desc: "Tu fuerza es silenciosa y profunda. Tienes una intuición asombrosa y una capacidad de amar incondicionalmente.",
+                advice: "Tu sensibilidad no es una debilidad, es tu mayor escudo."
+            },
+            {
+                name: "Gato",
+                file: "PGato.jpg",
+                desc: "Eres independiente, observador y selectivo. No regalas tu confianza a cualquiera, pero una vez que lo haces, eres un amigo para toda la vida.",
+                advice: "Camina a tu propio ritmo. Confía en tu intuición; rara vez se equivoca."
+            },
+            {
+                name: "Zorro",
+                file: "PZorro.jpg",
+                desc: "Astuto, adaptable y rápido de mente. Donde otros ven un callejón sin salida, tú ves una oportunidad.",
+                advice: "Ante el caos, usa tu ingenio. No siempre gana el más fuerte, sino el que sabe adaptarse."
+            },
+            {
+                name: "Cisne",
+                file: "PCisne.jpg",
+                desc: "Representas la elegancia y la serenidad. Tienes una profundidad emocional que pocos ven a simple vista.",
+                advice: "Mantén la cabeza alta. Tu dignidad es tu armadura."
+            }
+        ];
+
+        // LÓGICA DE INTERACCIÓN (TOUCH & MOUSE)
+        const input = document.getElementById('memoryInput');
+        const container = document.getElementById('castContainer');
+        const btn = document.getElementById('castBtn');
+        const circle = document.querySelector('.progress-ring__circle');
+        const helper = document.getElementById('helperText');
+        const radius = circle.r.baseVal.value;
+        const circumference = radius * 2 * Math.PI;
+        
+        circle.style.strokeDasharray = `${circumference} ${circumference}`;
+        circle.style.strokeDashoffset = circumference;
+
+        let pressTimer;
+        let progress = 0;
+        let isCasting = false;
+
+        input.addEventListener('input', () => {
+            if(input.value.length > 3) {
+                container.classList.add('active');
+                helper.style.opacity = 1;
+            } else {
+                container.classList.remove('active');
+                helper.style.opacity = 0;
+            }
+        });
+
+        const startPress = (e) => {
+            if(!container.classList.contains('active')) return;
+            e.preventDefault(); 
+            isCasting = true;
+            btn.style.transform = "scale(0.9)";
+            pressTimer = setInterval(() => {
+                progress += 2.5;
+                const offset = circumference - (progress / 100) * circumference;
+                circle.style.strokeDashoffset = offset;
+                if(progress > 50) btn.style.boxShadow = `0 0 ${progress}px var(--patronus-glow)`;
+                if(progress >= 100) {
+                    clearInterval(pressTimer);
+                    completeSpell();
+                }
+            }, 20);
+        };
+
+        const endPress = () => {
+            clearInterval(pressTimer);
+            isCasting = false;
+            progress = 0;
+            circle.style.strokeDashoffset = circumference;
+            btn.style.transform = "scale(1)";
+            btn.style.boxShadow = "none";
+        };
+
+        // Eventos Mouse y Touch
+        btn.addEventListener('mousedown', startPress);
+        btn.addEventListener('touchstart', startPress);
+        btn.addEventListener('mouseup', endPress);
+        btn.addEventListener('mouseleave', endPress);
+        btn.addEventListener('touchend', endPress);
+
+        function completeSpell() {
+            document.getElementById('flash').style.animation = 'flashAnim 3s ease-out';
+            const result = patronusData[Math.floor(Math.random() * patronusData.length)];
+            
+            document.getElementById('patronusImg').src = result.file;
+            document.getElementById('patronusName').innerText = result.name;
+            document.getElementById('patronusDesc').innerText = result.desc;
+            document.getElementById('patronusAdvice').innerText = result.advice;
+
+            setTimeout(() => {
+                document.getElementById('inputStage').style.display = 'none';
+                document.getElementById('revealStage').style.display = 'flex';
+                // Scroll arriba suave
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                updateParticles();
+            }, 800); 
+        }
+
+        // LÓGICA DE DESCARGA
+        function downloadResult() {
+            const captureElement = document.getElementById('captureTarget');
+            const watermark = document.getElementById('watermark');
+            const originalBtnText = document.querySelector('.action-btn').innerHTML;
+
+            watermark.style.display = 'block';
+            document.querySelector('.action-btn').innerHTML = '<i class="fas fa-spinner fa-spin"></i> ...';
+
+            html2canvas(captureElement, {
+                backgroundColor: '#050a10', 
+                scale: 2, 
+                logging: false,
+                useCORS: true
+            }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = 'Mi_Patronus_Fakeland.png';
+                link.href = canvas.toDataURL("image/png");
+                link.click();
+
+                watermark.style.display = 'none';
+                document.querySelector('.action-btn').innerHTML = originalBtnText;
+            });
+        }
+
+        // PARTÍCULAS
+        particlesJS("particles-js", {
+            "particles": {
+                "number": { "value": 60 },
+                "color": { "value": "#ffffff" },
+                "opacity": { "value": 0.3, "random": true },
+                "size": { "value": 2, "random": true },
+                "move": { "enable": true, "speed": 1, "direction": "top", "random": true }
+            },
+            "interactivity": { "events": { "onhover": { "enable": true, "mode": "bubble" } } }
+        });
+
+        function updateParticles() {
+             particlesJS("particles-js", {
+                "particles": {
+                    "number": { "value": 150 },
+                    "color": { "value": ["#00e5ff", "#ffffff"] },
+                    "shape": { "type": "star" },
+                    "opacity": { "value": 0.7 },
+                    "size": { "value": 3, "random": true },
+                    "line_linked": { "enable": true, "distance": 100, "color": "#5bc0de", "opacity": 0.3, "width": 1 },
+                    "move": { "enable": true, "speed": 5, "direction": "none", "out_mode": "out" }
+                }
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SECCIÓN PROHIBIDA | ACCESO DENEGADO</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Creepster&family=Crimson+Text:ital,wght@0,400;0,600;1,700&family=UnifrakturMaguntia&family=Caveat:wght@700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --dark-green: #0a1a0a;
+            --poison: #2ecc71;
+            --blood: #8b0000;
+            --parchment: #e3dccb;
+            --ink: #2b2b2b;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background-color: #050505;
+            color: #a0a0a0;
+            font-family: 'Crimson Text', serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+            display: flex; flex-direction: column;
+        }
+
+        /* --- PANTALLA DE BLOQUEO (LOGIN) --- */
+        #lock-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #000 url('https://www.transparenttextures.com/patterns/dark-matter.png');
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            z-index: 5000; transition: opacity 1.5s ease-in-out; padding: 20px;
+        }
+
+        .skull-icon {
+            font-size: 5rem; color: #111; margin-bottom: 20px;
+            text-shadow: 0 0 15px var(--poison);
+            animation: pulseEvil 3s infinite alternate;
+        }
+        @keyframes pulseEvil { from { text-shadow: 0 0 10px var(--poison); color: #111; } to { text-shadow: 0 0 30px var(--poison); color: #051505; } }
+
+        .riddle-box {
+            max-width: 600px; text-align: center; margin-bottom: 30px;
+            border: 1px solid #333; padding: 20px; background: rgba(0,0,0,0.8);
+            box-shadow: 0 0 30px rgba(0,0,0,0.8);
+        }
+        .riddle-title { color: var(--poison); font-family: 'Cinzel Decorative'; font-size: 1.5rem; margin-bottom: 10px; }
+        .riddle-text { font-style: italic; color: #ccc; font-size: 1.1rem; line-height: 1.6; }
+
+        .password-input {
+            background: rgba(0,0,0,0.5); border: 1px solid #333; border-bottom: 2px solid var(--poison);
+            color: #fff; padding: 15px; font-size: 1.5rem; text-align: center;
+            font-family: 'UnifrakturMaguntia', cursive; width: 300px; margin-bottom: 20px;
+            outline: none; transition: 0.3s;
+        }
+        .password-input:focus { box-shadow: 0 0 30px rgba(46, 204, 113, 0.2); }
+
+        .enter-btn {
+            background: #111; border: 1px solid var(--poison); color: var(--poison);
+            padding: 12px 50px; cursor: pointer; font-family: 'Cinzel Decorative';
+            transition: 0.3s; text-transform: uppercase; letter-spacing: 2px;
+        }
+        .enter-btn:hover { background: var(--poison); color: #000; box-shadow: 0 0 20px var(--poison); }
+
+        .shake { animation: shake 0.5s; }
+        @keyframes shake { 0% { transform: translateX(0); } 25% { transform: translateX(-10px); } 50% { transform: translateX(10px); } 75% { transform: translateX(-10px); } 100% { transform: translateX(0); } }
+
+        /* --- BIBLIOTECA --- */
+        #library-content {
+            display: none; background-image: url('https://www.transparenttextures.com/patterns/black-scales.png');
+            min-height: 100vh; padding: 60px 20px;
+        }
+
+        .library-header { text-align: center; margin-bottom: 60px; border-bottom: 1px solid #222; padding-bottom: 20px; }
+        .library-title { font-family: 'UnifrakturMaguntia'; font-size: 4.5rem; color: #ccc; text-shadow: 0 0 10px #000; line-height: 1; }
+        .library-quote { color: #555; font-style: italic; margin-top: 10px; font-size: 1.2rem; }
+
+        .books-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 40px; max-width: 1400px; margin: 0 auto;
+        }
+
+        /* TARJETA DE LIBRO (PORTADA) */
+        .dark-book {
+            background: rgba(10, 15, 10, 0.8); border: 1px solid #222;
+            padding: 20px; text-align: center; cursor: pointer;
+            transition: 0.4s; position: relative; overflow: hidden;
+            perspective: 1000px; /* Para efecto 3D sutil */
+        }
+        .dark-book:hover { transform: translateY(-10px); border-color: var(--poison); box-shadow: 0 10px 30px rgba(0,0,0,0.8); }
+        
+        .book-cover-art {
+            width: 140px; height: 200px; margin: 0 auto 15px auto;
+            background: #151515; border: 2px solid #333;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            box-shadow: 5px 5px 15px #000; transition: 0.3s;
+            font-family: 'Cinzel Decorative'; color: #666; padding: 5px; font-size: 0.7rem;
+            background-image: url('https://www.transparenttextures.com/patterns/leather.png');
+        }
+        .dark-book:hover .book-cover-art { border-color: var(--poison); color: var(--poison); }
+        
+        .book-icon { font-size: 2.5rem; margin-bottom: 15px; opacity: 0.7; }
+        .book-title-card { font-family: 'Cinzel Decorative'; font-size: 1.1rem; color: #ddd; margin-bottom: 5px; }
+        .book-author { font-size: 0.8rem; color: #666; font-style: italic; text-transform: uppercase; }
+
+        /* --- MODAL DE LIBRO REALISTA (AQUÍ ESTÁ LA MAGIA) --- */
+        .read-modal {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.92); backdrop-filter: blur(5px);
+            z-index: 6000; justify-content: center; align-items: center; padding: 20px;
+            overflow-y: auto;
+        }
+        
+        /* El Libro Abierto */
+        .real-book {
+            width: 100%; max-width: 1100px; height: 85vh;
+            background-color: var(--parchment);
+            background-image: url('https://www.transparenttextures.com/patterns/old-paper.png');
+            box-shadow: 
+                inset 0 0 100px rgba(0,0,0,0.5), /* Sombra interior (viejo) */
+                0 0 50px rgba(0,0,0,0.8), /* Sombra exterior */
+                10px 10px 30px #000;
+            display: flex;
+            border-radius: 5px;
+            position: relative;
+            animation: openBookAnim 0.8s ease-out;
+            color: var(--ink);
+        }
+
+        @keyframes openBookAnim {
+            from { transform: scale(0.1) rotateY(90deg); opacity: 0; }
+            to { transform: scale(1) rotateY(0deg); opacity: 1; }
+        }
+
+        /* Lomo del libro (separador central) */
+        .book-spine {
+            width: 40px; height: 100%;
+            background: linear-gradient(to right, rgba(0,0,0,0.1), rgba(0,0,0,0.3), rgba(0,0,0,0.1));
+            border-left: 1px solid rgba(0,0,0,0.1);
+            border-right: 1px solid rgba(0,0,0,0.1);
+            flex-shrink: 0;
+        }
+
+        /* Páginas */
+        .page {
+            flex: 1; padding: 40px 50px; overflow-y: auto;
+            font-size: 1.15rem; line-height: 1.6; text-align: justify;
+            position: relative;
+        }
+        .page::-webkit-scrollbar { width: 8px; }
+        .page::-webkit-scrollbar-thumb { background: #c0b090; border-radius: 4px; }
+
+        /* Estilos de Texto dentro del libro */
+        .chapter-header {
+            font-family: 'UnifrakturMaguntia'; font-size: 3rem; text-align: center;
+            border-bottom: 3px double var(--ink); margin-bottom: 30px; line-height: 1;
+        }
+        .drop-cap {
+            float: left; font-family: 'UnifrakturMaguntia'; font-size: 4.5rem;
+            line-height: 0.8; margin-right: 10px; color: var(--blood);
+        }
+        .hand-note {
+            font-family: 'Caveat', cursive; color: var(--blood); font-size: 1.3rem;
+            transform: rotate(-5deg); margin: 20px 0; display: block;
+            border: 1px dashed var(--blood); padding: 10px; background: rgba(139, 0, 0, 0.05);
+        }
+        .illustration {
+            width: 100%; height: 200px; background: #dcd0b0; 
+            border: 2px solid #555; margin: 20px 0;
+            display: flex; justify-content: center; align-items: center;
+            font-family: 'Cinzel Decorative'; color: #777; font-size: 0.9rem;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.2);
+        }
+        h3 { font-family: 'Cinzel Decorative'; margin-top: 20px; font-size: 1.3rem; border-bottom: 1px solid #aaa; }
+
+        /* Botón Cerrar (Como un marcapáginas) */
+        .bookmark-close {
+            position: absolute; right: 30px; top: -10px;
+            width: 40px; height: 100px; background: var(--blood);
+            color: #fff; font-size: 1.5rem; text-align: center; line-height: 80px;
+            cursor: pointer; box-shadow: 2px 2px 5px rgba(0,0,0,0.5);
+            transition: 0.3s; z-index: 10;
+        }
+        .bookmark-close:hover { top: 0; }
+        .bookmark-close::after {
+            content: ''; position: absolute; bottom: 0; left: 0;
+            border-left: 20px solid var(--blood); border-right: 20px solid var(--blood);
+            border-bottom: 20px solid transparent;
+        }
+
+        .escape-btn {
+            position: fixed; bottom: 30px; right: 30px; color: #444; text-decoration: none;
+            font-family: 'Cinzel Decorative'; font-size: 0.8rem; border: 1px solid #333; padding: 10px 20px;
+            transition: 0.3s;
+        }
+        .escape-btn:hover { border-color: #fff; color: #fff; }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .real-book { flex-direction: column; height: 95vh; }
+            .book-spine { width: 100%; height: 20px; background: linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(0,0,0,0.3)); }
+            .page { padding: 20px; }
+        }
+
+    </style>
+</head>
+<body>
+
+    <div id="lock-screen">
+        <i class="fas fa-eye skull-icon"></i>
+        
+        <div class="riddle-box">
+            <div class="riddle-title">El Acertijo del Guardián</div>
+            <p class="riddle-text">
+                "Nazco del miedo y la represión mágica.<br>
+                Soy un viento negro, un parásito que consume a los niños desde adentro.<br>
+                Newt Scamander intentó salvar a uno en Nueva York.<br>
+                ¿Qué soy?"
+            </p>
+        </div>
+        
+        <input type="password" id="password" class="password-input" placeholder="Respuesta..." autocomplete="off">
+        <button class="enter-btn" onclick="checkAccess()">Revelar</button>
+        <p id="error-msg" style="color: var(--blood); margin-top: 15px; opacity: 0; font-family: 'Cinzel Decorative';">RESPUESTA INCORRECTA</p>
+    </div>
+
+    <div id="library-content">
+        <div class="library-header">
+            <h1 class="library-title">La Sección Prohibida</h1>
+            <p class="library-quote">"El conocimiento peligroso es como el veneno de Basilisco: mortal en manos inexpertas, poderoso en las del maestro."</p>
+        </div>
+
+        <div class="books-grid" id="grid-container">
+            </div>
+
+        <a href="index.html" class="escape-btn">Salir de la Biblioteca</a>
+    </div>
+
+    <div id="reading-modal" class="read-modal">
+        <div class="real-book">
+            <div class="bookmark-close" onclick="closeBook()"><i class="fas fa-times"></i></div>
+            
+            <div class="page" id="page-left">
+                </div>
+
+            <div class="book-spine"></div>
+
+            <div class="page" id="page-right">
+                </div>
+        </div>
+    </div>
+
+    <script>
+        // --- 1. BASE DE DATOS MASIVA (LORE COMPLETO) ---
+        // Estructura: title, author, icon, page1 (Teoría), page2 (Práctica/Historia)
+        const libraryDB = [
+            {
+                title: "Secretos del Arte más Oscuro",
+                author: "Herpo el Loco",
+                icon: "gem",
+                page1: `
+                    <div class="chapter-header">De Horrocruxibus</div>
+                    <p><span class="drop-cap">E</span>l Horrocrux representa la perversión definitiva de las leyes mágicas. Es un receptáculo en el cual un mago oscuro ha ocultado un fragmento de su alma con el propósito de alcanzar la inmortalidad. Mientras ese fragmento permanezca seguro, el cuerpo del creador puede ser destruido, pero su esencia no podrá cruzar al Más Allá.</p>
+                    <p>La creación requiere un acto de maldad suprema: el asesinato. Matar desgarra el alma. El mago utiliza este daño para arrancar la parte desgarrada y encerrarla. El hechizo específico para sellar el alma es una abominación que no debe ser pronunciada.</p>
+                    <div class="hand-note">Nota: El alma se vuelve inestable. La apariencia física del mago se deforma con cada división. - A.D.</div>
+                `,
+                page2: `
+                    <h3>Métodos de Destrucción</h3>
+                    <p>Un Horrocrux es lo opuesto a un ser humano: si se destruye el contenedor, el alma muere. Pero el contenedor suele estar protegido por encantamientos poderosos.</p>
+                    <p>Para destruirlo, se requiere una sustancia tan destructiva que el Horrocrux no pueda repararse a sí mismo:</p>
+                    <ul>
+                        <li><strong>Veneno de Basilisco:</strong> Solo tiene un antídoto (lágrimas de fénix), por lo que impregna el objeto irremediablemente.</li>
+                        <li><strong>Fuego Maligno:</strong> Llamas malditas que consumen magia oscura, pero son casi imposibles de controlar.</li>
+                    </ul>
+                    <div class="illustration">[DIAGRAMA: ANILLO DE GAUNT PARTIDO]</div>
+                    <p>Advertencia: El fragmento de alma puede poseer a quien se acerque demasiado emocionalmente al objeto.</p>
+                `
+            },
+            {
+                title: "Obscurials y Parásitos",
+                author: "Newton Scamander",
+                icon: "cloud",
+                page1: `
+                    <div class="chapter-header">El Viento Negro</div>
+                    <p><span class="drop-cap">U</span>n Obscurus es una fuerza mágica parásita oscura. Se desarrolla cuando un niño mago, generalmente menor de diez años, es obligado a reprimir su talento mágico debido a abusos físicos o psicológicos.</p>
+                    <p>La magia reprimida no desaparece; se vuelve hacia adentro, pudriéndose y transformándose en una entidad malévola. El niño se convierte en un Obscurial. Cuando pierden el control, el Obscurus estalla como un viento negro destructivo, invisible o visible, capaz de arrasar estructuras y matar.</p>
+                    <h3>Esperanza de Vida</h3>
+                    <p>La mayoría de los Obscurials no sobreviven más allá de los diez años. La fuerza parásita consume su vitalidad.</p>
+                `,
+                page2: `
+                    <h3>Casos de Estudio</h3>
+                    <p><strong>Sudán, 1920:</strong> Encontré una niña de ocho años encarcelada por su propia tribu. Logré separar el Obscurus antes de su muerte, pero no pude salvarla. La entidad sobrevive dentro de una burbuja mágica en mi maleta.</p>
+                    <p><strong>Credence Barebone:</strong> Un caso extraordinario en Nueva York. Sobrevivió hasta la edad adulta debido a la inmensa potencia de su magia latente. Esto sugiere que un mago con el poder de un ancestro poderoso podría resistir la infección más tiempo.</p>
+                    <div class="hand-note">¡Peligro! No intentar separar sin equipo adecuado.</div>
+                    <p>Se cree que Ariana Dumbledore pudo haber sido una Obscurial tras su ataque, lo que explicaría las explosiones mágicas accidentales.</p>
+                `
+            },
+            {
+                title: "Maldiciones Imperdonables",
+                author: "Godelot",
+                icon: "bolt",
+                page1: `
+                    <div class="chapter-header">Las Tres Prohibidas</div>
+                    <p><span class="drop-cap">C</span>lasificadas en 1717, el uso de cualquiera de estas maldiciones contra un ser humano garantiza una sentencia de por vida en Azkaban.</p>
+                    <h3>Imperius (Imperio)</h3>
+                    <p>Control total. La víctima entra en un estado de dicha flotante, sin preocupaciones, obedeciendo cualquier orden. Requiere una fuerza mental tremenda para resistirla.</p>
+                    <h3>Cruciatus (Crucio)</h3>
+                    <p>La maldición de tortura. No deja marcas físicas. Estimula los receptores de dolor al máximo. Para que funcione, el lanzador debe *desear* causar dolor, no basta con la ira justa.</p>
+                `,
+                page2: `
+                    <h3>La Maldición Asesina (Avada Kedavra)</h3>
+                    <p>Un destello de luz verde cegadora y un sonido como de un torrente invisible. Causa la muerte biológica instantánea sin daño físico visible.</p>
+                    <p><strong>Defensa:</strong> No existe escudo mágico (Protego) capaz de detenerla. Solo se puede esquivar o bloquear con objetos físicos sólidos.</p>
+                    <div class="illustration">[MOVIMIENTO DE VARITA: RAYO HACIA ABAJO]</div>
+                    <p><strong>Excepción Histórica:</strong> Harry Potter es el único sobreviviente conocido, gracias a la protección de sacrificio de sangre (amor) invocada por su madre al morir.</p>
+                `
+            },
+            {
+                title: "El Basilisco",
+                author: "Salazar Slytherin (Copia)",
+                icon: "eye",
+                page1: `
+                    <div class="chapter-header">El Rey de las Serpientes</div>
+                    <p><span class="drop-cap">D</span>e todas las bestias temibles, ninguna es más letal que el Basilisco. Puede alcanzar un tamaño gigantesco y vivir cientos de años.</p>
+                    <p>Nace de un huevo de gallina incubado por un sapo. Sus métodos de asesinato son los más asombrosos: aparte de sus colmillos venenosos, el Basilisco tiene una mirada asesina. Cualquiera que mire directamente a sus ojos amarillos morirá al instante.</p>
+                    <p>Si la mirada es indirecta (reflejo, lente), la víctima quedará <strong>Petrificada</strong>, un estado similar a la muerte suspendida.</p>
+                `,
+                page2: `
+                    <h3>Debilidades y Control</h3>
+                    <p>Las arañas huyen ante el Basilisco, pues es su archienemigo. El Basilisco huye solo del canto del gallo, que le es fatal.</p>
+                    <p>Solo un Hablante de Pársel (Ofidioglota) puede controlar a la bestia, aunque esto depende de la lealtad de la criatura hacia el heredero de Slytherin.</p>
+                    <div class="hand-note">El veneno es tan potente que destruye objetos mágicos indestructibles. Solo las lágrimas de Fénix pueden curar la herida.</div>
+                `
+            },
+            {
+                title: "Pociones Muy Potentes",
+                author: "Phineas Bourne",
+                icon: "flask",
+                page1: `
+                    <div class="chapter-header">La Poción Multijugos</div>
+                    <p><span class="drop-cap">U</span>na decocción compleja y lenta que permite a quien la bebe asumir la forma física de otra persona. No altera la personalidad ni la memoria, solo el cuerpo.</p>
+                    <h3>Ingredientes Críticos:</h3>
+                    <ul>
+                        <li>Crisopos (guisados durante 21 días).</li>
+                        <li>Sanguijuelas.</li>
+                        <li>Descurainia sophia (recogida en luna llena).</li>
+                        <li>Poligonáceas.</li>
+                        <li>Polvo de cuerno de Bicornio.</li>
+                        <li>Piel de serpiente arbórea africana.</li>
+                        <li><strong>Algo de la persona</strong> en la que se desea transformar (pelo, uñas).</li>
+                    </ul>
+                `,
+                page2: `
+                    <h3>Efectos y Advertencias</h3>
+                    <p>El sabor y color varían según la naturaleza de la persona copiada (dorado para los puros de corazón, color lodo para los malvados).</p>
+                    <div class="hand-note">¡ADVERTENCIA! No usar con pelo de animal. La transformación no se revertirá y causará fusiones híbridas dolorosas.</div>
+                    <p>El efecto dura exactamente una hora, pero puede extenderse bebiendo dosis continuas. Los impostores pueden ser descubiertos por la falta de conocimiento o preguntas de seguridad.</p>
+                `
+            },
+            {
+                title: "Legilimancia Avanzada",
+                author: "Reinaie",
+                icon: "brain",
+                page1: `
+                    <div class="chapter-header">La Mente Abierta</div>
+                    <p><span class="drop-cap">L</span>a mente no es un libro que uno pueda abrir y leer a voluntad. Es una estructura compleja y multidimensional. La Legilimancia es el arte de navegar a través de esas capas.</p>
+                    <p>Un Legeremante experto puede extraer sentimientos, recuerdos y detectar mentiras al contacto visual. Los más poderosos, como Lord Voldemort, pueden hacerlo sin varita y a distancia si el vínculo es fuerte.</p>
+                `,
+                page2: `
+                    <h3>Oclumancia: La Defensa</h3>
+                    <p>La única defensa contra un intruso mental es la Oclumancia: el cierre de la mente. Requiere vaciar uno mismo de toda emoción, dejando la mente "en blanco" o creando recuerdos falsos para engañar al invasor.</p>
+                    <p>Snape describió la mente del Señor Tenebroso como "un arma siempre afilada". La incapacidad de controlar las propias emociones hace al mago vulnerable.</p>
+                `
+            },
+            {
+                title: "Necromancia: Inferi",
+                author: "Grindelwald (Notas)",
+                icon: "skull",
+                page1: `
+                    <div class="chapter-header">Marionetas de Carne</div>
+                    <p><span class="drop-cap">L</span>os Inferi son cadáveres reanimados mediante hechizos oscuros complejos. No están vivos. No tienen alma, ni voluntad, ni pensamiento. Son herramientas.</p>
+                    <p>Un Inferius (singular) es inmune a la mayoría de los hechizos que causan dolor (como el Cruciatus) porque no sienten. No pueden ser "matados" de nuevo, solo destruidos o desmembrados.</p>
+                `,
+                page2: `
+                    <h3>Debilidades</h3>
+                    <p>Al ser criaturas de la oscuridad y el frío, los Inferi temen a la luz y al calor. El fuego es el arma más efectiva.</p>
+                    <div class="illustration">[DIBUJO: CUERPO ESQUELÉTICO SALIENDO DEL AGUA]</div>
+                    <p>Lord Voldemort usó un ejército de Inferi para proteger el Horrocrux del Guardapelo en la cueva del mar. Se mantenían sumergidos en el lago negro, esperando cualquier perturbación en el agua para arrastrar al intruso a las profundidades.</p>
+                `
+            },
+            // ... (Se pueden añadir los 20 restantes con este formato, el código generará los modales automáticamente) ...
+            {
+                title: "Magia de Sangre",
+                author: "Dagworth-Granger",
+                icon: "tint",
+                page1: `
+                    <div class="chapter-header">Pactos y Maldiciones</div>
+                    <p><span class="drop-cap">L</span>a sangre es el conductor mágico más potente. Los pactos sellados con sangre, como el Juramento Inquebrantable, son contratos absolutos. Si se rompen, el infractor muere.</p>
+                    <p>Existe también la Maldición de Sangre (Maledictus), que se transmite exclusivamente de madres a hijas, condenando a la descendiente a transformarse permanentemente en una bestia.</p>
+                `,
+                page2: `
+                    <h3>Protección de Sacrificio</h3>
+                    <p>La magia antigua más poderosa. Si una persona elige morir voluntariamente para salvar a otra, su sangre crea un escudo impenetrable sobre el salvado. Voldemort no pudo tocar a Harry Potter debido a esto.</p>
+                    <div class="hand-note">Nota: El Pacto de Sangre entre Dumbledore y Grindelwald fue lo único que impidió su duelo durante décadas.</div>
+                `
+            }
+            // Agrega aquí los demás libros siguiendo el patrón title/page1/page2...
+        ];
+        
+        // Rellenar con más libros genéricos para completar el grid visual (para el ejemplo)
+        const extraBooks = [
+            {t: "Licantropía", a: "Marlowe Forfang", i: "wolf"},
+            {t: "Plantas Carnívoras", a: "Phyllida Spore", i: "leaf"},
+            {t: "Sectumsempra", a: "El Príncipe", i: "cut"},
+            {t: "Fuego Maligno", a: "V. Crabbe Sr.", i: "fire"},
+            {t: "Reliquias de la Muerte", a: "Beedle", i: "triangle"},
+            {t: "Dragones Asesinos", a: "C. Weasley", i: "dragon"},
+            {t: "Acromántulas", a: "Aragog", i: "spider"},
+            {t: "El Velo", a: "Inefable", i: "archway"},
+            {t: "Giratiempos", a: "S. Croaker", i: "hourglass"},
+            {t: "La Marca Tenebrosa", a: "T. Riddle", i: "skull-crossbones"},
+            {t: "Pestilencia", a: "Gunhilda", i: "biohazard"},
+            {t: "Mano de la Gloria", a: "Borgin", i: "hand-paper"},
+            {t: "Quintapeds", a: "MacBoon", i: "paw"},
+            {t: "Espejo de Oesed", a: "Desconocido", i: "mirror"},
+            {t: "Venenos Raros", a: "Snape", i: "flask"},
+            {t: "Maldición Gemino", a: "Lestrange", i: "clone"},
+            {t: "Dementores", a: "Ekrizdis", i: "ghost"},
+            {t: "Imperius", a: "Carrow", i: "user-secret"}
+        ];
+
+        // Añadirlos a la DB con texto genérico para que funcionen
+        extraBooks.forEach(b => {
+            libraryDB.push({
+                title: b.t, author: b.a, icon: b.i,
+                page1: `<div class="chapter-header">${b.t}</div><p><span class="drop-cap">E</span>ste volumen contiene información altamente restringida sobre ${b.t}. Su lectura está prohibida para estudiantes menores de séptimo año sin autorización firmada.</p><p>El contenido detalla los orígenes históricos, los contrahechizos conocidos y los incidentes mortales registrados por el Ministerio de Magia.</p>`,
+                page2: `<h3>Observaciones del Autor</h3><p>La práctica de esta rama de la magia requiere una voluntad férrea y, a menudo, el sacrificio de la propia moralidad.</p><div class="hand-note">Propiedad de Hogwarts. No sacar de la biblioteca.</div><div class="illustration">[ILUSTRACIÓN PENDIENTE]</div>`
+            });
+        });
+
+        // --- 2. GENERAR GRID DINÁMICAMENTE ---
+        const grid = document.getElementById('grid-container');
+        
+        libraryDB.forEach((book, index) => {
+            const card = document.createElement('div');
+            card.className = 'dark-book';
+            card.onclick = () => openBook(index);
+            
+            card.innerHTML = `
+                <div class="book-cover-art">
+                    <i class="fas fa-${book.icon} book-icon"></i>
+                    ${book.title.replace(/\s/g, '<br>').toUpperCase()}
+                </div>
+                <h3 class="book-title-card">${book.title}</h3>
+                <div class="book-author">${book.author}</div>
+            `;
+            grid.appendChild(card);
+        });
+
+        // --- 3. SISTEMA DE ACCESO (CONTRASEÑA OCULTA: OBSCURUS) ---
+        // Codificado en Base64 para ocultar la respuesta en el código
+        const ENCODED_KEY = "T0JTQ1VSVVM="; 
+
+        function checkAccess() {
+            const input = document.getElementById('password');
+            const lockScreen = document.getElementById('lock-screen');
+            const content = document.getElementById('library-content');
+            const errorMsg = document.getElementById('error-msg');
+
+            // Decodificar input y comparar
+            if (btoa(input.value.toUpperCase().trim()) === ENCODED_KEY) {
+                // Éxito
+                lockScreen.style.opacity = '0';
+                setTimeout(() => {
+                    lockScreen.style.display = 'none';
+                    content.style.display = 'block';
+                    window.scrollTo(0,0);
+                }, 1500);
+            } else {
+                // Fallo
+                lockScreen.classList.add('shake');
+                errorMsg.style.opacity = '1';
+                input.value = '';
+                setTimeout(() => lockScreen.classList.remove('shake'), 500);
+            }
+        }
+        
+        document.getElementById('password').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') checkAccess();
+        });
+
+        // --- 4. MODAL DE LECTURA (LIBRO REALISTA) ---
+        function openBook(index) {
+            const data = libraryDB[index];
+            
+            document.getElementById('page-left').innerHTML = data.page1;
+            document.getElementById('page-right').innerHTML = data.page2;
+            
+            document.getElementById('reading-modal').style.display = 'flex';
+        }
+
+        function closeBook() {
+            document.getElementById('reading-modal').style.display = 'none';
+        }
+
+        window.onclick = function(e) {
+            if (e.target == document.getElementById('reading-modal')) closeBook();
+        }
+
+    </script>
+
+</body>
+</html>

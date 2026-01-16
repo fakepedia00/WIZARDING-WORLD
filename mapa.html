@@ -1,0 +1,1683 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Mapa del Merodeador | Hogwarts</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --parchment: #f2e6d0;
+            --parchment-dark: #d9c8a5;
+            --ink: #2d1b0e;
+            --ink-light: #5d4037;
+            --dark-bg: #0a0705;
+            --gold: #d4af37;
+            --gryffindor-red: #740001;
+            --slytherin-green: #1a472a;
+            --ravenclaw-blue: #0e1a40;
+            --hufflepuff-yellow: #ecb939;
+            --shadow: rgba(0, 0, 0, 0.5);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            touch-action: none;
+        }
+
+        body {
+            font-family: 'Crimson Text', serif;
+            background-color: var(--dark-bg);
+            color: var(--ink);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+        }
+
+        /* ===== PANTALLA DE BLOQUEO RESPONSIVE ===== */
+        .lock-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--dark-bg) 0%, #1a0f0a 100%);
+            background-image: 
+                radial-gradient(circle at 20% 30%, rgba(116, 0, 1, 0.1) 0%, transparent 20%),
+                radial-gradient(circle at 80% 70%, rgba(26, 71, 42, 0.1) 0%, transparent 20%);
+            z-index: 10000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 1.5s ease, transform 1.5s ease;
+            padding: 20px;
+        }
+
+        .lock-content {
+            background: var(--parchment);
+            padding: clamp(1.5rem, 5vw, 3rem);
+            border-radius: 10px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+            text-align: center;
+            width: 100%;
+            max-width: 800px;
+            position: relative;
+            border: clamp(8px, 2vw, 15px) solid transparent;
+            border-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect x="0" y="0" width="100" height="100" fill="none" stroke="%232d1b0e" stroke-width="3"/></svg>') 30 stretch;
+            animation: pulse 3s infinite alternate;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 20px 60px rgba(212, 175, 55, 0.2); }
+            100% { box-shadow: 0 20px 60px rgba(212, 175, 55, 0.5); }
+        }
+
+        .lock-title {
+            font-family: 'Cinzel Decorative', cursive;
+            font-size: clamp(1.8rem, 6vw, 2.5rem);
+            color: var(--ink);
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            position: relative;
+            line-height: 1.2;
+        }
+
+        .lock-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: min(200px, 80%);
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--gold), transparent);
+        }
+
+        .lock-subtitle {
+            font-size: clamp(1rem, 3vw, 1.2rem);
+            font-style: italic;
+            color: var(--ink-light);
+            margin-bottom: clamp(1.5rem, 4vw, 2rem);
+            line-height: 1.6;
+        }
+
+        .password-container {
+            margin: clamp(1rem, 3vw, 2rem) 0;
+        }
+
+        .password-instruction {
+            font-size: clamp(0.9rem, 2.5vw, 1.1rem);
+            margin-bottom: 1rem;
+            color: var(--ink);
+            line-height: 1.4;
+        }
+
+        .password-input {
+            width: 100%;
+            padding: clamp(12px, 3vw, 15px);
+            font-size: clamp(1rem, 3vw, 1.2rem);
+            font-family: 'Cinzel Decorative', cursive;
+            background: transparent;
+            border: 2px solid var(--ink);
+            border-radius: 5px;
+            color: var(--ink);
+            text-align: center;
+            outline: none;
+            transition: all 0.3s ease;
+            letter-spacing: 1px;
+        }
+
+        .password-input:focus {
+            border-color: var(--gold);
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
+        }
+
+        .wand-trigger {
+            background: linear-gradient(145deg, var(--ink), #1a100c);
+            color: var(--gold);
+            border: 2px solid var(--gold);
+            padding: clamp(12px, 3vw, 15px) clamp(20px, 5vw, 40px);
+            font-size: clamp(1rem, 3vw, 1.2rem);
+            font-family: 'Cinzel Decorative', cursive;
+            cursor: pointer;
+            border-radius: 50px;
+            margin-top: 1rem;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            position: relative;
+            overflow: hidden;
+            width: 100%;
+            max-width: 300px;
+        }
+
+        .wand-trigger:hover, .wand-trigger:active {
+            background: var(--gold);
+            color: var(--dark-bg);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(212, 175, 55, 0.4);
+        }
+
+        .wand-trigger:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .error-message {
+            color: #ff4444;
+            margin-top: 1rem;
+            font-size: clamp(0.8rem, 2.5vw, 1rem);
+            min-height: 24px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            line-height: 1.4;
+        }
+
+        .hint-button {
+            background: none;
+            border: none;
+            color: var(--ink-light);
+            font-size: clamp(0.8rem, 2.5vw, 0.9rem);
+            cursor: help;
+            margin-top: 1rem;
+            font-style: italic;
+            text-decoration: underline;
+            transition: color 0.3s ease;
+            padding: 5px;
+        }
+
+        .hint-button:hover, .hint-button:active {
+            color: var(--gold);
+        }
+
+        /* ===== MAPA DESBLOQUEADO RESPONSIVE ===== */
+        body.unlocked .lock-screen {
+            opacity: 0;
+            pointer-events: none;
+            transform: scale(1.2);
+        }
+
+        .map-viewport {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: var(--parchment);
+            position: relative;
+            cursor: grab;
+            opacity: 0;
+            transition: opacity 1s ease;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        body.unlocked .map-viewport {
+            opacity: 1;
+        }
+
+        .map-viewport:active {
+            cursor: grabbing;
+        }
+
+        /* Tamaño del mapa dinámico para dispositivos */
+        .map-surface {
+            position: absolute;
+            top: 0;
+            left: 0;
+            background: 
+                linear-gradient(90deg, transparent 99%, rgba(45, 27, 14, 0.05) 99%),
+                linear-gradient(transparent 99%, rgba(45, 27, 14, 0.05) 99%),
+                var(--parchment);
+            background-size: 100px 100px, 100px 100px, 100% 100%;
+            transform-origin: 0 0;
+            will-change: transform;
+        }
+
+        /* Ajustar tamaño del mapa según dispositivo */
+        @media (max-width: 768px) {
+            .map-surface {
+                width: 3000px;
+                height: 3000px;
+            }
+        }
+
+        @media (min-width: 769px) {
+            .map-surface {
+                width: 4000px;
+                height: 4000px;
+            }
+        }
+
+        /* ===== ELEMENTOS DEL CASTILLO RESPONSIVE ===== */
+        .castle-element {
+            position: absolute;
+            pointer-events: none;
+        }
+
+        .castle-wall {
+            background: var(--ink);
+            border-radius: 3px;
+            box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .castle-room {
+            position: absolute;
+            border: 3px solid var(--ink);
+            border-radius: 5px;
+            background: rgba(242, 230, 208, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: clamp(5px, 1vw, 10px);
+            box-shadow: inset 0 0 20px rgba(45, 27, 14, 0.1);
+            transition: all 0.3s ease;
+            touch-action: none;
+        }
+
+        .castle-room:hover, .castle-room:active {
+            background: rgba(242, 230, 208, 0.9);
+            transform: scale(1.02);
+            z-index: 10 !important;
+        }
+
+        .room-label {
+            font-family: 'Cinzel Decorative', cursive;
+            font-size: clamp(0.8rem, 2vw, 1.1rem);
+            color: var(--ink);
+            text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.5);
+            font-weight: bold;
+            text-align: center;
+            line-height: 1.2;
+            max-width: 90%;
+            pointer-events: none;
+            word-wrap: break-word;
+        }
+
+        .room-gryffindor {
+            border-color: var(--gryffindor-red);
+            background: rgba(116, 0, 1, 0.05);
+        }
+
+        .room-slytherin {
+            border-color: var(--slytherin-green);
+            background: rgba(26, 71, 42, 0.05);
+        }
+
+        .room-ravenclaw {
+            border-color: var(--ravenclaw-blue);
+            background: rgba(14, 26, 64, 0.05);
+        }
+
+        .room-hufflepuff {
+            border-color: var(--hufflepuff-yellow);
+            background: rgba(236, 185, 57, 0.05);
+        }
+
+        .secret-passage {
+            position: absolute;
+            border: 2px dashed var(--gold);
+            background: repeating-linear-gradient(
+                45deg,
+                transparent,
+                transparent 10px,
+                rgba(212, 175, 55, 0.1) 10px,
+                rgba(212, 175, 55, 0.1) 20px
+            );
+            opacity: 0.7;
+            pointer-events: none;
+        }
+
+        .secret-passage::after {
+            content: '⋆';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: var(--gold);
+            font-size: clamp(1rem, 2vw, 1.5rem);
+        }
+
+        /* ===== HUELLAS Y PERSONAJES RESPONSIVE ===== */
+        .footprint {
+            position: absolute;
+            width: clamp(15px, 3vw, 20px);
+            height: clamp(20px, 4vw, 30px);
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 150"><path d="M50,20 C60,10 80,10 90,20 C100,30 95,40 85,45 C75,50 65,55 60,65 C55,75 50,85 45,95 C40,105 35,115 30,125 C25,135 20,140 15,145 L10,150 L5,145 C0,140 -5,135 -10,125 C-15,115 -20,105 -25,95 C-30,85 -35,75 -40,65 C-45,55 -55,50 -65,45 C-75,40 -80,30 -70,20 C-60,10 -40,10 -30,20 C-20,30 -10,25 0,20 Z" fill="%232d1b0e"/></svg>');
+            background-size: contain;
+            background-repeat: no-repeat;
+            pointer-events: none;
+            z-index: 50;
+            opacity: 0;
+        }
+
+        .character {
+            position: absolute;
+            width: clamp(30px, 6vw, 40px);
+            height: clamp(30px, 6vw, 40px);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: clamp(0.9rem, 2vw, 1.2rem);
+            color: white;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+            z-index: 60;
+            transform: translate(-50%, -50%);
+            transition: all 0.5s ease;
+            pointer-events: auto;
+            cursor: pointer;
+            touch-action: manipulation;
+        }
+
+        .character::after {
+            content: attr(data-initials);
+            font-family: 'Cinzel Decorative', cursive;
+            font-weight: bold;
+        }
+
+        .character-tooltip {
+            position: absolute;
+            background: var(--parchment);
+            border: 2px solid var(--ink);
+            padding: clamp(4px, 1vw, 8px) clamp(6px, 1.5vw, 12px);
+            border-radius: 5px;
+            font-family: 'Crimson Text', serif;
+            font-size: clamp(0.7rem, 1.8vw, 0.9rem);
+            white-space: nowrap;
+            z-index: 70;
+            opacity: 0;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+            pointer-events: none;
+            box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .character:hover .character-tooltip, .character:active .character-tooltip {
+            opacity: 1;
+            transform: translateY(-40px);
+        }
+
+        /* Colores de personajes */
+        .character-harry { background: var(--gryffindor-red); }
+        .character-draco { background: var(--slytherin-green); }
+        .character-dumbledore { background: var(--gold); color: var(--dark-bg); }
+        .character-snape { background: #2c2c2c; }
+        .character-hermione { background: #8b4513; }
+        .character-fred { background: #ff6b6b; }
+        .character-george { background: #4ecdc4; }
+
+        /* ===== CONTROLES DEL MAPA RESPONSIVE ===== */
+        .map-controls {
+            position: fixed;
+            bottom: clamp(10px, 2vw, 20px);
+            right: clamp(10px, 2vw, 20px);
+            display: flex;
+            flex-direction: column;
+            gap: clamp(8px, 1.5vw, 10px);
+            z-index: 1000;
+            pointer-events: auto;
+        }
+
+        .map-button {
+            width: clamp(40px, 8vw, 50px);
+            height: clamp(40px, 8vw, 50px);
+            border-radius: 50%;
+            background: var(--parchment);
+            border: 2px solid var(--ink);
+            color: var(--ink);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: clamp(1rem, 2.5vw, 1.2rem);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .map-button:hover, .map-button:active {
+            background: var(--gold);
+            transform: scale(1.1);
+            border-color: var(--gold);
+        }
+
+        .exit-btn {
+            background: var(--gryffindor-red);
+            border-color: var(--gryffindor-red);
+            color: white;
+        }
+
+        /* Controles de zoom para móviles */
+        .zoom-controls {
+            position: fixed;
+            bottom: clamp(10px, 2vw, 20px);
+            left: clamp(10px, 2vw, 20px);
+            display: flex;
+            flex-direction: column;
+            gap: clamp(8px, 1.5vw, 10px);
+            z-index: 1000;
+            pointer-events: auto;
+        }
+
+        .zoom-button {
+            width: clamp(45px, 9vw, 55px);
+            height: clamp(45px, 9vw, 55px);
+            border-radius: 50%;
+            background: var(--parchment);
+            border: 2px solid var(--ink);
+            color: var(--ink);
+            font-size: clamp(1.2rem, 3vw, 1.5rem);
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            touch-action: manipulation;
+        }
+
+        /* Leyenda responsive */
+        .legend {
+            position: fixed;
+            top: clamp(10px, 2vw, 20px);
+            right: clamp(10px, 2vw, 20px);
+            background: var(--parchment);
+            border: 3px solid var(--ink);
+            padding: clamp(10px, 2vw, 15px);
+            border-radius: 10px;
+            font-family: 'Crimson Text', serif;
+            font-size: clamp(0.7rem, 1.8vw, 0.9rem);
+            z-index: 1000;
+            max-width: min(250px, 90vw);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            opacity: 0.9;
+            transition: opacity 0.3s ease;
+            pointer-events: auto;
+        }
+
+        .legend:hover, .legend:active {
+            opacity: 1;
+        }
+
+        .legend-title {
+            font-family: 'Cinzel Decorative', cursive;
+            font-size: clamp(0.8rem, 2vw, 1rem);
+            margin-bottom: clamp(5px, 1vw, 10px);
+            color: var(--ink);
+            border-bottom: 1px solid var(--ink);
+            padding-bottom: clamp(3px, 0.8vw, 5px);
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: clamp(4px, 1vw, 8px);
+        }
+
+        .legend-color {
+            width: clamp(15px, 3vw, 20px);
+            height: clamp(15px, 3vw, 20px);
+            border: 1px solid var(--ink);
+            margin-right: clamp(5px, 1vw, 10px);
+            border-radius: 3px;
+            flex-shrink: 0;
+        }
+
+        /* ===== EFECTOS ESPECIALES ===== */
+        .ink-splash {
+            position: absolute;
+            pointer-events: none;
+            z-index: 500;
+            opacity: 0;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; }
+        }
+
+        .reveal-text {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-family: 'Cinzel Decorative', cursive;
+            font-size: clamp(2rem, 8vw, 3rem);
+            color: var(--gold);
+            text-shadow: 0 0 20px rgba(212, 175, 55, 0.8);
+            opacity: 0;
+            pointer-events: none;
+            z-index: 9999;
+            text-align: center;
+            padding: 20px;
+        }
+
+        /* ===== INSTRUCCIONES PARA TÁCTIL ===== */
+        .touch-instructions {
+            position: fixed;
+            bottom: clamp(60px, 12vw, 80px);
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(45, 27, 14, 0.9);
+            color: var(--parchment);
+            padding: clamp(8px, 2vw, 12px) clamp(12px, 3vw, 20px);
+            border-radius: 20px;
+            font-size: clamp(0.7rem, 2vw, 0.9rem);
+            z-index: 1000;
+            opacity: 0.8;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+            white-space: nowrap;
+            display: none;
+        }
+
+        body.mobile .touch-instructions {
+            display: block;
+        }
+
+        /* ===== LOADING ===== */
+        .loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--dark-bg);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10001;
+            transition: opacity 0.5s ease;
+        }
+
+        .loading-spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid transparent;
+            border-top-color: var(--gold);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* ===== MEDIA QUERIES ESPECÍFICAS ===== */
+        @media (max-width: 480px) {
+            .lock-content {
+                padding: 1rem;
+            }
+            
+            .character-tooltip {
+                display: none; /* Ocultar tooltips en móviles muy pequeños */
+            }
+            
+            .map-controls, .zoom-controls {
+                bottom: 5px;
+            }
+            
+            .legend {
+                max-width: 85vw;
+                font-size: 0.7rem;
+            }
+        }
+
+        @media (min-width: 769px) {
+            .touch-instructions {
+                display: none;
+            }
+            
+            .zoom-controls {
+                display: none;
+            }
+        }
+
+        /* Orientación horizontal en móviles */
+        @media (max-height: 500px) and (orientation: landscape) {
+            .lock-content {
+                max-height: 90vh;
+                overflow-y: auto;
+                padding: 1rem;
+            }
+            
+            .map-controls, .zoom-controls {
+                bottom: 5px;
+            }
+            
+            .legend {
+                top: 5px;
+                right: 5px;
+                max-width: 200px;
+            }
+        }
+
+        /* Evitar desbordamientos */
+        .castle-room, .castle-wall, .secret-passage {
+            max-width: 100%;
+            max-height: 100%;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body>
+    <!-- Pantalla de carga -->
+    <div class="loading" id="loadingScreen">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <!-- Pantalla de bloqueo con contraseña -->
+    <div class="lock-screen" id="lockScreen">
+        <div class="lock-content">
+            <h1 class="lock-title">Mapa del Merodeador</h1>
+            <p class="lock-subtitle">
+                "Messrs. Moony, Wormtail, Padfoot, and Prongs<br>
+                Purveyors of Aids to Magical Mischief-Makers<br>
+                are proud to present..."
+            </p>
+            
+            <div class="password-container">
+                <p class="password-instruction">
+                    Para revelar el mapa, debes jurar solemnemente:<br>
+                    <em>"¡Mis intenciones no son buenas!"</em>
+                </p>
+                <input type="text" 
+                       id="passwordInput" 
+                       class="password-input" 
+                       placeholder="Escribe la contraseña mágica..."
+                       autocomplete="off"
+                       autocapitalize="off"
+                       autocorrect="off">
+                <div class="error-message" id="errorMessage"></div>
+            </div>
+            
+            <button class="wand-trigger" onclick="checkPassword()" id="unlockButton">
+                <i class="fas fa-wand-sparkles"></i> Revelar Mapa
+            </button>
+            
+            <button class="hint-button" onclick="showHint()">
+                ¿Necesitas una pista?
+            </button>
+        </div>
+    </div>
+
+    <!-- Texto de revelación -->
+    <div class="reveal-text" id="revealText">
+        ¡TRAVESURA REALIZADA!
+    </div>
+
+    <!-- Instrucciones táctiles -->
+    <div class="touch-instructions" id="touchInstructions">
+        Desliza para mover • Pulsa para ampliar
+    </div>
+
+    <!-- Contenedor principal del mapa -->
+    <div class="map-viewport" id="mapViewport">
+        <div class="map-surface" id="mapSurface">
+            <!-- Las habitaciones y pasillos se generarán dinámicamente -->
+        </div>
+        
+        <!-- Contenedor para huellas -->
+        <div id="footprintsContainer"></div>
+        
+        <!-- Contenedor para personajes -->
+        <div id="charactersContainer"></div>
+        
+        <!-- Contenedor para pasadizos secretos -->
+        <div id="secretPassagesContainer"></div>
+        
+        <!-- Efectos de tinta -->
+        <div id="inkEffects"></div>
+    </div>
+
+    <!-- Controles de zoom para móviles -->
+    <div class="zoom-controls" id="zoomControls">
+        <button class="zoom-button" onclick="zoomIn()" title="Acercar">
+            <i class="fas fa-search-plus"></i>
+        </button>
+        <button class="zoom-button" onclick="zoomOut()" title="Alejar">
+            <i class="fas fa-search-minus"></i>
+        </button>
+        <button class="zoom-button" onclick="resetZoom()" title="Restablecer zoom">
+            <i class="fas fa-expand-alt"></i>
+        </button>
+    </div>
+
+    <!-- Leyenda del mapa -->
+    <div class="legend" id="legend">
+        <div class="legend-title">Leyenda del Mapa</div>
+        <div class="legend-item">
+            <div class="legend-color" style="background: var(--gryffindor-red);"></div>
+            <span>Gryffindor</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color" style="background: var(--slytherin-green);"></div>
+            <span>Slytherin</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color" style="background: var(--ravenclaw-blue);"></div>
+            <span>Ravenclaw</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color" style="background: var(--hufflepuff-yellow);"></div>
+            <span>Hufflepuff</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color" style="background: repeating-linear-gradient(45deg, var(--gold), var(--gold) 10px, transparent 10px, transparent 20px);"></div>
+            <span>Pasadizo Secreto</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color" style="background: var(--ink);"></div>
+            <span>Huella de Personaje</span>
+        </div>
+    </div>
+
+    <!-- Controles del mapa -->
+    <div class="map-controls">
+        <button class="map-button" onclick="centerMap()" title="Centrar Mapa">
+            <i class="fas fa-crosshairs"></i>
+        </button>
+        <button class="map-button" onclick="toggleCharacters()" title="Mostrar/Ocultar Personajes">
+            <i class="fas fa-users"></i>
+        </button>
+        <button class="map-button" onclick="togglePassages()" title="Mostrar/Ocultar Pasadizos">
+            <i class="fas fa-door-secret"></i>
+        </button>
+        <button class="map-button" onclick="toggleLegend()" title="Mostrar/Ocultar Leyenda">
+            <i class="fas fa-info-circle"></i>
+        </button>
+        <button class="map-button exit-btn" onclick="closeMap()" title="Travesura Realizada">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+
+    <script>
+        // ===== DETECCIÓN DE DISPOSITIVO =====
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        if (isMobile) {
+            document.body.classList.add('mobile');
+        }
+
+        // ===== CONFIGURACIÓN Y CONSTANTES =====
+        const CORRECT_PASSWORD = "mis intenciones no son buenas";
+        const HINT = "¡Es exactamente lo contrario de lo que diría un estudiante modelo!";
+        const INDEX_URL = 'index.html';
+
+        // Definición del castillo optimizada para móviles
+        const castleLayout = {
+            rooms: [
+                // Torre Gryffindor
+                { id: 'common-gryffindor', name: 'Sala Gryffindor', x: 1500, y: 400, width: 200, height: 150, house: 'gryffindor' },
+                { id: 'dorm-harry', name: 'Dormitorio Harry', x: 1520, y: 300, width: 60, height: 80, house: 'gryffindor' },
+                { id: 'dorm-ron', name: 'Dormitorio Ron', x: 1620, y: 300, width: 60, height: 80, house: 'gryffindor' },
+                
+                // Mazmorras Slytherin
+                { id: 'common-slytherin', name: 'Mazmorras Slytherin', x: 300, y: 1500, width: 250, height: 180, house: 'slytherin' },
+                { id: 'potions-class', name: 'Clase Pociones', x: 400, y: 1400, width: 180, height: 120, house: 'slytherin' },
+                
+                // Ala Ravenclaw
+                { id: 'common-ravenclaw', name: 'Torre Ravenclaw', x: 1700, y: 1500, width: 180, height: 200, house: 'ravenclaw' },
+                { id: 'library', name: 'Biblioteca', x: 1300, y: 1200, width: 300, height: 250, house: 'ravenclaw' },
+                
+                // Cocinas Hufflepuff
+                { id: 'common-hufflepuff', name: 'Cocinas Hufflepuff', x: 400, y: 800, width: 200, height: 160, house: 'hufflepuff' },
+                { id: 'greenhouses', name: 'Invernaderos', x: 200, y: 700, width: 150, height: 300, house: 'hufflepuff' },
+                
+                // Áreas comunes
+                { id: 'great-hall', name: 'Gran Comedor', x: 900, y: 900, width: 400, height: 250 },
+                { id: 'entrance-hall', name: 'Vestíbulo', x: 900, y: 700, width: 300, height: 150 },
+                { id: 'moving-stairs', name: 'Escaleras Móviles', x: 700, y: 500, width: 500, height: 100 },
+                { id: 'dumbledore-office', name: 'Oficina Dumbledore', x: 1100, y: 300, width: 180, height: 150 },
+                { id: 'room-requirement', name: 'Sala Menesteres', x: 1400, y: 800, width: 150, height: 150 },
+                { id: 'hospital-wing', name: 'Ala Hospitalaria', x: 600, y: 1200, width: 200, height: 180 },
+                { id: 'transfiguration', name: 'Transformaciones', x: 700, y: 300, width: 150, height: 120 },
+                { id: 'defense-arts', name: 'Defensa Oscuras', x: 500, y: 300, width: 150, height: 120 },
+                { id: 'divination', name: 'Adivinación', x: 1600, y: 200, width: 120, height: 180 },
+                { id: 'quidditch-field', name: 'Quidditch', x: 800, y: 1700, width: 400, height: 250 },
+                { id: 'forbidden-forest', name: 'Bosque Prohibido', x: 100, y: 1600, width: 500, height: 300 },
+                { id: 'hagrid-hut', name: 'Cabaña Hagrid', x: 200, y: 1100, width: 100, height: 100 },
+                { id: 'kitchens', name: 'Cocinas', x: 850, y: 1200, width: 200, height: 150 },
+                { id: 'prefects-bath', name: 'Baño Prefectos', x: 1300, y: 600, width: 100, height: 100 },
+                { id: 'owlery', name: 'Lechuza', x: 1800, y: 500, width: 120, height: 150 },
+                { id: 'astronomy-tower', name: 'Astronomía', x: 1600, y: 100, width: 80, height: 120 }
+            ],
+            
+            walls: [
+                // Torres principales
+                { x: 1450, y: 350, width: 20, height: 250 },
+                { x: 1650, y: 350, width: 20, height: 250 },
+                { x: 250, y: 1480, width: 350, height: 20 },
+                { x: 1650, y: 1480, width: 250, height: 20 },
+                
+                // Gran Salón
+                { x: 850, y: 850, width: 500, height: 20 },
+                { x: 850, y: 1120, width: 500, height: 20 }
+            ],
+            
+            secretPassages: [
+                { x: 1550, y: 550, width: 50, height: 300, destination: 'Tetera Chiflada' },
+                { x: 320, y: 1300, width: 30, height: 200, destination: 'Knockturn' },
+                { x: 1700, y: 1300, width: 40, height: 150, destination: 'Armario' },
+                { x: 950, y: 1350, width: 100, height: 20, destination: 'Honeydukes' }
+            ]
+        };
+
+        // Personajes del mapa
+        const characters = [
+            { id: 'harry', name: 'Harry Potter', initials: 'HP', color: 'character-harry', startX: 1540, startY: 350 },
+            { id: 'hermione', name: 'Hermione Granger', initials: 'HG', color: 'character-hermione', startX: 1580, startY: 350 },
+            { id: 'draco', name: 'Draco Malfoy', initials: 'DM', color: 'character-draco', startX: 350, startY: 1550 },
+            { id: 'dumbledore', name: 'Albus Dumbledore', initials: 'AD', color: 'character-dumbledore', startX: 1190, startY: 350 },
+            { id: 'snape', name: 'Severus Snape', initials: 'SS', color: 'character-snape', startX: 490, startY: 1460 },
+            { id: 'fred', name: 'Fred Weasley', initials: 'FW', color: 'character-fred', startX: 1520, startY: 380 },
+            { id: 'george', name: 'George Weasley', initials: 'GW', color: 'character-george', startX: 1560, startY: 380 }
+        ];
+
+        // ===== VARIABLES GLOBALES =====
+        let mapScale = isMobile ? 0.5 : 1;
+        let isDragging = false;
+        let isPinching = false;
+        let startX, startY, scrollLeft, scrollTop;
+        let startTouches = [];
+        let initialPinchDistance = 0;
+        let showCharacters = true;
+        let showPassages = true;
+        let showLegend = true;
+        let characterIntervals = [];
+        let lastTapTime = 0;
+        let tapCount = 0;
+
+        // ===== INICIALIZACIÓN =====
+        document.addEventListener('DOMContentLoaded', () => {
+            // Ocultar pantalla de carga
+            setTimeout(() => {
+                document.getElementById('loadingScreen').style.opacity = '0';
+                setTimeout(() => {
+                    document.getElementById('loadingScreen').style.display = 'none';
+                }, 500);
+            }, 1000);
+            
+            // Configurar evento para la contraseña
+            const passwordInput = document.getElementById('passwordInput');
+            passwordInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') checkPassword();
+            });
+            
+            // Enfocar automáticamente en el input en desktop
+            if (!isMobile) {
+                setTimeout(() => passwordInput.focus(), 500);
+            }
+            
+            // Configurar botón de desbloqueo
+            document.getElementById('unlockButton').addEventListener('click', checkPassword);
+            
+            // Configurar tamaño inicial del mapa
+            adjustMapSize();
+            
+            // Configurar redimensionamiento
+            window.addEventListener('resize', adjustMapSize);
+            window.addEventListener('orientationchange', () => {
+                setTimeout(adjustMapSize, 100);
+            });
+        });
+
+        // ===== AJUSTE DE TAMAÑO DEL MAPA =====
+        function adjustMapSize() {
+            const surface = document.getElementById('mapSurface');
+            const isPortrait = window.innerHeight > window.innerWidth;
+            
+            if (isMobile) {
+                if (isPortrait) {
+                    // Portrait: mapa más largo verticalmente
+                    surface.style.width = '2500px';
+                    surface.style.height = '3500px';
+                } else {
+                    // Landscape: mapa más ancho
+                    surface.style.width = '3500px';
+                    surface.style.height = '2500px';
+                }
+            } else {
+                // Desktop: mapa grande
+                surface.style.width = '4000px';
+                surface.style.height = '4000px';
+            }
+            
+            // Ajustar zoom inicial según dispositivo y orientación
+            if (isMobile) {
+                mapScale = isPortrait ? 0.4 : 0.6;
+            } else {
+                mapScale = 1;
+            }
+            
+            surface.style.transform = `scale(${mapScale})`;
+        }
+
+        // ===== SISTEMA DE CONTRASEÑA =====
+        function checkPassword() {
+            const input = document.getElementById('passwordInput').value.toLowerCase().trim();
+            const errorElement = document.getElementById('errorMessage');
+            const button = document.getElementById('unlockButton');
+            
+            if (input === CORRECT_PASSWORD) {
+                // Deshabilitar el botón
+                button.disabled = true;
+                button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Revelando...';
+                
+                // Vibrar si es móvil
+                if (navigator.vibrate) navigator.vibrate(100);
+                
+                // Mostrar texto de revelación
+                const revealText = document.getElementById('revealText');
+                revealText.textContent = '¡TRAVESURA REALIZADA!';
+                revealText.style.animation = 'fadeIn 0.5s forwards';
+                
+                // Efectos visuales
+                createInkSplash(window.innerWidth/2, window.innerHeight/2);
+                
+                // Desbloquear después de un retraso
+                setTimeout(() => {
+                    revealText.style.animation = 'fadeOut 1s forwards';
+                    unlockMap();
+                }, 1500);
+                
+            } else {
+                // Mostrar error
+                errorElement.textContent = '¡Contraseña incorrecta! Prueba otra vez.';
+                errorElement.style.opacity = 1;
+                
+                // Efecto de error
+                const inputElement = document.getElementById('passwordInput');
+                inputElement.style.borderColor = '#ff4444';
+                inputElement.style.boxShadow = '0 0 20px rgba(255, 68, 68, 0.3)';
+                
+                // Vibrar si es móvil
+                if (navigator.vibrate) navigator.vibrate(200);
+                
+                // Restaurar después de 2 segundos
+                setTimeout(() => {
+                    errorElement.style.opacity = 0;
+                    inputElement.style.borderColor = '';
+                    inputElement.style.boxShadow = '';
+                }, 2000);
+            }
+        }
+
+        function showHint() {
+            const errorElement = document.getElementById('errorMessage');
+            errorElement.textContent = HINT;
+            errorElement.style.color = 'var(--gold)';
+            errorElement.style.opacity = 1;
+            
+            // Restaurar después de 4 segundos
+            setTimeout(() => {
+                errorElement.style.opacity = 0;
+            }, 4000);
+        }
+
+        // ===== DESBLOQUEO DEL MAPA =====
+        function unlockMap() {
+            // Desbloquear visualmente
+            document.body.classList.add('unlocked');
+            
+            // Inicializar elementos del mapa
+            setTimeout(() => {
+                initializeCastle();
+                initializeCharacters();
+                startCharacterMovement();
+                centerMap();
+                
+                // Inicializar arrastre y gestos táctiles
+                setupTouchAndDrag();
+                
+                // Mostrar instrucciones táctiles por 5 segundos
+                if (isMobile) {
+                    setTimeout(() => {
+                        document.getElementById('touchInstructions').style.opacity = '0';
+                        setTimeout(() => {
+                            document.getElementById('touchInstructions').style.display = 'none';
+                        }, 300);
+                    }, 5000);
+                }
+                
+                // Efecto inicial
+                createInkSplash(window.innerWidth/2, window.innerHeight/2);
+            }, 500);
+        }
+
+        // ===== CONSTRUCCIÓN DEL CASTILLO =====
+        function initializeCastle() {
+            const surface = document.getElementById('mapSurface');
+            
+            // Crear habitaciones
+            castleLayout.rooms.forEach(room => {
+                const roomElement = document.createElement('div');
+                roomElement.className = `castle-room ${room.house ? 'room-' + room.house : ''}`;
+                roomElement.style.left = `${room.x}px`;
+                roomElement.style.top = `${room.y}px`;
+                roomElement.style.width = `${room.width}px`;
+                roomElement.style.height = `${room.height}px`;
+                roomElement.style.zIndex = '1';
+                
+                // Evento de doble toque/click para centrar
+                roomElement.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const now = Date.now();
+                    const timeSinceLastTap = now - lastTapTime;
+                    
+                    if (timeSinceLastTap < 300 && tapCount === 1) {
+                        // Doble toque - centrar y zoom
+                        centerOnRoom(room);
+                        tapCount = 0;
+                    } else {
+                        // Toque simple
+                        tapCount = 1;
+                        lastTapTime = now;
+                        setTimeout(() => { tapCount = 0; }, 300);
+                    }
+                });
+                
+                const label = document.createElement('div');
+                label.className = 'room-label';
+                label.textContent = room.name;
+                roomElement.appendChild(label);
+                
+                surface.appendChild(roomElement);
+            });
+            
+            // Crear muros
+            castleLayout.walls.forEach(wall => {
+                const wallElement = document.createElement('div');
+                wallElement.className = 'castle-wall castle-element';
+                wallElement.style.left = `${wall.x}px`;
+                wallElement.style.top = `${wall.y}px`;
+                wallElement.style.width = `${wall.width}px`;
+                wallElement.style.height = `${wall.height}px`;
+                wallElement.style.zIndex = '2';
+                
+                surface.appendChild(wallElement);
+            });
+            
+            // Crear pasadizos secretos
+            castleLayout.secretPassages.forEach(passage => {
+                const passageElement = document.createElement('div');
+                passageElement.className = 'secret-passage castle-element';
+                passageElement.style.left = `${passage.x}px`;
+                passageElement.style.top = `${passage.y}px`;
+                passageElement.style.width = `${passage.width}px`;
+                passageElement.style.height = `${passage.height}px`;
+                passageElement.style.zIndex = '3';
+                passageElement.setAttribute('data-destination', passage.destination);
+                
+                document.getElementById('secretPassagesContainer').appendChild(passageElement);
+            });
+        }
+
+        // ===== SISTEMA DE PERSONAJES =====
+        function initializeCharacters() {
+            const container = document.getElementById('charactersContainer');
+            
+            characters.forEach(char => {
+                const charElement = document.createElement('div');
+                charElement.className = `character ${char.color}`;
+                charElement.id = `character-${char.id}`;
+                charElement.style.left = `${char.startX}px`;
+                charElement.style.top = `${char.startY}px`;
+                charElement.setAttribute('data-initials', char.initials);
+                charElement.setAttribute('title', char.name);
+                
+                // Tooltip solo para desktop
+                if (!isMobile) {
+                    const tooltip = document.createElement('div');
+                    tooltip.className = 'character-tooltip';
+                    tooltip.textContent = char.name;
+                    charElement.appendChild(tooltip);
+                }
+                
+                // Eventos
+                charElement.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    centerOnCharacter(char.id);
+                    if (isMobile) {
+                        // En móviles mostrar nombre temporalmente
+                        showCharacterInfo(char);
+                    }
+                });
+                
+                container.appendChild(charElement);
+            });
+        }
+
+        function startCharacterMovement() {
+            // Limpiar intervalos anteriores
+            characterIntervals.forEach(clearInterval);
+            characterIntervals = [];
+            
+            characters.forEach((char, index) => {
+                // Cada personaje se mueve a diferente velocidad
+                const interval = setInterval(() => {
+                    if (showCharacters) {
+                        moveCharacter(char.id);
+                    }
+                }, 3000 + (index * 1500));
+                
+                characterIntervals.push(interval);
+            });
+        }
+
+        function moveCharacter(characterId) {
+            const charElement = document.getElementById(`character-${characterId}`);
+            if (!charElement || !showCharacters) return;
+            
+            // Obtener posición actual
+            let currentX = parseInt(charElement.style.left) || 0;
+            let currentY = parseInt(charElement.style.top) || 0;
+            
+            // Determinar una habitación destino aleatoria
+            const targetRoom = castleLayout.rooms[Math.floor(Math.random() * castleLayout.rooms.length)];
+            
+            // Calcular nueva posición (cerca de la habitación)
+            const targetX = targetRoom.x + (Math.random() * targetRoom.width);
+            const targetY = targetRoom.y + (Math.random() * targetRoom.height);
+            
+            // Crear huella en la posición actual
+            createFootprint(currentX, currentY, Math.atan2(targetY - currentY, targetX - currentX));
+            
+            // Mover el personaje
+            const duration = 4000;
+            const startTime = Date.now();
+            
+            function animateMove() {
+                const elapsed = Date.now() - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                
+                // Ease out
+                const easedProgress = 1 - Math.pow(1 - progress, 3);
+                
+                const newX = currentX + (targetX - currentX) * easedProgress;
+                const newY = currentY + (targetY - currentY) * easedProgress;
+                
+                charElement.style.left = `${newX}px`;
+                charElement.style.top = `${newY}px`;
+                
+                if (progress < 1) {
+                    requestAnimationFrame(animateMove);
+                } else {
+                    // Crear huella final
+                    createFootprint(targetX, targetY, Math.random() * Math.PI * 2);
+                }
+            }
+            
+            animateMove();
+        }
+
+        // ===== SISTEMA DE HUELLAS =====
+        function createFootprint(x, y, angle) {
+            if (!showCharacters) return;
+            
+            const container = document.getElementById('footprintsContainer');
+            const footprint = document.createElement('div');
+            footprint.className = 'footprint';
+            
+            footprint.style.left = `${x}px`;
+            footprint.style.top = `${y}px`;
+            
+            // Rotar la huella según la dirección
+            const degrees = angle * (180 / Math.PI);
+            footprint.style.transform = `translate(-50%, -50%) rotate(${degrees}deg)`;
+            
+            container.appendChild(footprint);
+            
+            // Animación de aparición
+            footprint.animate([
+                { opacity: 0, transform: `translate(-50%, -50%) rotate(${degrees}deg) scale(0.5)` },
+                { opacity: 0.8, transform: `translate(-50%, -50%) rotate(${degrees}deg) scale(1)` },
+                { opacity: 0.8 },
+                { opacity: 0 }
+            ], {
+                duration: 8000,
+                easing: 'cubic-bezier(0.4, 0, 0.2, 1)'
+            });
+            
+            // Eliminar después de la animación
+            setTimeout(() => {
+                if (footprint.parentNode) {
+                    footprint.remove();
+                }
+            }, 8000);
+        }
+
+        // ===== SISTEMA DE GESTOS TÁCTILES Y ARRASTRE =====
+        function setupTouchAndDrag() {
+            const viewport = document.getElementById('mapViewport');
+            const surface = document.getElementById('mapSurface');
+            
+            // Eventos para ratón (PC)
+            viewport.addEventListener('mousedown', startDragMouse);
+            document.addEventListener('mousemove', dragMouse);
+            document.addEventListener('mouseup', endDrag);
+            
+            // Eventos táctiles (móvil)
+            viewport.addEventListener('touchstart', startDragTouch, { passive: false });
+            viewport.addEventListener('touchmove', dragTouch, { passive: false });
+            viewport.addEventListener('touchend', endDrag);
+            viewport.addEventListener('touchcancel', endDrag);
+            
+            // Zoom con rueda (PC)
+            viewport.addEventListener('wheel', handleWheelZoom, { passive: false });
+            
+            // Doble toque para zoom (móvil)
+            viewport.addEventListener('touchend', handleDoubleTap);
+            
+            // Prevenir acciones por defecto
+            viewport.addEventListener('contextmenu', (e) => e.preventDefault());
+            viewport.addEventListener('gesturestart', (e) => e.preventDefault());
+            viewport.addEventListener('gesturechange', (e) => e.preventDefault());
+            viewport.addEventListener('gestureend', (e) => e.preventDefault());
+        }
+
+        // ===== FUNCIONES DE ARRASTRE PARA RATÓN =====
+        function startDragMouse(e) {
+            if (e.button !== 0) return; // Solo botón izquierdo
+            isDragging = true;
+            startX = e.pageX;
+            startY = e.pageY;
+            const viewport = document.getElementById('mapViewport');
+            scrollLeft = viewport.scrollLeft;
+            scrollTop = viewport.scrollTop;
+            
+            viewport.style.cursor = 'grabbing';
+            e.preventDefault();
+        }
+
+        function dragMouse(e) {
+            if (!isDragging) return;
+            
+            const viewport = document.getElementById('mapViewport');
+            const x = e.pageX;
+            const y = e.pageY;
+            
+            const walkX = (x - startX) * 2;
+            const walkY = (y - startY) * 2;
+            
+            viewport.scrollLeft = scrollLeft - walkX;
+            viewport.scrollTop = scrollTop - walkY;
+            
+            e.preventDefault();
+        }
+
+        // ===== FUNCIONES DE ARRASTRE TÁCTIL =====
+        function startDragTouch(e) {
+            if (e.touches.length === 1) {
+                // Un dedo - arrastre
+                isDragging = true;
+                isPinching = false;
+                startX = e.touches[0].pageX;
+                startY = e.touches[0].pageY;
+                const viewport = document.getElementById('mapViewport');
+                scrollLeft = viewport.scrollLeft;
+                scrollTop = viewport.scrollTop;
+                viewport.style.cursor = 'grabbing';
+            } else if (e.touches.length === 2) {
+                // Dos dedos - pellizco para zoom
+                isDragging = false;
+                isPinching = true;
+                startTouches = [e.touches[0], e.touches[1]];
+                initialPinchDistance = getDistance(startTouches[0], startTouches[1]);
+            }
+            e.preventDefault();
+        }
+
+        function dragTouch(e) {
+            if (isDragging && e.touches.length === 1) {
+                // Arrastre con un dedo
+                const viewport = document.getElementById('mapViewport');
+                const x = e.touches[0].pageX;
+                const y = e.touches[0].pageY;
+                
+                const walkX = (x - startX) * 2;
+                const walkY = (y - startY) * 2;
+                
+                viewport.scrollLeft = scrollLeft - walkX;
+                viewport.scrollTop = scrollTop - walkY;
+            } else if (isPinching && e.touches.length === 2) {
+                // Zoom con pellizco
+                const touch1 = e.touches[0];
+                const touch2 = e.touches[1];
+                const currentDistance = getDistance(touch1, touch2);
+                
+                if (initialPinchDistance > 0) {
+                    const scaleChange = currentDistance / initialPinchDistance;
+                    zoomToPoint((touch1.pageX + touch2.pageX) / 2, (touch1.pageY + touch2.pageY) / 2, scaleChange);
+                    initialPinchDistance = currentDistance;
+                }
+            }
+            e.preventDefault();
+        }
+
+        function endDrag() {
+            isDragging = false;
+            isPinching = false;
+            startTouches = [];
+            initialPinchDistance = 0;
+            document.getElementById('mapViewport').style.cursor = 'grab';
+        }
+
+        function getDistance(touch1, touch2) {
+            const dx = touch2.pageX - touch1.pageX;
+            const dy = touch2.pageY - touch1.pageY;
+            return Math.sqrt(dx * dx + dy * dy);
+        }
+
+        // ===== SISTEMA DE ZOOM =====
+        function handleWheelZoom(e) {
+            e.preventDefault();
+            
+            const viewport = document.getElementById('mapViewport');
+            const rect = viewport.getBoundingClientRect();
+            const mouseX = e.clientX - rect.left + viewport.scrollLeft;
+            const mouseY = e.clientY - rect.top + viewport.scrollTop;
+            
+            // Determinar dirección del zoom
+            const delta = e.deltaY > 0 ? 0.9 : 1.1;
+            zoomToPoint(mouseX, mouseY, delta);
+        }
+
+        function handleDoubleTap(e) {
+            if (e.touches && e.touches.length > 0) return;
+            
+            const now = Date.now();
+            const timeSinceLastTap = now - lastTapTime;
+            
+            if (timeSinceLastTap < 300 && tapCount === 1) {
+                // Doble toque - hacer zoom
+                const viewport = document.getElementById('mapViewport');
+                const rect = viewport.getBoundingClientRect();
+                const touch = e.changedTouches[0];
+                const x = touch.clientX - rect.left + viewport.scrollLeft;
+                const y = touch.clientY - rect.top + viewport.scrollTop;
+                
+                if (mapScale < 1.5) {
+                    zoomToPoint(x, y, 1.8); // Zoom in
+                } else {
+                    zoomToPoint(x, y, 0.5); // Zoom out
+                }
+                
+                tapCount = 0;
+                e.preventDefault();
+            } else {
+                // Toque simple
+                tapCount = 1;
+                lastTapTime = now;
+                setTimeout(() => { tapCount = 0; }, 300);
+            }
+        }
+
+        function zoomToPoint(x, y, scaleFactor) {
+            const viewport = document.getElementById('mapViewport');
+            const surface = document.getElementById('mapSurface');
+            
+            const newScale = Math.min(Math.max(mapScale * scaleFactor, 0.2), 3);
+            
+            if (newScale !== mapScale) {
+                // Calcular nueva posición para mantener el punto fijo
+                const scaleChange = newScale / mapScale;
+                viewport.scrollLeft = x * scaleChange - (x - viewport.scrollLeft);
+                viewport.scrollTop = y * scaleChange - (y - viewport.scrollTop);
+                
+                // Aplicar escala
+                surface.style.transform = `scale(${newScale})`;
+                mapScale = newScale;
+                
+                // Efecto visual
+                createInkSplash(x, y);
+            }
+        }
+
+        function zoomIn() {
+            const viewport = document.getElementById('mapViewport');
+            const centerX = viewport.scrollLeft + viewport.clientWidth / 2;
+            const centerY = viewport.scrollTop + viewport.clientHeight / 2;
+            zoomToPoint(centerX, centerY, 1.2);
+        }
+
+        function zoomOut() {
+            const viewport = document.getElementById('mapViewport');
+            const centerX = viewport.scrollLeft + viewport.clientWidth / 2;
+            const centerY = viewport.scrollTop + viewport.clientHeight / 2;
+            zoomToPoint(centerX, centerY, 0.8);
+        }
+
+        function resetZoom() {
+            const viewport = document.getElementById('mapViewport');
+            const surface = document.getElementById('mapSurface');
+            
+            mapScale = isMobile ? 0.5 : 1;
+            surface.style.transform = `scale(${mapScale})`;
+            
+            // Centrar después de resetear zoom
+            centerMap();
+            createInkSplash(window.innerWidth/2, window.innerHeight/2);
+        }
+
+        // ===== EFECTOS VISUALES =====
+        function createInkSplash(x, y) {
+            const container = document.getElementById('inkEffects');
+            const splash = document.createElement('div');
+            splash.className = 'ink-splash';
+            splash.style.left = `${x}px`;
+            splash.style.top = `${y}px`;
+            
+            // Crear múltiples gotas
+            for (let i = 0; i < 6; i++) {
+                const drop = document.createElement('div');
+                drop.style.position = 'absolute';
+                drop.style.width = `${Math.random() * 20 + 5}px`;
+                drop.style.height = `${Math.random() * 20 + 5}px`;
+                drop.style.background = `radial-gradient(circle, var(--ink) 0%, transparent 70%)`;
+                drop.style.borderRadius = '50%';
+                drop.style.left = '0';
+                drop.style.top = '0';
+                
+                const angle = Math.random() * Math.PI * 2;
+                const distance = Math.random() * 50 + 30;
+                const duration = Math.random() * 400 + 300;
+                
+                drop.animate([
+                    { transform: `translate(0, 0) scale(0)`, opacity: 1 },
+                    { transform: `translate(${Math.cos(angle) * distance}px, ${Math.sin(angle) * distance}px) scale(1)`, opacity: 0 }
+                ], {
+                    duration: duration,
+                    easing: 'ease-out'
+                });
+                
+                splash.appendChild(drop);
+            }
+            
+            container.appendChild(splash);
+            
+            setTimeout(() => {
+                if (splash.parentNode) {
+                    splash.remove();
+                }
+            }, 1000);
+        }
+
+        // ===== FUNCIONES DE UTILIDAD =====
+        function centerMap() {
+            const viewport = document.getElementById('mapViewport');
+            const surface = document.getElementById('mapSurface');
+            
+            // Calcular centro del mapa
+            const centerX = surface.offsetWidth * mapScale / 2;
+            const centerY = surface.offsetHeight * mapScale / 2;
+            
+            viewport.scrollTo({
+                left: centerX - viewport.clientWidth / 2,
+                top: centerY - viewport.clientHeight / 2,
+                behavior: 'smooth'
+            });
+            
+            createInkSplash(window.innerWidth/2, window.innerHeight/2);
+        }
+
+        function centerOnCharacter(characterId) {
+            const charElement = document.getElementById(`character-${characterId}`);
+            if (!charElement) return;
+            
+            const viewport = document.getElementById('mapViewport');
+            const rect = charElement.getBoundingClientRect();
+            
+            viewport.scrollTo({
+                left: viewport.scrollLeft + (rect.left - viewport.clientWidth / 2),
+                top: viewport.scrollTop + (rect.top - viewport.clientHeight / 2),
+                behavior: 'smooth'
+            });
+            
+            // Destacar el personaje
+            charElement.style.boxShadow = '0 0 30px rgba(212, 175, 55, 0.8)';
+            setTimeout(() => {
+                charElement.style.boxShadow = '';
+            }, 2000);
+            
+            createInkSplash(rect.left + rect.width/2, rect.top + rect.height/2);
+        }
+
+        function centerOnRoom(room) {
+            const viewport = document.getElementById('mapViewport');
+            const roomCenterX = room.x + room.width/2;
+            const roomCenterY = room.y + room.height/2;
+            
+            // Calcular posición en la vista actual
+            const scaledX = roomCenterX * mapScale;
+            const scaledY = roomCenterY * mapScale;
+            
+            viewport.scrollTo({
+                left: scaledX - viewport.clientWidth / 2,
+                top: scaledY - viewport.clientHeight / 2,
+                behavior: 'smooth'
+            });
+            
+            // Hacer zoom si es necesario
+            if (mapScale < 1.2) {
+                setTimeout(() => {
+                    zoomToPoint(scaledX, scaledY, 1.5);
+                }, 300);
+            }
+            
+            createInkSplash(window.innerWidth/2, window.innerHeight/2);
+        }
+
+        function showCharacterInfo(character) {
+            const revealText = document.getElementById('revealText');
+            revealText.textContent = character.name;
+            revealText.style.animation = 'none';
+            
+            setTimeout(() => {
+                revealText.style.animation = 'fadeIn 0.5s forwards';
+                setTimeout(() => {
+                    revealText.style.animation = 'fadeOut 1s forwards';
+                }, 1500);
+            }, 10);
+        }
+
+        function toggleCharacters() {
+            showCharacters = !showCharacters;
+            const container = document.getElementById('charactersContainer');
+            container.style.opacity = showCharacters ? '1' : '0.3';
+            
+            // Pausar o reanudar movimiento
+            if (showCharacters) {
+                startCharacterMovement();
+            } else {
+                characterIntervals.forEach(clearInterval);
+                characterIntervals = [];
+            }
+            
+            createInkSplash(window.innerWidth/2, window.innerHeight/2);
+        }
+
+        function togglePassages() {
+            showPassages = !showPassages;
+            const container = document.getElementById('secretPassagesContainer');
+            container.style.opacity = showPassages ? '1' : '0.3';
+            createInkSplash(window.innerWidth/2, window.innerHeight/2);
+        }
+
+        function toggleLegend() {
+            showLegend = !showLegend;
+            const legend = document.getElementById('legend');
+            legend.style.opacity = showLegend ? '0.9' : '0';
+            legend.style.pointerEvents = showLegend ? 'auto' : 'none';
+            createInkSplash(window.innerWidth/2, window.innerHeight/2);
+        }
+
+        // ===== CERRAR MAPA Y VOLVER A INDEX.HTML =====
+        function closeMap() {
+            const revealText = document.getElementById('revealText');
+            revealText.textContent = '¡TRAVESURA REALIZADA!';
+            revealText.style.animation = 'fadeIn 0.5s forwards';
+            
+            // Efectos de cierre
+            createInkSplash(window.innerWidth/2, window.innerHeight/2);
+            if (navigator.vibrate) navigator.vibrate(200);
+            
+            // Detener movimiento de personajes
+            characterIntervals.forEach(clearInterval);
+            characterIntervals = [];
+            
+            // Redirigir a index.html después de 2 segundos
+            setTimeout(() => {
+                window.location.href = INDEX_URL;
+            }, 2000);
+        }
+
+        // ===== PREVENIR COMPORTAMIENTOS POR DEFECTO =====
+        // Prevenir el menú contextual en móviles
+        document.addEventListener('contextmenu', function(e) {
+            if (isMobile) {
+                e.preventDefault();
+                return false;
+            }
+        }, false);
+
+        // Prevenir el pull-to-refresh en móviles
+        document.addEventListener('touchmove', function(e) {
+            if (e.target.classList.contains('map-viewport') || 
+                e.target.closest('.map-viewport')) {
+                // Permitir scroll en el mapa
+                return;
+            }
+            // Prevenir en otros elementos
+            e.preventDefault();
+        }, { passive: false });
+
+        // Manejar tecla Escape
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                if (document.body.classList.contains('unlocked')) {
+                    closeMap();
+                }
+            }
+        });
+    </script>
+</body>
+</html>

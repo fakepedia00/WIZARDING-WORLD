@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inicio | Fakeland Project</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Crimson+Text:ital,wght@0,400;0,600;1,400&family=UnifrakturMaguntia&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* --- VARIABLES --- */
+        :root {
+            --gold: #d4af37;
+            --gold-glow: #ffd700;
+            --dark-bg: #0e1116;
+            --paper: #f3e8d4;
+            --ink: #1a1a1a;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background-color: var(--dark-bg);
+            background-image: url('https://www.transparenttextures.com/patterns/stardust.png');
+            color: #ccc;
+            font-family: 'Crimson Text', serif;
+            min-height: 100vh;
+            display: flex; flex-direction: column; overflow-x: hidden;
+            position: relative;
+        }
+
+        /* --- EFECTOS MÁGICOS DE FONDO --- */
+        #magic-canvas {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -1; pointer-events: none;
+            background: radial-gradient(circle at 50% 50%, #1a1a2e 0%, #000000 100%);
+        }
+
+        .firefly {
+            position: fixed; left: 50%; top: 50%; width: 4px; height: 4px;
+            margin: -2px 0 0 -2px; pointer-events: none; border-radius: 50%;
+            background-color: var(--gold-glow); box-shadow: 0 0 10px 2px var(--gold-glow);
+            animation: drift ease alternate infinite; z-index: 0; opacity: 0;
+        }
+        @keyframes drift {
+            0% { transform: translate(0,0); opacity: 0; }
+            20% { opacity: 1; }
+            80% { opacity: 1; }
+            100% { transform: translate(var(--moveX), var(--moveY)); opacity: 0; }
+        }
+
+        .cursor-trail {
+            position: fixed; width: 8px; height: 8px;
+            background: var(--gold); border-radius: 50%;
+            pointer-events: none; z-index: 9999;
+            box-shadow: 0 0 10px var(--gold);
+            animation: fadeOut 1s forwards;
+        }
+        @keyframes fadeOut { to { opacity: 0; transform: scale(0); } }
+
+        .reveal { opacity: 0; transform: translateY(50px); transition: all 0.8s ease-out; }
+        .reveal.active { opacity: 1; transform: translateY(0); }
+
+        /* --- NAV --- */
+        nav {
+            display: flex; justify-content: center; align-items: center;
+            padding: 10px 20px; background: rgba(5, 5, 5, 0.9);
+            border-bottom: 1px solid rgba(212, 175, 55, 0.3);
+            position: fixed; top: 0; width: 100%; z-index: 1000; height: 60px;
+            backdrop-filter: blur(5px);
+        }
+        .menu-toggle { position: absolute; left: 20px; background: transparent; border: none; color: var(--gold); font-size: 1.5rem; cursor: pointer; }
+        .nav-logo { height: 40px; width: auto; transition: 0.3s; }
+        .nav-logo:hover { filter: drop-shadow(0 0 8px var(--gold)); transform: scale(1.1); }
+
+        /* --- SIDEBAR --- */
+        .sidebar {
+            position: fixed; top: 0; left: -100%; width: 80%; max-width: 300px; height: 100%;
+            background: rgba(8, 8, 10, 0.98); border-right: 1px solid var(--gold);
+            z-index: 2000; transition: 0.4s; display: flex; flex-direction: column; padding-top: 20px;
+        }
+        .sidebar.active { left: 0; }
+        .close-btn { align-self: flex-end; margin-right: 20px; background: transparent; border: none; color: #aaa; font-size: 2rem; cursor: pointer; }
+        .sidebar-links { list-style: none; padding: 20px 0; }
+        .sidebar-links a { display: block; padding: 15px 25px; color: #ccc; text-decoration: none; transition: 0.3s; font-family: 'Cinzel Decorative'; font-size: 1rem; }
+        .sidebar-links a:hover { color: var(--gold); padding-left: 35px; text-shadow: 0 0 5px var(--gold); }
+        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1500; opacity: 0; pointer-events: none; transition: 0.3s; }
+        .overlay.active { opacity: 1; pointer-events: all; }
+
+        /* --- HERO --- */
+        .hero-section {
+            height: 100vh; width: 100%; position: relative;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            text-align: center; margin-bottom: 50px; overflow: hidden; background-color: #000;
+        }
+        .hero-bg {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background-image: url('hero_train.jpg'); 
+            background-size: cover; background-position: center;
+            filter: brightness(0.5); z-index: 0;
+            animation: zoomIn 20s infinite alternate; 
+        }
+        @keyframes zoomIn { from { transform: scale(1); } to { transform: scale(1.1); } }
+        .hero-bg[style*="hero_train.jpg"] { background-image: url('https://images.unsplash.com/photo-1618519764620-7403abdbdfe9?auto=format&fit=crop&w=1920&q=80'); }
+        .hero-content { z-index: 1; padding: 20px; animation: glowFade 3s ease-in-out; }
+        @keyframes glowFade { 0% { opacity: 0; text-shadow: 0 0 0 transparent; } 100% { opacity: 1; text-shadow: 0 0 20px rgba(212,175,55,0.5); } }
+        
+        .ww-logo { font-family: 'Cinzel Decorative', cursive; font-size: clamp(1rem, 3vw, 1.5rem); letter-spacing: 5px; text-transform: uppercase; color: #ccc; margin-bottom: 10px; }
+        .main-title { font-family: 'Cinzel Decorative', cursive; font-size: clamp(3rem, 10vw, 7rem); color: var(--gold); line-height: 0.9; margin-bottom: 20px; text-shadow: 0 0 20px rgba(0,0,0,0.8); }
+        .subtitle { font-size: 1.2rem; color: #fff; max-width: 600px; margin: 0 auto 40px auto; text-shadow: 0 2px 4px rgba(0,0,0,1); }
+        
+        .hero-btn {
+            display: inline-block; padding: 15px 40px; border: 2px solid var(--gold);
+            color: var(--gold); text-decoration: none; font-family: 'Cinzel Decorative'; font-size: 1.2rem;
+            text-transform: uppercase; background: rgba(0,0,0,0.6); backdrop-filter: blur(5px);
+            transition: 0.3s; position: relative; overflow: hidden;
+        }
+        .hero-btn:hover { background: var(--gold); color: #000; box-shadow: 0 0 30px var(--gold); }
+        .hero-btn::after {
+            content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            transition: 0.5s;
+        }
+        .hero-btn:hover::after { left: 100%; }
+
+        /* --- GRID --- */
+        .container { max-width: 1200px; margin: 0 auto; padding: 40px 20px; position: relative; z-index: 2; }
+        .section-title {
+            text-align: center; font-family: 'Cinzel Decorative'; font-size: 2.5rem;
+            color: var(--gold); margin-bottom: 40px; border-bottom: 1px solid #333; padding-bottom: 20px;
+            text-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
+        }
+        .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 30px; }
+        .feature-card {
+            background: rgba(21, 25, 34, 0.8); border: 1px solid #333; border-radius: 10px;
+            overflow: hidden; transition: 0.4s; position: relative;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5); backdrop-filter: blur(5px);
+        }
+        .feature-card:hover { transform: translateY(-15px) scale(1.02); border-color: var(--gold); box-shadow: 0 0 25px rgba(212, 175, 55, 0.2); }
+        .card-img { height: 200px; width: 100%; object-fit: cover; filter: brightness(0.7) grayscale(30%); transition: 0.5s; }
+        .feature-card:hover .card-img { filter: brightness(1.1) grayscale(0%); }
+        .card-content { padding: 25px; text-align: center; }
+        .card-title { font-family: 'Cinzel Decorative'; color: #fff; font-size: 1.4rem; margin-bottom: 10px; }
+        .card-text { font-size: 0.9rem; color: #aaa; margin-bottom: 20px; }
+        .card-link {
+            display: inline-block; padding: 8px 20px; border: 1px solid #555;
+            color: var(--gold); text-decoration: none; font-size: 0.8rem; text-transform: uppercase;
+            transition: 0.3s;
+        }
+        .feature-card:hover .card-link { background: var(--gold); color: #000; border-color: var(--gold); box-shadow: 0 0 10px var(--gold); }
+
+        /* --- NEWSPAPER --- */
+        .newspaper-section {
+            margin-top: 80px; background-color: var(--paper); color: var(--ink);
+            padding: 50px 20px; text-align: center;
+            border-top: 5px double var(--ink); border-bottom: 5px double var(--ink);
+            background-image: url('https://www.transparenttextures.com/patterns/old-paper.png');
+            position: relative; z-index: 2;
+        }
+        .paper-header { font-family: 'UnifrakturMaguntia', cursive; font-size: clamp(3rem, 6vw, 5rem); line-height: 0.8; margin-bottom: 10px; }
+        .headline-box { margin: 20px auto; max-width: 800px; }
+        .main-headline { font-family: 'Cinzel Decorative'; font-weight: 900; font-size: clamp(1.5rem, 4vw, 3rem); text-transform: uppercase; line-height: 1; margin-bottom: 20px; }
+        .magic-photo-frame {
+            width: 100%; max-width: 500px; height: 250px;
+            margin: 0 auto; border: 2px solid var(--ink); padding: 5px; background: #fff;
+            transform: rotate(-1deg); transition: 0.3s;
+        }
+        .magic-photo-frame:hover { transform: rotate(0deg) scale(1.02); }
+        .magic-photo { width: 100%; height: 100%; object-fit: cover; filter: grayscale(100%) contrast(120%); }
+        .cta-paper-btn {
+            display: inline-block; margin-top: 30px; padding: 10px 30px; border: 2px solid var(--ink);
+            color: var(--ink); font-weight: bold; text-decoration: none;
+            font-family: 'Cinzel Decorative'; text-transform: uppercase; transition: 0.3s;
+        }
+        .cta-paper-btn:hover { background: var(--ink); color: var(--paper); transform: scale(1.1); }
+
+        /* --- FOOTER & SECRETO --- */
+        footer { 
+            text-align: center; padding: 40px; color: #333; font-size: 0.8rem; margin-top: auto; 
+            background: #050505; position: relative; z-index: 2; border-top: 1px solid #111;
+        }
+        
+        .secret-access {
+            color: #0b0b0b; /* Casi invisible */
+            text-decoration: none; cursor: default; transition: 0.5s;
+            font-size: 0.8rem; margin-left: 10px;
+        }
+        .secret-access:hover {
+            color: #2ecc71; text-shadow: 0 0 5px #2ecc71; cursor: help;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div id="magic-canvas"></div>
+
+    <nav>
+        <button class="menu-toggle" onclick="toggleMenu()"><i class="fas fa-bars"></i></button>
+        <a href="index.html"><img src="WIZARDINGLOGO.PNG" class="nav-logo"></a>
+    </nav>
+
+    <div class="overlay" id="overlay" onclick="toggleMenu()"></div>
+    <div class="sidebar" id="sidebar">
+        <button class="close-btn" onclick="toggleMenu()">&times;</button>
+        <div style="text-align: center; margin-bottom: 20px;"><img src="WIZARDINGLOGO.PNG" width="80"></div>
+        <ul class="sidebar-links">
+            <li><a href="index.html" style="color: var(--gold);">Inicio</a></li>
+            <li><a href="peliculas.html">Películas</a></li> <li><a href="noticias.html">El Profeta</a></li>
+            <li><a href="quiz.html">T.I.M.O. Quiz</a></li>
+            <li><a href="staff.html">Staff</a></li>
+            <li><a href="mapa.html">Mapa</a></li>
+            <li><a href="diagon.html">Callejón Diagon</a></li>
+            <li><a href="hechizos.html">Hechizos</a></li>
+            <li><a href="reglamento.html">Decretos</a></li>
+        </ul>
+    </div>
+
+    <header class="hero-section">
+        <div class="hero-bg"></div>
+        <div class="hero-content">
+            <div class="ww-logo">The Wizarding World of Harry Potter</div>
+            <h1 class="main-title">Fakeland Project</h1>
+            <p class="subtitle">Bienvenido al andén 9 ¾. Tu viaje al mundo de la magia comienza aquí. Prepara tu varita y sube a bordo.</p>
+            <a href="peliculas.html" class="hero-btn">Iniciar Aventura</a>
+        </div>
+    </header>
+
+    <div class="container">
+        <h2 class="section-title reveal">Directorios del Mundo Mágico</h2>
+
+        <div class="features-grid">
+            
+            <div class="feature-card reveal">
+                <img src="card_movies.jpg" class="card-img" onerror="this.src='https://images.unsplash.com/photo-1547756536-cde3673fa2e5?auto=format&fit=crop&w=600&q=80'">
+                <div class="card-content">
+                    <h3 class="card-title">Películas</h3>
+                    <p class="card-text">Revive la historia completa.</p>
+                    <a href="peliculas.html" class="card-link">Maratón</a>
+                </div>
+            </div>
+
+            <div class="feature-card reveal">
+                <img src="card_quiz.jpg" class="card-img" onerror="this.src='https://images.unsplash.com/photo-1516979187457-637abb4f9353?auto=format&fit=crop&w=600&q=80'">
+                <div class="card-content"><h3 class="card-title">T.I.M.O. Quiz</h3><p class="card-text">Pon a prueba tu conocimiento.</p><a href="quiz.html" class="card-link">Hacer Examen</a></div>
+            </div>
+            <div class="feature-card reveal">
+                <img src="card_mapa.jpg" class="card-img" onerror="this.src='mapa.jpg'">
+                <div class="card-content"><h3 class="card-title">Mapa del Merodeador</h3><p class="card-text">Descubre los secretos.</p><a href="mapa.html" class="card-link">Jurar Solemnemente</a></div>
+            </div>
+            <div class="feature-card reveal">
+                <img src="card_diagon.jpg" class="card-img" onerror="this.src='shop_gringotts.jpg'">
+                <div class="card-content"><h3 class="card-title">Callejón Diagon</h3><p class="card-text">Equipamiento escolar.</p><a href="diagon.html" class="card-link">Ir de Compras</a></div>
+            </div>
+            <div class="feature-card reveal">
+                <img src="card_staff.jpg" class="card-img" onerror="this.src='https://images.unsplash.com/photo-1453906971074-ce568cccbc63?auto=format&fit=crop&w=600&q=80'">
+                <div class="card-content"><h3 class="card-title">Staff</h3><p class="card-text">Únete al Ministerio.</p><a href="staff.html" class="card-link">Postular</a></div>
+            </div>
+            <div class="feature-card reveal">
+                <img src="card_hechizos.jpg" class="card-img" onerror="this.src='https://images.unsplash.com/photo-1515229330267-33a37b38c292?auto=format&fit=crop&w=600&q=80'">
+                <div class="card-content"><h3 class="card-title">Grimorio</h3><p class="card-text">Encantamientos esenciales.</p><a href="hechizos.html" class="card-link">Leer Libro</a></div>
+            </div>
+             <div class="feature-card reveal">
+                <img src="card_reglas.jpg" class="card-img" onerror="this.src='https://images.unsplash.com/photo-1594322436404-5a0526db4d13?auto=format&fit=crop&w=600&q=80'">
+                <div class="card-content"><h3 class="card-title">Decretos</h3><p class="card-text">Normas de convivencia.</p><a href="reglamento.html" class="card-link">Leer Normas</a></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="newspaper-section reveal">
+        <div class="paper-header">EL PROFETA</div>
+        <p style="font-family: 'Cinzel Decorative'; letter-spacing: 2px;">ÚLTIMAS NOTICIAS DEL MUNDO MÁGICO</p>
+        <div class="headline-box">
+            <h1 class="main-headline" id="randomHeadline">CARGANDO...</h1>
+            <div class="magic-photo-frame"><img src="" class="magic-photo" id="randomImage"></div>
+            <a href="noticias.html" class="cta-paper-btn">Leer Edición Completa</a>
+        </div>
+    </div>
+
+    <footer>
+        <p>
+            &copy; 2026 Fakeland Project. Roleplay Experience.
+            <a href="prohibida.html" class="secret-access"><i class="fas fa-key"></i></a>
+        </p>
+    </footer>
+
+    <script>
+        function toggleMenu() {
+            document.getElementById('sidebar').classList.toggle('active');
+            document.getElementById('overlay').classList.toggle('active');
+        }
+
+        // RASTRO MOUSE
+        document.addEventListener('mousemove', function(e) {
+            const particle = document.createElement('div');
+            particle.className = 'cursor-trail';
+            document.body.appendChild(particle);
+            particle.style.left = e.pageX + 'px';
+            particle.style.top = e.pageY + 'px';
+            setTimeout(() => particle.remove(), 1000);
+        });
+
+        // LUCIÉRNAGAS
+        function createFirefly() {
+            const firefly = document.createElement('div');
+            firefly.className = 'firefly';
+            firefly.style.left = Math.random() * window.innerWidth + 'px';
+            firefly.style.top = Math.random() * window.innerHeight + 'px';
+            firefly.style.setProperty('--moveX', (Math.random() * 200 - 100) + 'px');
+            firefly.style.setProperty('--moveY', (Math.random() * 200 - 100) + 'px');
+            firefly.style.animationDuration = (Math.random() * 10 + 5) + 's';
+            document.body.appendChild(firefly);
+            setTimeout(() => firefly.remove(), 15000);
+        }
+        setInterval(createFirefly, 300);
+
+        // SCROLL REVEAL
+        const revealElements = document.querySelectorAll('.reveal');
+        function revealOnScroll() {
+            const windowHeight = window.innerHeight;
+            const elementVisible = 150;
+            revealElements.forEach((reveal) => {
+                if (reveal.getBoundingClientRect().top < windowHeight - elementVisible) {
+                    reveal.classList.add('active');
+                }
+            });
+        }
+        window.addEventListener('scroll', revealOnScroll);
+        revealOnScroll();
+
+        // NOTICIAS RANDOM
+        const news = [
+            { title: "¡FUGA MASIVA EN AZKABAN!", img: "noticia1.jpg" },
+            { title: "HARRY POTTER: ¿EL ELEGIDO?", img: "noticia2.jpg" },
+            { title: "DUMBLEDORE NOMBRA PROFESOR", img: "noticia3.jpg" },
+            { title: "¡AVISTADO AUTO VOLADOR!", img: "noticia4.jpg" },
+            { title: "MINISTERIO NIEGA RETORNO", img: "noticia5.jpg" },
+            { title: "NUEVAS REGLAS EN GRINGOTTS", img: "noticia6.jpg" },
+            { title: "¡MUNDIAL DE QUIDDITCH!", img: "noticia7.jpg" },
+            { title: "DRAGÓN SOBRE LONDRES", img: "noticia8.jpg" },
+            { title: "ESCÁNDALO DE POCIONES", img: "noticia9.jpg" },
+            { title: "REDADA EN MANSIÓN MALFOY", img: "noticia10.jpg" },
+            { title: "ACCIDENTE EN POCIONES", img: "noticia11.jpg" },
+            { title: "GILDEROY LOCKHART FIRMA", img: "noticia12.jpg" },
+            { title: "¿SIRIUS BLACK EN HOGSMEADE?", img: "noticia13.jpg" },
+            { title: "FIESTA DE FANTASMAS", img: "noticia14.jpg" },
+            { title: "LLUVIA DE RANAS", img: "noticia15.jpg" },
+            { title: "RETRASOS EN EL EXPRESO", img: "noticia16.jpg" },
+            { title: "DEMENTORES EN HUELGA", img: "noticia17.jpg" },
+            { title: "NUEVAS BROMAS EN ZONKO", img: "noticia18.jpg" },
+            { title: "GRITOS DE MANDRÁGORAS", img: "noticia19.jpg" },
+            { title: "ROBO EN DEP. DE MISTERIOS", img: "noticia20.jpg" }
+        ];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const randomIndex = Math.floor(Math.random() * news.length);
+            const randomNews = news[randomIndex];
+            document.getElementById('randomHeadline').innerText = randomNews.title;
+            const imgEl = document.getElementById('randomImage');
+            imgEl.src = randomNews.img;
+            imgEl.onerror = function() {
+                this.src = 'https://images.unsplash.com/photo-1547756536-cde3673fa2e5?auto=format&fit=crop&w=1000&q=80';
+            };
+        });
+    </script>
+</body>
+</html>
